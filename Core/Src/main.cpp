@@ -92,12 +92,12 @@ int main()
     {
         if (total_msec - last_msec >= 5000)
         {
+            last_msec = total_msec;
             switch_led();
             for (int i = 0; i < 256; ++i)
             {
                 while (!(USART1->SR & USART_SR_TXE))
                 {}
-                last_msec = total_msec;
                 USART1->DR = i;
             }
         }
