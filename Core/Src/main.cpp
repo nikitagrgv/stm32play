@@ -62,6 +62,17 @@ void setPinMode(GPIO_TypeDef *port, int pin, GPIOMode mode)
     reg = (reg & clear_mask) | mask;
 }
 
+void printSync(const char *message)
+{
+    const char *p = message;
+    while (*p)
+    {
+        while (!(USART1->SR & USART_SR_TXE))
+        {}
+        USART1->DR = *p++;
+    }
+}
+
 int main()
 {
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN
@@ -82,7 +93,7 @@ int main()
     // USART1 - for Modbus. 9600 baudrate
     // -------------------------------------------------------------------------
     USART1->BRR = 833; // USARTDIV = 8e6 / 9600 = 833
-    USART1->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE | USART_CR1_TCIE;
+    USART1->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
 
     NVIC_EnableIRQ(USART1_IRQn);
     __enable_irq(); // enable interrupts
@@ -90,16 +101,11 @@ int main()
     last_msec = total_msec;
     while (true)
     {
-        if (total_msec - last_msec >= 5000)
+        if (total_msec - last_msec >= 1000)
         {
             last_msec = total_msec;
             switch_led();
-            for (int i = 0; i < 256; ++i)
-            {
-                while (!(USART1->SR & USART_SR_TXE))
-                {}
-                USART1->DR = i;
-            }
+            printSync("hello wornl\n");
         }
     }
 }
