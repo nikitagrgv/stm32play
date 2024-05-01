@@ -21,13 +21,7 @@ extern "C"
 
     void USART1_IRQHandler(void)
     {
-        if (USART1->SR & USART_SR_TC)
-        {
-            volatile uint32_t a = total_msec - last_msec;
-            volatile uint32_t b = a + 1;
-            USART1->SR &= ~USART_SR_TC;
-        }
-        else if (USART1->SR & USART_SR_RXNE)
+        if (USART1->SR & USART_SR_RXNE)
         {
             switch_led();
             volatile uint8_t data = USART1->DR;
@@ -65,7 +59,7 @@ void setPinMode(GPIO_TypeDef *port, int pin, GPIOMode mode)
     auto &reg = is_high ? port->CRH : port->CRL;
     const uint32_t clear_mask = getGPIOClearMask(pos);
     const uint32_t mask = getGPIOMask(mode, pos);
-    reg = (reg & ~clear_mask) | mask;
+    reg = (reg & clear_mask) | mask;
 }
 
 int main()
@@ -76,7 +70,7 @@ int main()
     // C13 open drain
     setPinMode(GPIOC, 13, GPIOMode::GeneralOpenDrain50MHz);
 
-    setPinMode(GPIOA, 9, GPIOMode::AlternateOpenDrain50MHz); // USART1 TX
+    setPinMode(GPIOA, 9, GPIOMode::AlternatePushPull50MHz); // USART1 TX
     setPinMode(GPIOA, 10, GPIOMode::FloatingInput);         // USART1 RX
 
     // SysTick
@@ -96,10 +90,10 @@ int main()
     last_msec = total_msec;
     while (true)
     {
-        if (total_msec - last_msec >= 500)
+        if (total_msec - last_msec >= 5000)
         {
             switch_led();
-            for (int i =0; i < 256; ++i)
+            for (int i = 0; i < 256; ++i)
             {
                 while (!(USART1->SR & USART_SR_TXE))
                 {}
