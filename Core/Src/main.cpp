@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <stm32f103xb.h>
 
-bool led_state = false;
+volatile bool led_state = false;
 void switch_led()
 {
     const uint32_t val = led_state ? GPIO_BSRR_BR13 : GPIO_BSRR_BS13;
@@ -14,8 +14,8 @@ void switch_led()
 
 extern "C"
 {
-    uint32_t total_msec = 0;
-    size_t last_msec = 0;
+    volatile uint32_t total_msec = 0;
+    volatile size_t last_msec = 0;
     void SysTick_Handler()
     {
         ++total_msec;
