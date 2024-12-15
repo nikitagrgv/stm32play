@@ -1,5 +1,7 @@
 #include <cassert>
 #include <cmath>
+#include <cstdarg>
+#include <cstdio>
 #include <stm32f103xb.h>
 
 bool led_state = false;
@@ -62,15 +64,25 @@ void setPinMode(GPIO_TypeDef *port, int pin, GPIOMode mode)
     reg = (reg & clear_mask) | mask;
 }
 
-void printSync(const char *message)
+void printSync(const char *fmt, ...)
 {
-    const char *p = message;
+    va_list va;
+    va_start(va, fmt);
+
+    constexpr int BUFFER_SIZE = 100;
+    char buffer[BUFFER_SIZE];
+
+    vsnprintf(buffer, BUFFER_SIZE, fmt, va);
+
+    const char *p = buffer;
     while (*p)
     {
         while (!(USART1->SR & USART_SR_TXE))
         {}
         USART1->DR = *p++;
     }
+
+    va_end(va);
 }
 
 int main()
@@ -105,7 +117,7 @@ int main()
         {
             last_msec = total_msec;
             switch_led();
-            printSync("hello wornl\n");
+            printSync("Total msec = %d\n", total_msec);
         }
     }
 }
