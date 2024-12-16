@@ -161,7 +161,7 @@ void printSyncFmt(const char *fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-    constexpr int BUFFER_SIZE = 100;
+    constexpr int BUFFER_SIZE = 1024;
     char buffer[BUFFER_SIZE];
 
     vsnprintf(buffer, BUFFER_SIZE, fmt, va);
@@ -198,16 +198,34 @@ int main()
 
     constexpr int BUFFER_SIZE = 256;
     uint8_t buffer[BUFFER_SIZE + 1];
+    uint8_t *buffer_end = buffer + BUFFER_SIZE;
+    constexpr int WAIT_TIME = 100;
     while (true)
     {
-        const int num_read = usart1_stream.readData(buffer, BUFFER_SIZE);
+        int total_num_read = 0;
+        uint8_t *cur_buff_pos = buffer;
+        while (buffer_end - cur_buff_pos > 0)
+        {
+            int num_read = usart1_stream.readData(cur_buff_pos, buffer_end - cur_buff_pos);
+            if (num_read == 0)
+            {
+                sleepMsec(WAIT_TIME);
+                num_read = usart1_stream.readData(cur_buff_pos, buffer_end - cur_buff_pos);
+                if (num_read == 0)
+                {
+                    break;
+                }
+            }
+            total_num_read += num_read;
+            cur_buff_pos = buffer + total_num_read;
+        }
 
-        if (num_read == 0)
+        if (total_num_read == 0)
         {
             continue;
         }
 
-        buffer[num_read] = 0;
+        buffer[total_num_read] = 0;
 
         printSyncFmt((char *)buffer);
         printSync("\n");
