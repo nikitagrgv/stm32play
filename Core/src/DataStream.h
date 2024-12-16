@@ -25,3 +25,10 @@ private:
     volatile uint8_t *cur_{};
     volatile uint8_t *begin_{};
 };
+
+template <int BUF_SIZE>
+class FixedDataStream: public DataStream
+{
+public:
+todo
+};
