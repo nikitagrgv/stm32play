@@ -4,7 +4,7 @@
 
 class DataStream
 {
-    static constexpr int SIZE = 128;
+    static constexpr int SIZE = 1024;
 
 public:
     DataStream();

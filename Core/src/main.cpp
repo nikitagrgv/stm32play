@@ -116,11 +116,11 @@ int main()
     NVIC_EnableIRQ(USART1_IRQn);
     __enable_irq(); // enable interrupts
 
-    constexpr int BUFFER_SIZE = 256;
+    constexpr int BUFFER_SIZE = 1024;
     uint8_t buffer[BUFFER_SIZE + 1];
     while (true)
     {
-        constexpr int THROTTLING_MSEC = 500;
+        constexpr int THROTTLING_MSEC = 1000;
         const int num_read = usart1_stream.readDataThrottling(buffer, BUFFER_SIZE, THROTTLING_MSEC);
 
         if (num_read == 0)
