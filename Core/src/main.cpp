@@ -1,3 +1,7 @@
+#include "DataStream.h"
+#include "Globals.h"
+#include "Utils.h"
+
 #include <cassert>
 #include <cmath>
 #include <cstdarg>
@@ -12,88 +16,11 @@ void switch_led()
     GPIOC->BSRR = val;
 }
 
-class DataStream
-{
-    static constexpr int SIZE = 128;
-
-public:
-    DataStream()
-    {
-        buffer_begin_ = buffer_;
-        buffer_end_ = buffer_begin_ + SIZE;
-        begin_ = buffer_begin_;
-        cur_ = buffer_begin_;
-    }
-
-    void writeByte(uint8_t byte)
-    {
-        volatile uint8_t *next_cur = cur_ + 1;
-        if (next_cur == buffer_end_)
-        {
-            next_cur = buffer_begin_;
-        }
-
-        if (next_cur == begin_)
-        {
-            // overflow
-            return;
-        }
-
-        *cur_ = byte;
-        cur_ = next_cur;
-    }
-
-    bool readByte(uint8_t &byte)
-    {
-        if (begin_ == cur_)
-        {
-            // Nothing to read
-            return false;
-        }
-
-        volatile uint8_t *next_begin = begin_ + 1;
-        if (next_begin == buffer_end_)
-        {
-            next_begin = buffer_begin_;
-        }
-
-        byte = *begin_;
-        begin_ = next_begin;
-        return true;
-    }
-
-    int readData(uint8_t *data, int max_len)
-    {
-        int num_read = 0;
-        bool read = true;
-        while (read && num_read < max_len)
-        {
-            read = readByte(data[num_read]);
-            num_read += read;
-        }
-        return num_read;
-    }
-
-private:
-    volatile uint8_t buffer_[SIZE]{}; // TODO: must be external
-    volatile uint8_t *buffer_begin_{};
-    volatile uint8_t *buffer_end_{};
-
-    volatile uint8_t *cur_{};
-    volatile uint8_t *begin_{};
-};
 
 DataStream usart1_stream;
 
-volatile uint32_t total_msec = 0;
-
 extern "C"
 {
-    void SysTick_Handler()
-    {
-        ++total_msec;
-    }
-
     void USART1_IRQHandler(void)
     {
         if (USART1->SR & USART_SR_RXNE)
@@ -103,13 +30,6 @@ extern "C"
             usart1_stream.writeByte(data);
         }
     }
-}
-
-void sleepMsec(uint32_t msec)
-{
-    const uint32_t end_msec = total_msec + msec;
-    while (total_msec < end_msec)
-    {}
 }
 
 enum class GPIOMode
@@ -198,34 +118,17 @@ int main()
 
     constexpr int BUFFER_SIZE = 256;
     uint8_t buffer[BUFFER_SIZE + 1];
-    uint8_t *buffer_end = buffer + BUFFER_SIZE;
-    constexpr int WAIT_TIME = 100;
     while (true)
     {
-        int total_num_read = 0;
-        uint8_t *cur_buff_pos = buffer;
-        while (buffer_end - cur_buff_pos > 0)
-        {
-            int num_read = usart1_stream.readData(cur_buff_pos, buffer_end - cur_buff_pos);
-            if (num_read == 0)
-            {
-                sleepMsec(WAIT_TIME);
-                num_read = usart1_stream.readData(cur_buff_pos, buffer_end - cur_buff_pos);
-                if (num_read == 0)
-                {
-                    break;
-                }
-            }
-            total_num_read += num_read;
-            cur_buff_pos = buffer + total_num_read;
-        }
+        constexpr int THROTTLING_MSEC = 500;
+        const int num_read = usart1_stream.readDataThrottling(buffer, BUFFER_SIZE, THROTTLING_MSEC);
 
-        if (total_num_read == 0)
+        if (num_read == 0)
         {
             continue;
         }
 
-        buffer[total_num_read] = 0;
+        buffer[num_read] = 0;
 
         printSyncFmt((char *)buffer);
         printSync("\n");
