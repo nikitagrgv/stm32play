@@ -12,16 +12,66 @@ void switch_led()
     GPIOC->BSRR = val;
 }
 
-class Stream
+class DataStream
 {
-    static constexpr int SIZE = 128;
+    static constexpr int SIZE = 16;
 
 public:
+    DataStream()
+    {
+        buffer_begin_ = buffer_;
+        buffer_end_ = buffer_begin_ + SIZE;
+        begin_ = buffer_begin_;
+        cur_ = buffer_begin_;
+    }
 
+    void writeByte(uint8_t byte)
+    {
+        volatile uint8_t *next_cur = cur_ + 1;
+        if (next_cur == buffer_end_)
+        {
+            next_cur = buffer_begin_;
+        }
+
+        if (next_cur == begin_)
+        {
+            // overflow
+            return;
+        }
+
+        *cur_ = byte;
+        cur_ = next_cur;
+    }
+
+    bool readByte(uint8_t &byte)
+    {
+        if (begin_ == cur_)
+        {
+            // Nothing to read
+            return false;
+        }
+
+        volatile uint8_t *next_begin = begin_ + 1;
+        if (next_begin == buffer_end_)
+        {
+            next_begin = buffer_begin_;
+        }
+
+        byte = *begin_;
+        begin_ = next_begin;
+        return true;
+    }
 
 private:
-    char buffer_[SIZE]{};
+    volatile uint8_t buffer_[SIZE]{}; // TODO: must be external
+    volatile uint8_t *buffer_begin_{};
+    volatile uint8_t *buffer_end_{};
+
+    volatile uint8_t *cur_{};
+    volatile uint8_t *begin_{};
 };
+
+DataStream usart1_stream;
 
 volatile uint32_t total_msec = 0;
 
@@ -37,10 +87,17 @@ extern "C"
         if (USART1->SR & USART_SR_RXNE)
         {
             switch_led();
-            volatile uint8_t data = USART1->DR;
-            volatile char c = data;
+            const uint8_t data = USART1->DR;
+            usart1_stream.writeByte(data);
         }
     }
+}
+
+void sleepMsec(uint32_t msec)
+{
+    const uint32_t end_msec = total_msec + msec;
+    while (total_msec < end_msec)
+    {}
 }
 
 enum class GPIOMode
@@ -75,7 +132,19 @@ void setPinMode(GPIO_TypeDef *port, int pin, GPIOMode mode)
     reg = (reg & clear_mask) | mask;
 }
 
-void printSync(const char *fmt, ...)
+void printSync(const char *string)
+{
+    const char *p = string;
+    while (*p)
+    {
+        while (!(USART1->SR & USART_SR_TXE))
+        {}
+        USART1->DR = *p++;
+    }
+}
+
+
+void printSyncFmt(const char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
@@ -85,13 +154,7 @@ void printSync(const char *fmt, ...)
 
     vsnprintf(buffer, BUFFER_SIZE, fmt, va);
 
-    const char *p = buffer;
-    while (*p)
-    {
-        while (!(USART1->SR & USART_SR_TXE))
-        {}
-        USART1->DR = *p++;
-    }
+    printSync(buffer);
 
     va_end(va);
 }
@@ -121,14 +184,37 @@ int main()
     NVIC_EnableIRQ(USART1_IRQn);
     __enable_irq(); // enable interrupts
 
-    size_t last_msec = total_msec;
+    constexpr int BUFFER_SIZE = 256;
+    uint8_t buffer[BUFFER_SIZE];
     while (true)
     {
-        if (total_msec - last_msec >= 1000)
+        sleepMsec(1000);
+        switch_led();
+
+        int num_read = 0;
+        bool read = false;
+        do
         {
-            last_msec = total_msec;
-            switch_led();
-            printSync("Total msec = %d\n", total_msec);
+            read = usart1_stream.readByte(buffer[num_read]);
+            num_read += read;
         }
+        while (read && num_read < BUFFER_SIZE);
+
+        if (num_read == 0)
+        {
+            continue;
+        }
+
+        buffer[num_read] = 0;
+
+        printSyncFmt((char*)buffer);
+        printSync("\n");
+
+        // if (total_msec - last_msec >= 1000)
+        // {
+        //     last_msec = total_msec;
+        //     switch_led();
+        //     printSync("Total msec = %d\n", total_msec);
+        // }
     }
 }
