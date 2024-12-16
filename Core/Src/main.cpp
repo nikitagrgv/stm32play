@@ -101,10 +101,10 @@ int main()
     SysTick->VAL = 0;
     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 
-    // -------------------------------------------------------------------------
-    // USART1 - for Modbus. 9600 baudrate
-    // -------------------------------------------------------------------------
-    USART1->BRR = 833; // USARTDIV = 8e6 / 9600 = 833
+    // USART1
+    constexpr int baudrate = 9600;
+    constexpr int brr_value = 8'000'000 / baudrate; // USARTDIV
+    USART1->BRR = brr_value;
     USART1->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
 
     NVIC_EnableIRQ(USART1_IRQn);
