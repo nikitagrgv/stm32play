@@ -14,7 +14,7 @@ void switch_led()
 
 class DataStream
 {
-    static constexpr int SIZE = 16;
+    static constexpr int SIZE = 128;
 
 public:
     DataStream()
@@ -60,6 +60,18 @@ public:
         byte = *begin_;
         begin_ = next_begin;
         return true;
+    }
+
+    int readData(uint8_t *data, int max_len)
+    {
+        int num_read = 0;
+        bool read = true;
+        while (read && num_read < max_len)
+        {
+            read = readByte(data[num_read]);
+            num_read += read;
+        }
+        return num_read;
     }
 
 private:
@@ -185,20 +197,10 @@ int main()
     __enable_irq(); // enable interrupts
 
     constexpr int BUFFER_SIZE = 256;
-    uint8_t buffer[BUFFER_SIZE];
+    uint8_t buffer[BUFFER_SIZE + 1];
     while (true)
     {
-        sleepMsec(1000);
-        switch_led();
-
-        int num_read = 0;
-        bool read = false;
-        do
-        {
-            read = usart1_stream.readByte(buffer[num_read]);
-            num_read += read;
-        }
-        while (read && num_read < BUFFER_SIZE);
+        const int num_read = usart1_stream.readData(buffer, BUFFER_SIZE);
 
         if (num_read == 0)
         {
@@ -207,14 +209,7 @@ int main()
 
         buffer[num_read] = 0;
 
-        printSyncFmt((char*)buffer);
+        printSyncFmt((char *)buffer);
         printSync("\n");
-
-        // if (total_msec - last_msec >= 1000)
-        // {
-        //     last_msec = total_msec;
-        //     switch_led();
-        //     printSync("Total msec = %d\n", total_msec);
-        // }
     }
 }
