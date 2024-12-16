@@ -12,10 +12,21 @@ void switch_led()
     GPIOC->BSRR = val;
 }
 
+class Stream
+{
+    static constexpr int SIZE = 128;
+
+public:
+
+
+private:
+    char buffer_[SIZE]{};
+};
+
+volatile uint32_t total_msec = 0;
+
 extern "C"
 {
-    volatile uint32_t total_msec = 0;
-    volatile size_t last_msec = 0;
     void SysTick_Handler()
     {
         ++total_msec;
@@ -110,7 +121,7 @@ int main()
     NVIC_EnableIRQ(USART1_IRQn);
     __enable_irq(); // enable interrupts
 
-    last_msec = total_msec;
+    size_t last_msec = total_msec;
     while (true)
     {
         if (total_msec - last_msec >= 1000)
