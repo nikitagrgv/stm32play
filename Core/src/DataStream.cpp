@@ -3,20 +3,20 @@
 #include "Globals.h"
 #include "Utils.h"
 
-DataStream::DataStream()
+DataStream::DataStream(volatile uint8_t *buf_begin, volatile uint8_t *buf_end)
 {
-    buffer_begin_ = buffer_;
-    buffer_end_ = buffer_begin_ + SIZE;
-    begin_ = buffer_begin_;
-    cur_ = buffer_begin_;
+    buf_begin_ = buf_begin;
+    buf_end_ = buf_end;
+    begin_ = buf_begin_;
+    cur_ = buf_begin_;
 }
 
 void DataStream::writeByte(uint8_t byte)
 {
     volatile uint8_t *next_cur = cur_ + 1;
-    if (next_cur == buffer_end_)
+    if (next_cur == buf_end_)
     {
-        next_cur = buffer_begin_;
+        next_cur = buf_begin_;
     }
 
     if (next_cur == begin_)
@@ -38,9 +38,9 @@ bool DataStream::readByte(uint8_t &byte)
     }
 
     volatile uint8_t *next_begin = begin_ + 1;
-    if (next_begin == buffer_end_)
+    if (next_begin == buf_end_)
     {
-        next_begin = buffer_begin_;
+        next_begin = buf_begin_;
     }
 
     byte = *begin_;

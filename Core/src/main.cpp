@@ -17,7 +17,7 @@ void switch_led()
 }
 
 
-DataStream usart1_stream;
+FixedDataStream<1024> usart1_stream;
 
 extern "C"
 {
