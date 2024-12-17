@@ -120,7 +120,7 @@ int main()
     uint8_t buffer[BUFFER_SIZE + 1];
     while (true)
     {
-        constexpr int THROTTLING_MSEC = 1000;
+        constexpr int THROTTLING_MSEC = 100;
         const int num_read = usart1_stream.readDataThrottling(buffer, BUFFER_SIZE, THROTTLING_MSEC);
 
         if (num_read == 0)
