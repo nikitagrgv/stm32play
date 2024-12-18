@@ -53,7 +53,7 @@ enum class PullUpOrDownMode
     Down = 0,
     Up = 1,
 };
-void setPullUpOrDown(GPIO_TypeDef *port, int pin, PullUpOrDownMode mode)
+void setPinPullUpOrDown(GPIO_TypeDef *port, int pin, PullUpOrDownMode mode)
 {
     setPinOutput(port, pin, mode == PullUpOrDownMode::Up);
 }
@@ -118,6 +118,7 @@ int main()
 
     setPinMode(GPIOA, 9, GPIOMode::AlternatePushPull50MHz); // USART1 TX
     setPinMode(GPIOA, 10, GPIOMode::InputPullUpOrDown);     // USART1 RX
+    setPinPullUpOrDown(GPIOA, 10, PullUpOrDownMode::Up);
 
     // SysTick
     SysTick->LOAD = 8'000 - 1;
