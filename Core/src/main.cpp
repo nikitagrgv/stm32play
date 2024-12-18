@@ -9,33 +9,10 @@
 #include <cstdio>
 #include <stm32f103xb.h>
 
-volatile bool led_state = false;
-void switch_led()
-{
-    const uint32_t val = led_state ? GPIO_BSRR_BR13 : GPIO_BSRR_BS13;
-    led_state = !led_state;
-    GPIOC->BSRR = val;
-}
-
-FixedDataStream<1024> usart1_stream;
-
-extern "C"
-{
-    void USART1_IRQHandler(void)
-    {
-        if (USART1->SR & USART_SR_RXNE)
-        {
-            switch_led();
-            const uint8_t data = USART1->DR;
-            usart1_stream.writeByte(data);
-            stat::addReadBytesUsart(1);
-        }
-    }
-}
-
 enum class GPIOMode
 {
-    FloatingInput = 0b0100,
+    InputFloating = 0b0100,
+    InputPullUpOrDown = 0b1000,
     GeneralPushPull50MHz = 0b0011,
     GeneralOpenDrain50MHz = 0b0111,
     AlternatePushPull50MHz = 0b1011,
@@ -63,6 +40,45 @@ void setPinMode(GPIO_TypeDef *port, int pin, GPIOMode mode)
     const uint32_t clear_mask = getGPIOClearMask(pos);
     const uint32_t mask = getGPIOMask(mode, pos);
     reg = (reg & clear_mask) | mask;
+}
+
+void setPinOutput(GPIO_TypeDef *port, int pin, bool value)
+{
+    const uint32_t mask = value ? GPIO_BSRR_BS0 << pin : GPIO_BSRR_BR0 << pin;
+    port->BSRR = mask;
+}
+
+enum class PullUpOrDownMode
+{
+    Down = 0,
+    Up = 1,
+};
+void setPullUpOrDown(GPIO_TypeDef *port, int pin, PullUpOrDownMode mode)
+{
+    setPinOutput(port, pin, mode == PullUpOrDownMode::Up);
+}
+
+volatile bool led_state = false;
+void toggleIndicatorLed()
+{
+    setPinOutput(GPIOC, 13, led_state);
+    led_state = !led_state;
+}
+
+FixedDataStream<1024> usart1_stream;
+
+extern "C"
+{
+    void USART1_IRQHandler(void)
+    {
+        if (USART1->SR & USART_SR_RXNE)
+        {
+            toggleIndicatorLed();
+            const uint8_t data = USART1->DR;
+            usart1_stream.writeByte(data);
+            stat::addReadBytesUsart(1);
+        }
+    }
 }
 
 void printSync(const char *string)
@@ -101,7 +117,7 @@ int main()
     setPinMode(GPIOC, 13, GPIOMode::GeneralOpenDrain50MHz);
 
     setPinMode(GPIOA, 9, GPIOMode::AlternatePushPull50MHz); // USART1 TX
-    setPinMode(GPIOA, 10, GPIOMode::FloatingInput);         // USART1 RX
+    setPinMode(GPIOA, 10, GPIOMode::InputPullUpOrDown);     // USART1 RX
 
     // SysTick
     SysTick->LOAD = 8'000 - 1;
@@ -122,8 +138,9 @@ int main()
     while (true)
     {
         constexpr int THROTTLING_MSEC = 100;
-        // const int num_read = usart1_stream.readData(buffer, BUFFER_SIZE);
-        const int num_read = usart1_stream.readDataThrottling(buffer, BUFFER_SIZE, THROTTLING_MSEC);
+        const int num_read = usart1_stream.readData(buffer, BUFFER_SIZE);
+        // const int num_read = usart1_stream.readDataThrottling(buffer, BUFFER_SIZE,
+        // THROTTLING_MSEC);
 
         if (num_read == 0)
         {
@@ -141,5 +158,7 @@ int main()
         printSyncFmt("num read usart = %d\n", stat::getReadBytesUsart());
         printSyncFmt("num read stream = %d\n", stat::getReadBytesStream());
 #endif
+
+        toggleIndicatorLed();
     }
 }
