@@ -1,12 +1,13 @@
-#THIS FILE IS AUTO GENERATED FROM THE TEMPLATE! DO NOT CHANGE!
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
 cmake_minimum_required(VERSION 3.27)
 
+option(ENABLE_DATA_STATISTIC "Enable Data Statistic" ON)
+
 # specify cross-compilers and tools
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
 set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
-set(CMAKE_ASM_COMPILER  arm-none-eabi-gcc)
+set(CMAKE_ASM_COMPILER arm-none-eabi-gcc)
 set(CMAKE_AR arm-none-eabi-ar)
 set(CMAKE_OBJCOPY arm-none-eabi-objcopy)
 set(CMAKE_OBJDUMP arm-none-eabi-objdump)
@@ -52,6 +53,10 @@ endif ()
 include_directories(Core/Src Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include)
 
 add_definitions(-DDEBUG -DSTM32F103xB)
+
+if (ENABLE_DATA_STATISTIC)
+    add_definitions(-DENABLE_DATA_STATISTIC)
+endif ()
 
 file(GLOB_RECURSE SOURCES "Core/*.*")
 
