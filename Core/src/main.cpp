@@ -1,5 +1,6 @@
 #include "DataStream.h"
 #include "Globals.h"
+#include "Statistic.h"
 #include "Utils.h"
 
 #include <cassert>
@@ -16,12 +17,7 @@ void switch_led()
     GPIOC->BSRR = val;
 }
 
-
 FixedDataStream<1024> usart1_stream;
-
-
-volatile int NUM_READ_USART = 0;
-volatile int NUM_READ_STREAM = 0;
 
 extern "C"
 {
@@ -32,7 +28,7 @@ extern "C"
             switch_led();
             const uint8_t data = USART1->DR;
             usart1_stream.writeByte(data);
-            ++NUM_READ_USART;
+            stat::addReadBytesUsart(1);
         }
     }
 }
@@ -134,14 +130,16 @@ int main()
             continue;
         }
 
-        NUM_READ_STREAM += num_read;
+        stat::addReadBytesStream(num_read);
 
         buffer[num_read] = 0;
 
         printSyncFmt((char *)buffer);
         printSync("\n");
 
-        printSyncFmt("num read usart = %d\n", NUM_READ_USART);
-        printSyncFmt("num read stream = %d\n", NUM_READ_STREAM);
+#ifdef ENABLE_DATA_STATISTIC
+        printSyncFmt("num read usart = %d\n", stat::getReadBytesUsart());
+        printSyncFmt("num read stream = %d\n", stat::getReadBytesStream());
+#endif
     }
 }
