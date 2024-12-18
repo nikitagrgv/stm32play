@@ -1,4 +1,5 @@
 #include "DataStream.h"
+#include "GPIO.h"
 #include "Globals.h"
 #include "Statistic.h"
 #include "Utils.h"
@@ -9,59 +10,10 @@
 #include <cstdio>
 #include <stm32f103xb.h>
 
-enum class GPIOMode
-{
-    InputFloating = 0b0100,
-    InputPullUpOrDown = 0b1000,
-    GeneralPushPull50MHz = 0b0011,
-    GeneralOpenDrain50MHz = 0b0111,
-    AlternatePushPull50MHz = 0b1011,
-    AlternateOpenDrain50MHz = 0b1111,
-};
-
-constexpr uint32_t getGPIOMask(GPIOMode mode, int pos)
-{
-    assert(pos < 8);
-    const int bit_pos = pos * 4;
-    return (uint32_t)mode << bit_pos;
-}
-
-constexpr uint32_t getGPIOClearMask(int pos)
-{
-    assert(pos < 8);
-    return ~(0b1111UL << (pos * 4));
-}
-
-void setPinMode(GPIO_TypeDef *port, int pin, GPIOMode mode)
-{
-    const int is_high = pin >= 8;
-    const int pos = pin % 8;
-    auto &reg = is_high ? port->CRH : port->CRL;
-    const uint32_t clear_mask = getGPIOClearMask(pos);
-    const uint32_t mask = getGPIOMask(mode, pos);
-    reg = (reg & clear_mask) | mask;
-}
-
-void setPinOutput(GPIO_TypeDef *port, int pin, bool value)
-{
-    const uint32_t mask = value ? GPIO_BSRR_BS0 << pin : GPIO_BSRR_BR0 << pin;
-    port->BSRR = mask;
-}
-
-enum class PullUpOrDownMode
-{
-    Down = 0,
-    Up = 1,
-};
-void setPinPullUpOrDown(GPIO_TypeDef *port, int pin, PullUpOrDownMode mode)
-{
-    setPinOutput(port, pin, mode == PullUpOrDownMode::Up);
-}
-
 volatile bool led_state = false;
 void toggleIndicatorLed()
 {
-    setPinOutput(GPIOC, 13, led_state);
+    gpio::setPinOutput(GPIOC, 13, led_state);
     led_state = !led_state;
 }
 
@@ -92,7 +44,6 @@ void printSync(const char *string)
     }
 }
 
-
 void printSyncFmt(const char *fmt, ...)
 {
     va_list va;
@@ -114,11 +65,11 @@ int main()
         | RCC_APB2ENR_AFIOEN | RCC_APB2ENR_USART1EN;
 
     // C13 open drain
-    setPinMode(GPIOC, 13, GPIOMode::GeneralOpenDrain50MHz);
+    gpio::setPinMode(GPIOC, 13, gpio::PinMode::GeneralOpenDrain50MHz);
 
-    setPinMode(GPIOA, 9, GPIOMode::AlternatePushPull50MHz); // USART1 TX
-    setPinMode(GPIOA, 10, GPIOMode::InputPullUpOrDown);     // USART1 RX
-    setPinPullUpOrDown(GPIOA, 10, PullUpOrDownMode::Up);
+    gpio::setPinMode(GPIOA, 9, gpio::PinMode::AlternatePushPull50MHz); // USART1 TX
+    gpio::setPinMode(GPIOA, 10, gpio::PinMode::InputPullUpOrDown);     // USART1 RX
+    gpio::setPinPullUpOrDown(GPIOA, 10, gpio::PullUpOrDownMode::Up);
 
     // SysTick
     SysTick->LOAD = 8'000 - 1;
