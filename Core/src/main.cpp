@@ -19,6 +19,10 @@ void switch_led()
 
 FixedDataStream<1024> usart1_stream;
 
+
+volatile int NUM_READ_USART = 0;
+volatile int NUM_READ_STREAM = 0;
+
 extern "C"
 {
     void USART1_IRQHandler(void)
@@ -28,6 +32,7 @@ extern "C"
             switch_led();
             const uint8_t data = USART1->DR;
             usart1_stream.writeByte(data);
+            ++NUM_READ_USART;
         }
     }
 }
@@ -121,6 +126,7 @@ int main()
     while (true)
     {
         constexpr int THROTTLING_MSEC = 100;
+        // const int num_read = usart1_stream.readData(buffer, BUFFER_SIZE);
         const int num_read = usart1_stream.readDataThrottling(buffer, BUFFER_SIZE, THROTTLING_MSEC);
 
         if (num_read == 0)
@@ -128,9 +134,14 @@ int main()
             continue;
         }
 
+        NUM_READ_STREAM += num_read;
+
         buffer[num_read] = 0;
 
         printSyncFmt((char *)buffer);
         printSync("\n");
+
+        printSyncFmt("num read usart = %d\n", NUM_READ_USART);
+        printSyncFmt("num read stream = %d\n", NUM_READ_STREAM);
     }
 }

@@ -67,12 +67,12 @@ int DataStream::readDataThrottling(uint8_t *data, int max_len, int throttling_ms
     const uint8_t *buffer_end = data + max_len;
 
     {
-        const int num_read = readData(cur_buff_pos, buffer_end - cur_buff_pos);
-        if (num_read == 0)
+        total_num_read = readData(cur_buff_pos, buffer_end - cur_buff_pos);
+        if (total_num_read == 0)
         {
             return 0;
         }
-        cur_buff_pos = data + num_read;
+        cur_buff_pos = data + total_num_read;
     }
 
     while (buffer_end - cur_buff_pos > 0)
