@@ -59,6 +59,59 @@ void printSyncFmt(const char *fmt, ...)
     va_end(va);
 }
 
+// TODO: multiple commands in buffer
+class CommandBuffer
+{
+public:
+    static constexpr int BUFFER_SIZE = 1024;
+
+public:
+    CommandBuffer()
+    {
+        cur_pos_ = buffer_;
+        buf_end_ = cur_pos_ + BUFFER_SIZE;
+    }
+
+    bool writeByte(uint8_t byte)
+    {
+        if (cur_command_start_ != nullptr)
+        {
+            return false;
+        }
+        if (cur_pos_ == buf_end_)
+        {
+            return false;
+        }
+        *cur_pos_ = byte;
+        ++cur_pos_;
+        if (byte == '\n' || byte == '\r')
+        {
+            cur_command_start_ = buffer_;
+            *cur_pos_ = '\0';
+        }
+        return true;
+    }
+
+    [[nodiscard]] const char *getCurrentCommand() const
+    {
+        return reinterpret_cast<const char *>(cur_command_start_);
+    }
+
+    void flushCurrentCommand()
+    {
+        cur_pos_ = buffer_;
+        cur_command_start_ = nullptr;
+    }
+
+private:
+    uint8_t buffer_[BUFFER_SIZE]{};
+    uint8_t *buf_end_{};
+    uint8_t *cur_pos_{};
+    uint8_t *cur_command_start_{};
+};
+
+CommandBuffer command_buffer;
+
 int main()
 {
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN
@@ -89,11 +142,7 @@ int main()
     uint8_t buffer[BUFFER_SIZE + 1];
     while (true)
     {
-        constexpr int THROTTLING_MSEC = 100;
         const int num_read = usart1_stream.readData(buffer, BUFFER_SIZE);
-        // const int num_read = usart1_stream.readDataThrottling(buffer, BUFFER_SIZE,
-        // THROTTLING_MSEC);
-
         if (num_read == 0)
         {
             continue;
@@ -101,10 +150,22 @@ int main()
 
         stat::addReadBytesStream(num_read);
 
-        buffer[num_read] = 0;
+        const uint8_t *end = buffer + num_read;
+        uint8_t *cur = buffer;
+        while (cur != end)
+        {
+            command_buffer.writeByte(*cur);
+            ++cur;
+        }
 
-        printSyncFmt((char *)buffer);
-        printSync("\n");
+        const char *command = command_buffer.getCurrentCommand();
+        if (!command)
+        {
+            continue;
+        }
+
+        printSyncFmt("command: %s\n", command);
+        command_buffer.flushCurrentCommand();
 
 #ifdef ENABLE_DATA_STATISTIC
         printSyncFmt("num read usart = %d\n", stat::getReadBytesUsart());
