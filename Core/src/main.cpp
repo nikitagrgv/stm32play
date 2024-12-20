@@ -1,3 +1,4 @@
+#include "CommandBuffer.h"
 #include "DataStream.h"
 #include "GPIO.h"
 #include "Globals.h"
@@ -31,58 +32,6 @@ extern "C"
         }
     }
 }
-
-
-// TODO: multiple commands in buffer
-class CommandBuffer
-{
-public:
-    static constexpr int BUFFER_SIZE = 1024;
-
-public:
-    CommandBuffer()
-    {
-        cur_pos_ = buffer_;
-        buf_end_ = cur_pos_ + BUFFER_SIZE;
-    }
-
-    bool writeByte(uint8_t byte)
-    {
-        if (cur_command_start_ != nullptr)
-        {
-            return false;
-        }
-        if (cur_pos_ == buf_end_)
-        {
-            return false;
-        }
-        *cur_pos_ = byte;
-        ++cur_pos_;
-        if (byte == '\n' || byte == '\r')
-        {
-            cur_command_start_ = buffer_;
-            *cur_pos_ = '\0';
-        }
-        return true;
-    }
-
-    [[nodiscard]] const char *getCurrentCommand() const
-    {
-        return reinterpret_cast<const char *>(cur_command_start_);
-    }
-
-    void flushCurrentCommand()
-    {
-        cur_pos_ = buffer_;
-        cur_command_start_ = nullptr;
-    }
-
-private:
-    uint8_t buffer_[BUFFER_SIZE]{};
-    uint8_t *buf_end_{};
-    uint8_t *cur_pos_{};
-    uint8_t *cur_command_start_{};
-};
 
 CommandBuffer command_buffer;
 
