@@ -35,6 +35,20 @@ extern "C"
 
 CommandBuffer command_buffer;
 
+
+class CommandExecutor
+{
+public:
+    bool execute(const char *command)
+    {
+        return false;
+    }
+
+private:
+};
+
+CommandExecutor command_executor;
+
 int main()
 {
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN
@@ -89,7 +103,13 @@ int main()
             continue;
         }
 
-        io::printSyncFmt("command: %s\n", command);
+        io::printSyncFmt("executing command: %s\n", command);
+        const bool executed = command_executor.execute(command);
+        if (!executed)
+        {
+            io::printSyncFmt("executing failed\n");
+        }
+
         command_buffer.flushCurrentCommand();
 
 #ifdef ENABLE_DATA_STATISTIC
