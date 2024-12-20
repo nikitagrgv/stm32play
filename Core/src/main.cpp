@@ -1,13 +1,12 @@
 #include "DataStream.h"
 #include "GPIO.h"
 #include "Globals.h"
+#include "Print.h"
 #include "Statistic.h"
 #include "Utils.h"
 
 #include <cassert>
 #include <cmath>
-#include <cstdarg>
-#include <cstdio>
 #include <stm32f103xb.h>
 
 volatile bool led_state = false;
@@ -33,31 +32,6 @@ extern "C"
     }
 }
 
-void printSync(const char *string)
-{
-    const char *p = string;
-    while (*p)
-    {
-        while (!(USART1->SR & USART_SR_TXE))
-        {}
-        USART1->DR = *p++;
-    }
-}
-
-void printSyncFmt(const char *fmt, ...)
-{
-    va_list va;
-    va_start(va, fmt);
-
-    constexpr int BUFFER_SIZE = 1024;
-    char buffer[BUFFER_SIZE];
-
-    vsnprintf(buffer, BUFFER_SIZE, fmt, va);
-
-    printSync(buffer);
-
-    va_end(va);
-}
 
 // TODO: multiple commands in buffer
 class CommandBuffer
@@ -135,6 +109,8 @@ int main()
     USART1->BRR = brr_value;
     USART1->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
 
+    io::setPrintUsart(USART1);
+
     NVIC_EnableIRQ(USART1_IRQn);
     __enable_irq(); // enable interrupts
 
@@ -164,12 +140,12 @@ int main()
             continue;
         }
 
-        printSyncFmt("command: %s\n", command);
+        io::printSyncFmt("command: %s\n", command);
         command_buffer.flushCurrentCommand();
 
 #ifdef ENABLE_DATA_STATISTIC
-        printSyncFmt("num read usart = %d\n", stat::getReadBytesUsart());
-        printSyncFmt("num read stream = %d\n", stat::getReadBytesStream());
+        io::printSyncFmt("num read usart = %d\n", stat::getReadBytesUsart());
+        io::printSyncFmt("num read stream = %d\n", stat::getReadBytesStream());
 #endif
 
         toggleIndicatorLed();
