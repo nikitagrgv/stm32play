@@ -17,12 +17,12 @@ bool CommandBuffer::writeByte(uint8_t byte)
         return false;
     }
     *cur_pos_ = byte;
-    ++cur_pos_;
     if (byte == '\n' || byte == '\r')
     {
         cur_command_start_ = buffer_;
         *cur_pos_ = '\0';
     }
+    ++cur_pos_;
     return true;
 }
 
