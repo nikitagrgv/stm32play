@@ -41,6 +41,9 @@ class CommandExecutor
 public:
     bool execute(const char *command)
     {
+
+
+
         return false;
     }
 
@@ -103,11 +106,10 @@ int main()
             continue;
         }
 
-        io::printSyncFmt("executing command: %s\n", command);
         const bool executed = command_executor.execute(command);
         if (!executed)
         {
-            io::printSyncFmt("executing failed\n");
+            io::printSyncFmt("can't execute: `%s`\n", command);
         }
 
         command_buffer.flushCurrentCommand();
