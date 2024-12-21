@@ -2,10 +2,10 @@
 #include "DataStream.h"
 #include "GPIO.h"
 #include "Globals.h"
+#include "HeapUsage.h"
 #include "Print.h"
 #include "Statistic.h"
 #include "StringUtils.h"
-#include "Utils.h"
 
 #include <stm32f103xb.h>
 
@@ -68,6 +68,14 @@ struct GetCommand
 #elif
             io::printSync("Statistic is disabled\n");
 #endif
+            return true;
+        }
+        if (str_utils::compareTrimmed(args, "heap"))
+        {
+            uint32_t used = 0;
+            uint32_t total = 0;
+            utils::getSbrkUsage(used, total);
+            io::printSyncFmt("sbrk usage = %u/%u\n", used, total);
             return true;
         }
         return false;

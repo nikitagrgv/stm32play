@@ -1,7 +1,7 @@
 #include "DataStream.h"
 
 #include "Globals.h"
-#include "Utils.h"
+#include "Sleep.h"
 
 DataStream::DataStream(volatile uint8_t *buf_begin, volatile uint8_t *buf_end)
 {
@@ -80,7 +80,7 @@ int DataStream::readDataThrottling(uint8_t *data, int max_len, int throttling_ms
         int num_read = readData(cur_buff_pos, buffer_end - cur_buff_pos);
         if (num_read == 0)
         {
-            str_utils::sleepMsec(throttling_msec);
+            utils::sleepMsec(throttling_msec);
             num_read = readData(cur_buff_pos, buffer_end - cur_buff_pos);
             if (num_read == 0)
             {
