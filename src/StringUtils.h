@@ -45,6 +45,7 @@ FORCE_INLINE bool allOf(const char *str, char ch)
         {
             return false;
         }
+        ++str;
     }
     return true;
 }
