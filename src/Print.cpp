@@ -1,7 +1,9 @@
 #include "Print.h"
 
+#include "MicroAssert.h"
+
 #include <cstdarg>
-#include <cstdio>
+#include <printf.h>
 #include <stm32f103xb.h>
 
 namespace
@@ -9,9 +11,16 @@ namespace
 
 USART_TypeDef *PRINT_USART = nullptr;
 
-constexpr int PRINT_BUFFER_SIZE = 1024;
-
 } // namespace
+
+// implement symbol from mpaland/printf library
+void _putchar(char character)
+{
+    MICRO_ASSERT(PRINT_USART);
+    while (!(USART1->SR & USART_SR_TXE))
+    {}
+    USART1->DR = character;
+}
 
 void io::setPrintUsart(USART_TypeDef *usart)
 {
@@ -24,6 +33,7 @@ void io::printCharSync(char ch)
     {
         return;
     }
+
 
     while (!(USART1->SR & USART_SR_TXE))
     {}
@@ -50,18 +60,12 @@ void io::printSyncFmt(const char *fmt, ...)
 {
     if (!PRINT_USART)
     {
-        // TODO: is it same to return here (va_list)?
+        // TODO: is it safe to return here (va_list)?
         return;
     }
 
     va_list va;
     va_start(va, fmt);
-
-    char buffer[PRINT_BUFFER_SIZE];
-
-    vsnprintf(buffer, PRINT_BUFFER_SIZE, fmt, va);
-
-    printSync(buffer);
-
+    vprintf(fmt, va);
     va_end(va);
 }
