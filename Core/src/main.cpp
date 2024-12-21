@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "Print.h"
 #include "Statistic.h"
+#include "StringUtils.h"
 #include "Utils.h"
 
 #include <cassert>
@@ -41,14 +42,11 @@ class CommandExecutor
 public:
     bool execute(const char *command)
     {
-        bool executed = false;
-
-        const auto get_func = [](const char *arg) {
-            io::printSyncFmt("get: %s\n", arg);
+        const auto get_func = [](const char *args) {
+            io::printSyncFmt("get: %s\n", args);
             return true;
         };
-        executed = try_execute(command, "get", get_func);
-        if (executed)
+        if (try_execute(command, "get", get_func))
         {
             return true;
         }
@@ -60,27 +58,18 @@ private:
     template<typename F>
     static bool try_execute(const char *command, const char *cmd_name, F &&func)
     {
-        const char *cur = command;
-        const char *cur_cmd_name = cmd_name;
-        while (*cur_cmd_name != 0)
-        {
-            if (*cur == 0)
-            {
-                return false;
-            }
-            if (*cur != *cur_cmd_name)
-            {
-                return false;
-            }
-            ++cur;
-            ++cur_cmd_name;
-        }
-        if (*cur != ' ')
+        command = str_utils::skipStartSpaces(command);
+        const char *args = str_utils::skipStart(command, cmd_name);
+        if (!args)
         {
             return false;
         }
-        ++cur;
-        return func(cur);
+        if (*args != ' ')
+        {
+            return false;
+        }
+        ++args;
+        return func(args);
     }
 };
 

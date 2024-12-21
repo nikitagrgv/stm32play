@@ -80,7 +80,7 @@ int DataStream::readDataThrottling(uint8_t *data, int max_len, int throttling_ms
         int num_read = readData(cur_buff_pos, buffer_end - cur_buff_pos);
         if (num_read == 0)
         {
-            utils::sleepMsec(throttling_msec);
+            str_utils::sleepMsec(throttling_msec);
             num_read = readData(cur_buff_pos, buffer_end - cur_buff_pos);
             if (num_read == 0)
             {
