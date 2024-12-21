@@ -1,6 +1,7 @@
 #pragma once
 
-#include <cassert>
+#include "MicroAssert.h"
+
 #include <stm32f103xb.h>
 
 namespace gpio
@@ -18,14 +19,14 @@ enum class PinMode
 
 constexpr uint32_t getGPIOMask(PinMode mode, int pos)
 {
-    assert(pos < 8);
+    MICRO_ASSERT(pos < 8);
     const int bit_pos = pos * 4;
     return (uint32_t)mode << bit_pos;
 }
 
 constexpr uint32_t getGPIOClearMask(int pos)
 {
-    assert(pos < 8);
+    MICRO_ASSERT(pos < 8);
     return ~(0b1111UL << (pos * 4));
 }
 

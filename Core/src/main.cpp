@@ -7,8 +7,6 @@
 #include "StringUtils.h"
 #include "Utils.h"
 
-#include <cassert>
-#include <cmath>
 #include <stm32f103xb.h>
 
 volatile bool led_state = false;
@@ -99,7 +97,7 @@ private:
     template<typename F>
     static bool try_execute(const char *command, const char *cmd_name, F &&func)
     {
-        assert(*command != ' '); // spaces must be already skipped
+        MICRO_ASSERT(*command != ' '); // spaces must be already skipped
         const char *name_end = str_utils::skipStart(command, cmd_name);
         if (!name_end)
         {
