@@ -36,6 +36,9 @@ add_compile_options(-fno-exceptions)
 # uncomment to mitigate c++17 absolute addresses warnings
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --specs=nano.specs")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --specs=nano.specs")
+
 # Enable assembler files preprocessing
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
@@ -61,13 +64,13 @@ endif ()
 
 add_definitions(-DSTM32F103xB)
 
-include_directories(src extern Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include)
+include_directories(src Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include)
 
 if (ENABLE_DATA_STATISTIC)
     add_definitions(-DENABLE_DATA_STATISTIC)
 endif ()
 
-file(GLOB_RECURSE SOURCES "src/*.*" "extern/*.*")
+file(GLOB_RECURSE SOURCES "src/*.*")
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F103C8TX_FLASH.ld)
 

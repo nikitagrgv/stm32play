@@ -3,7 +3,7 @@
 #include "MicroAssert.h"
 
 #include <cstdarg>
-#include <printf.h>
+#include <cstdio>
 #include <stm32f103xb.h>
 
 namespace
@@ -13,13 +13,18 @@ USART_TypeDef *PRINT_USART = nullptr;
 
 } // namespace
 
-// implement symbol from mpaland/printf library
-void _putchar(char character)
+extern "C"
 {
-    MICRO_ASSERT(PRINT_USART);
-    while (!(USART1->SR & USART_SR_TXE))
-    {}
-    USART1->DR = character;
+    // implement symbol from syscall.c
+    // TODO: implement __io_getchar too
+    int __io_putchar(int ch)
+    {
+        MICRO_ASSERT(PRINT_USART);
+        while (!(USART1->SR & USART_SR_TXE))
+        {}
+        USART1->DR = ch;
+        return ch;
+    }
 }
 
 void io::setPrintUsart(USART_TypeDef *usart)
