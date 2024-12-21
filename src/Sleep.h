@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace str_utils
+namespace utils
 {
 
 void sleepMsec(uint32_t msec);
