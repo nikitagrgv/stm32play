@@ -65,29 +65,3 @@ void io::printSyncFmt(const char *fmt, ...)
 
     va_end(va);
 }
-
-void io::printLineSync(const char *string)
-{
-    printSync(string);
-    printCharSync('\n');
-}
-
-void io::printLineSyncFmt(const char *fmt, ...)
-{
-    if (!PRINT_USART)
-    {
-        // TODO: is it same to return here (va_list)?
-        return;
-    }
-
-    va_list va;
-    va_start(va, fmt);
-
-    char buffer[PRINT_BUFFER_SIZE];
-
-    vsnprintf(buffer, PRINT_BUFFER_SIZE, fmt, va);
-
-    printLineSync(buffer);
-
-    va_end(va);
-}
