@@ -7,7 +7,9 @@
 #include "Statistic.h"
 #include "StringUtils.h"
 
+#include <memory>
 #include <stm32f103xb.h>
+#include <vector>
 
 volatile bool led_state = false;
 void toggleIndicatorLed()
@@ -34,33 +36,28 @@ extern "C"
 
 CommandBuffer command_buffer;
 
-struct HelpCommand
+class ICommand
 {
-    static constexpr const char *name = "help";
-    static bool execute(const char *args)
-    {
-        if (!str_utils::isEmpty(args))
-        {
-            return false;
-        }
-        io::printSync("-- help --\n");
-        io::printSync("get:\n");
-        io::printSync("  stat\n");
-        io::printSync("----------\n");
-        return true;
-    }
+public:
+    virtual ~ICommand() = default;
+
+    virtual const char *name() = 0;
+    virtual bool execute(const char *args) = 0;
+    virtual bool help() { return false; }
 };
 
-struct GetCommand
+class PrintCommand final : public ICommand
 {
-    static constexpr const char *name = "get";
-    static bool execute(const char *args)
+public:
+    const char *name() override { return "print"; }
+
+    bool execute(const char *args) override
     {
         if (str_utils::isEmpty(args))
         {
             return false;
         }
-        if (str_utils::compareTrimmed(args, "stat"))
+        if (str_utils::compareTrimmed(args, "datastat"))
         {
 #ifdef ENABLE_DATA_STATISTIC
             io::printSyncFmt("num read usart = %d\n", stat::getReadBytesUsart());
@@ -70,7 +67,7 @@ struct GetCommand
 #endif
             return true;
         }
-        if (str_utils::compareTrimmed(args, "heap"))
+        if (str_utils::compareTrimmed(args, "heapstat"))
         {
             uint32_t used = 0;
             uint32_t total = 0;
@@ -80,55 +77,102 @@ struct GetCommand
         }
         return false;
     }
+
+    bool help() override
+    {
+        io::printSync("print entries:\n");
+        io::printSync("  datastat\n");
+        io::printSync("  heapstat\n");
+        return true;
+    }
 };
 
 class CommandExecutor
 {
 public:
+    void addCommand(std::unique_ptr<ICommand> command)
+    {
+        commands_.push_back(std::move(command));
+        commands_.shrink_to_fit();
+    }
+
     bool execute(const char *command)
     {
         command = str_utils::skipStartSpaces(command);
 
-        if (try_execute<HelpCommand>(command))
+        if (try_execute_help_command(command))
         {
             return true;
         }
-        if (try_execute<GetCommand>(command))
+
+        for (const std::unique_ptr<ICommand> &cmd : commands_)
         {
-            return true;
+            const char *cmd_name = cmd->name();
+            const char *name_end = str_utils::skipStart(command, cmd_name);
+            if (!name_end)
+            {
+                // Name doesn't match
+                continue;
+            }
+
+            const char *args = str_utils::skipStartSpaces(name_end);
+            if (*args != 0 && args == name_end)
+            {
+                // Name doesn't match
+                // Must be at least one space between command name and args
+                continue;
+            }
+
+            return cmd->execute(args);
         }
 
         return false;
     }
 
 private:
-    template<typename F>
-    static bool try_execute(const char *command, const char *cmd_name, F &&func)
+    bool try_execute_help_command(const char *command)
     {
-        MICRO_ASSERT(*command != ' '); // spaces must be already skipped
-        const char *name_end = str_utils::skipStart(command, cmd_name);
+        const char *name_end = str_utils::skipStart(command, "help");
         if (!name_end)
         {
             return false;
         }
 
-        const char *args = str_utils::skipStartSpaces(name_end);
-        if (*args != 0 && args == name_end)
+        const char *arg = str_utils::skipStartSpaces(name_end);
+        if (*arg != 0 && arg == name_end)
         {
-            // must be at least one space between command name and args
             return false;
         }
 
-        return func(args);
+        if (str_utils::allAreSpaces(arg))
+        {
+            io::printSync("commands:\n");
+            for (const std::unique_ptr<ICommand> &cmd : commands_)
+            {
+                io::printSyncFmt("  %s\n", cmd->name());
+            }
+            return true;
+        }
+
+        for (const std::unique_ptr<ICommand> &cmd : commands_)
+        {
+            const char *cmd_name = cmd->name();
+            const char *cmd_name_end = str_utils::skipStart(arg, cmd_name);
+            if (!cmd_name_end)
+            {
+                continue;
+            }
+            if (!str_utils::allAreSpaces(cmd_name_end))
+            {
+                continue;
+            }
+            return cmd->help();
+        }
+        return false;
     }
 
-    template<typename C>
-    static bool try_execute(const char *command)
-    {
-        const char *cmd_name = C::name;
-        auto f = &C::execute;
-        return try_execute(command, cmd_name, f);
-    }
+private:
+    std::vector<std::unique_ptr<ICommand>> commands_;
 };
 
 CommandExecutor command_executor;
@@ -160,6 +204,8 @@ int main()
 
     NVIC_EnableIRQ(USART1_IRQn);
     __enable_irq(); // enable interrupts
+
+    command_executor.addCommand(std::make_unique<PrintCommand>());
 
     while (true)
     {
