@@ -3,6 +3,7 @@ set(CMAKE_SYSTEM_VERSION 1)
 cmake_minimum_required(VERSION 3.27)
 
 option(ENABLE_DATA_STATISTIC "Enable Data Statistic" ON)
+option(DEBUG_OPTIMIZED "Use -Og instead of -O0" OFF)
 
 # specify cross-compilers and tools
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
@@ -47,12 +48,18 @@ elseif ("${CMAKE_BUILD_TYPE}" STREQUAL "MinSizeRel")
     add_compile_options(-Os)
 else ()
     message(STATUS "Minimal optimization, debug info included")
-    add_compile_options(-Og -g)
+    if (DEBUG_OPTIMIZED)
+        add_compile_options(-Og)
+    else ()
+        add_compile_options(-O0)
+    endif ()
+    add_compile_options(-g)
+    add_definitions(-DDEBUG)
 endif ()
 
-include_directories(Core/Src Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include)
+add_definitions(-DSTM32F103xB)
 
-add_definitions(-DDEBUG -DSTM32F103xB)
+include_directories(Core/Src Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include)
 
 if (ENABLE_DATA_STATISTIC)
     add_definitions(-DENABLE_DATA_STATISTIC)

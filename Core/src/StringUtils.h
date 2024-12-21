@@ -4,6 +4,11 @@
 namespace str_utils
 {
 
+FORCE_INLINE bool isEmpty(const char *str)
+{
+    return !str || *str == 0;
+}
+
 FORCE_INLINE const char *skipStart(const char *str, const char *start)
 {
     while (*start)

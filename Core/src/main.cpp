@@ -36,6 +36,33 @@ extern "C"
 
 CommandBuffer command_buffer;
 
+struct HelpCommand
+{
+    static constexpr const char *name = "help";
+    static bool execute(const char *args)
+    {
+        if (!str_utils::isEmpty(args))
+        {
+            return false;
+        }
+        io::printSyncFmt("--- help ---\n");
+        return true;
+    }
+};
+
+struct GetCommand
+{
+    static constexpr const char *name = "get";
+    static bool execute(const char *args)
+    {
+        if (str_utils::isEmpty(args))
+        {
+            return false;
+        }
+        io::printSyncFmt("get: %s\n", args);
+        return true;
+    }
+};
 
 class CommandExecutor
 {
@@ -44,11 +71,11 @@ public:
     {
         command = str_utils::skipStartSpaces(command);
 
-        const auto get_func = [](const char *args) {
-            io::printSyncFmt("get: %s\n", args);
+        if (try_execute<HelpCommand>(command))
+        {
             return true;
-        };
-        if (try_execute(command, "get", get_func))
+        }
+        if (try_execute<GetCommand>(command))
         {
             return true;
         }
@@ -60,17 +87,29 @@ private:
     template<typename F>
     static bool try_execute(const char *command, const char *cmd_name, F &&func)
     {
-        const char *args = str_utils::skipStart(command, cmd_name);
-        if (!args)
+        assert(*command != ' '); // spaces must be already skipped
+        const char *name_end = str_utils::skipStart(command, cmd_name);
+        if (!name_end)
         {
             return false;
         }
-        if (*args != ' ')
+
+        const char *args = str_utils::skipStartSpaces(name_end);
+        if (*args != 0 && args == name_end)
         {
+            // must be at least one space between command name and args
             return false;
         }
-        ++args;
+
         return func(args);
+    }
+
+    template<typename C>
+    static bool try_execute(const char *command)
+    {
+        const char *cmd_name = C::name;
+        auto f = &C::execute;
+        return try_execute(command, cmd_name, f);
     }
 };
 
