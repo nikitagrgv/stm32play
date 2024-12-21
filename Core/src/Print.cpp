@@ -9,7 +9,9 @@ namespace
 
 USART_TypeDef *PRINT_USART = nullptr;
 
-}
+constexpr int PRINT_BUFFER_SIZE = 1024;
+
+} // namespace
 
 void io::setPrintUsart(USART_TypeDef *usart)
 {
@@ -55,10 +57,9 @@ void io::printSyncFmt(const char *fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-    constexpr int BUFFER_SIZE = 1024;
-    char buffer[BUFFER_SIZE];
+    char buffer[PRINT_BUFFER_SIZE];
 
-    vsnprintf(buffer, BUFFER_SIZE, fmt, va);
+    vsnprintf(buffer, PRINT_BUFFER_SIZE, fmt, va);
 
     printSync(buffer);
 
@@ -82,10 +83,9 @@ void io::printLineSyncFmt(const char *fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-    constexpr int BUFFER_SIZE = 1024;
-    char buffer[BUFFER_SIZE];
+    char buffer[PRINT_BUFFER_SIZE];
 
-    vsnprintf(buffer, BUFFER_SIZE, fmt, va);
+    vsnprintf(buffer, PRINT_BUFFER_SIZE, fmt, va);
 
     printLineSync(buffer);
 
