@@ -55,7 +55,7 @@ void io::printSyncFmt(const char *fmt, ...)
     va_list va;
     va_start(va, fmt);
 
-     constexpr int BUFFER_SIZE = 1024;
+    constexpr int BUFFER_SIZE = 1024;
     char buffer[BUFFER_SIZE];
 
     vsnprintf(buffer, BUFFER_SIZE, fmt, va);
