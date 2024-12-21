@@ -42,6 +42,8 @@ class CommandExecutor
 public:
     bool execute(const char *command)
     {
+        command = str_utils::skipStartSpaces(command);
+
         const auto get_func = [](const char *args) {
             io::printSyncFmt("get: %s\n", args);
             return true;
@@ -58,7 +60,6 @@ private:
     template<typename F>
     static bool try_execute(const char *command, const char *cmd_name, F &&func)
     {
-        command = str_utils::skipStartSpaces(command);
         const char *args = str_utils::skipStart(command, cmd_name);
         if (!args)
         {
@@ -103,24 +104,13 @@ int main()
     NVIC_EnableIRQ(USART1_IRQn);
     __enable_irq(); // enable interrupts
 
-    constexpr int BUFFER_SIZE = 1024;
-    static uint8_t buffer[BUFFER_SIZE + 1];
     while (true)
     {
-        const int num_read = usart1_stream.readData(buffer, BUFFER_SIZE);
-        if (num_read == 0)
+        uint8_t byte;
+        while (usart1_stream.readByte(byte))
         {
-            continue;
-        }
-
-        stat::addReadBytesStream(num_read);
-
-        const uint8_t *end = buffer + num_read;
-        uint8_t *cur = buffer;
-        while (cur != end)
-        {
-            command_buffer.writeByte(*cur);
-            ++cur;
+            stat::addReadBytesStream(1);
+            command_buffer.writeByte(byte);
         }
 
         const char *command = command_buffer.getCurrentCommand();
