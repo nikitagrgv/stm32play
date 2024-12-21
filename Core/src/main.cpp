@@ -41,13 +41,47 @@ class CommandExecutor
 public:
     bool execute(const char *command)
     {
+        bool executed = false;
 
-
+        const auto get_func = [](const char *arg) {
+            io::printSyncFmt("get: %s\n", arg);
+            return true;
+        };
+        executed = try_execute(command, "get", get_func);
+        if (executed)
+        {
+            return true;
+        }
 
         return false;
     }
 
 private:
+    template<typename F>
+    static bool try_execute(const char *command, const char *cmd_name, F &&func)
+    {
+        const char *cur = command;
+        const char *cur_cmd_name = cmd_name;
+        while (*cur_cmd_name != 0)
+        {
+            if (*cur == 0)
+            {
+                return false;
+            }
+            if (*cur != *cur_cmd_name)
+            {
+                return false;
+            }
+            ++cur;
+            ++cur_cmd_name;
+        }
+        if (*cur != ' ')
+        {
+            return false;
+        }
+        ++cur;
+        return func(cur);
+    }
 };
 
 CommandExecutor command_executor;
@@ -81,7 +115,7 @@ int main()
     __enable_irq(); // enable interrupts
 
     constexpr int BUFFER_SIZE = 1024;
-    uint8_t buffer[BUFFER_SIZE + 1];
+    static uint8_t buffer[BUFFER_SIZE + 1];
     while (true)
     {
         const int num_read = usart1_stream.readData(buffer, BUFFER_SIZE);
