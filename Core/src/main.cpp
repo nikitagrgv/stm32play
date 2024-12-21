@@ -45,7 +45,10 @@ struct HelpCommand
         {
             return false;
         }
-        io::printSyncFmt("--- help ---\n");
+        io::printSync("-- help --\n");
+        io::printSync("get:\n");
+        io::printSync("  stat\n");
+        io::printSync("----------\n");
         return true;
     }
 };
@@ -59,8 +62,17 @@ struct GetCommand
         {
             return false;
         }
-        io::printSyncFmt("get: %s\n", args);
-        return true;
+        if (str_utils::compareTrimmed(args, "stat"))
+        {
+#ifdef ENABLE_DATA_STATISTIC
+            io::printSyncFmt("num read usart = %d\n", stat::getReadBytesUsart());
+            io::printSyncFmt("num read stream = %d\n", stat::getReadBytesStream());
+#elif
+            io::printSync("Statistic is disabled\n");
+#endif
+            return true;
+        }
+        return false;
     }
 };
 
@@ -133,7 +145,7 @@ int main()
     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 
     // USART1
-    constexpr int baudrate = 9600;
+    constexpr int baudrate = 56'000;
     constexpr int brr_value = 8'000'000 / baudrate; // USARTDIV
     USART1->BRR = brr_value;
     USART1->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
@@ -165,11 +177,6 @@ int main()
         }
 
         command_buffer.flushCurrentCommand();
-
-#ifdef ENABLE_DATA_STATISTIC
-        io::printSyncFmt("num read usart = %d\n", stat::getReadBytesUsart());
-        io::printSyncFmt("num read stream = %d\n", stat::getReadBytesStream());
-#endif
 
         toggleIndicatorLed();
     }
