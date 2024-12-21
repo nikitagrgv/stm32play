@@ -59,13 +59,13 @@ endif ()
 
 add_definitions(-DSTM32F103xB)
 
-include_directories(src Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include)
+include_directories(src extern Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include)
 
 if (ENABLE_DATA_STATISTIC)
     add_definitions(-DENABLE_DATA_STATISTIC)
 endif ()
 
-file(GLOB_RECURSE SOURCES "src/*.*")
+file(GLOB_RECURSE SOURCES "src/*.*" "extern/*.*")
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F103C8TX_FLASH.ld)
 
