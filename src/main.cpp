@@ -38,6 +38,40 @@ CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
+
+namespace tim
+{
+
+enum SetupFlags : uint32_t
+{
+    SINGLE_SHOT = TIM_CR1_OPM,
+};
+
+void setupTimer(TIM_TypeDef *tim, uint32_t prescaler, uint32_t reload_value, uint32_t flags = 0)
+{
+    MICRO_ASSERT(prescaler <= 0xFFFF);
+    MICRO_ASSERT(reload_value <= 0xFFFF);
+
+    const bool single_shot = flags & SINGLE_SHOT;
+
+    tim->PSC = (glob::SYS_FREQUENCY / 1'000'000) - 1;
+    tim->ARR = reload_value - single_shot;
+    tim->CNT = 0;
+    tim->EGR = TIM_EGR_UG; // Flush ARR and PSC!
+
+    const uint32_t cr1 = flags;
+    tim->CR1 = cr1;
+}
+
+void runTimer(TIM_TypeDef *tim)
+{
+    tim->CNT = 0;
+    tim->CR1 |= TIM_CR1_CEN;
+}
+
+} // namespace tim
+
+
 int main()
 {
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN | RCC_APB2ENR_AFIOEN
@@ -107,25 +141,22 @@ int main()
         const char *name() override { return "reset"; }
         bool execute(const char *args) override
         {
-            TIM2->CNT = 0;
-            TIM2->CR1 = TIM_CR1_CEN | TIM_CR1_OPM;
+            tim::runTimer(TIM2);
             return true;
         }
     };
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
 
+    constexpr uint32_t prescaler = (glob::SYS_FREQUENCY / 1'000'000) - 1;
+    constexpr uint32_t reload_value = 0xFFFF - 1;
+    tim::setupTimer(TIM2, prescaler, reload_value, tim::SINGLE_SHOT);
 
-    TIM2->PSC = (glob::SYS_FREQUENCY / 1'000'000) - 1;
-    TIM2->ARR = 0xFFFF - 1;
-    TIM2->CNT = 1;
-    TIM2->EGR = TIM_EGR_UG; // Flush ARR and PSC!
-    TIM2->CR1 = TIM_CR1_CEN | TIM_CR1_OPM;
-
+    tim::runTimer(TIM2);
 
     while (true)
     {
         io::printSyncFmt("time : %lu\n", TIM2->CNT);
-        utils::sleepMsec(1);
+        utils::sleepMsec(50);
 
 
         uint8_t byte;
