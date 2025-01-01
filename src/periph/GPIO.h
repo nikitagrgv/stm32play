@@ -1,8 +1,8 @@
 #pragma once
 
-#include "MicroAssert.h"
+#include "core/MicroAssert.h"
 
-#include <stm32f103xb.h>
+#include <stm32f1xx.h>
 
 namespace gpio
 {

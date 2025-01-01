@@ -1,16 +1,14 @@
 #include "DataStream.h"
-#include "GPIO.h"
-#include "Globals.h"
-#include "HeapUsage.h"
 #include "Print.h"
 #include "Statistic.h"
-#include "StringUtils.h"
 #include "commands/CommandBuffer.h"
 #include "commands/CommandExecutor.h"
 #include "commands/PrintCommand.h"
+#include "periph/GPIO.h"
+#include "periph/USART.h"
 
 #include <memory>
-#include <stm32f103xb.h>
+#include <stm32f1xx.h>
 
 volatile bool led_state = false;
 void toggleIndicatorLed()
@@ -41,8 +39,8 @@ CommandExecutor command_executor;
 
 int main()
 {
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN
-        | RCC_APB2ENR_AFIOEN | RCC_APB2ENR_USART1EN;
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN | RCC_APB2ENR_AFIOEN
+        | RCC_APB2ENR_USART1EN;
 
     // C13 open drain
     gpio::setPinMode(GPIOC, 13, gpio::PinMode::GeneralOpenDrain50MHz);
@@ -58,9 +56,8 @@ int main()
 
     // USART1
     constexpr uint32_t baudrate = 56'000;
-    constexpr uint32_t usart_brr = 8'000'000 / baudrate;
-    USART1->BRR = usart_brr;
-    USART1->CR1 = USART_CR1_UE | USART_CR1_TE | USART_CR1_RE | USART_CR1_RXNEIE;
+    constexpr uint32_t flags = usart::ENABLE_RECEIVE | usart::ENABLE_TRANSMIT | usart::ENABLE_RECEIVE_INTERRUPT;
+    usart::setupUsart(USART1, baudrate, flags);
 
     io::setPrintUsart(USART1);
 

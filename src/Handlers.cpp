@@ -1,6 +1,6 @@
 #include "Handlers.h"
 
-#include "Globals.h"
+#include "core/Globals.h"
 
 extern "C"
 {

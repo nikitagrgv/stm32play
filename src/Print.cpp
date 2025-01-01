@@ -1,10 +1,10 @@
 #include "Print.h"
 
-#include "MicroAssert.h"
+#include "core/MicroAssert.h"
 
 #include <cstdarg>
 #include <cstdio>
-#include <stm32f103xb.h>
+#include <stm32f1xx.h>
 
 namespace
 {
