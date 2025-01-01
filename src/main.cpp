@@ -5,7 +5,7 @@
 #include "commands/PrintCommand.h"
 #include "debug/Statistic.h"
 #include "periph/GPIO.h"
-#include "periph/InterruptsControl.h"
+#include "periph/IRQ.h"
 #include "periph/TIM.h"
 #include "periph/USART.h"
 #include "utils/DataStream.h"
