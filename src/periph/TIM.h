@@ -11,10 +11,11 @@ constexpr uint32_t MAX_RELOAD_VALUE = 0xFFFF;
 
 enum SetupFlags : uint32_t
 {
-    SINGLE_SHOT = TIM_CR1_OPM,
+    SINGLE_SHOT = 1 << 0,
+    ENABLE_UPDATE_INTERRUPT = 1 << 1,
 };
 
-void setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value, uint32_t flags = 0);
+void setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value, uint32_t setup_flags = 0);
 
 void restartTimer(TIM_TypeDef *tim);
 void stopTimer(TIM_TypeDef *tim);

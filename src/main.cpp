@@ -14,6 +14,13 @@
 
 FixedDataStream<1024> usart1_stream;
 
+void sleep1()
+{
+    volatile uint32_t t = 10;
+    while (--t)
+    {}
+}
+
 
 FixedDataStream<1024> temp;
 volatile bool listening = false;
@@ -30,31 +37,32 @@ extern "C"
         }
     }
 
+    void TIM2_IRQHandler()
+    {
+        if (TIM2->SR & TIM_SR_UIF)
+        {
+            TIM2->SR &= ~TIM_SR_UIF;
+            gpio::setPinOutput(GPIOC, 13, true);
+            sleep1();
+            gpio::setPinOutput(GPIOC, 13, false);
+            const bool bit = gpio::getPinInput(GPIOA, 0);
+            temp.writeByte(bit ? '1' : '0');
+        }
+    }
+
     void EXTI0_IRQHandler()
     {
         if (EXTI->PR & EXTI_PR_PR0)
         {
+            gpio::setPinOutput(GPIOC, 13, true);
+            sleep1();
+            gpio::setPinOutput(GPIOC, 13, false);
             if (listening)
             {
-                const bool high = gpio::getPinInput(GPIOA, 0);
-                num_height += high;
+                ++num_height;
                 if (num_height >= 3)
                 {
-                    if (high)
-                    {
-                        constexpr uint32_t frequency = 1'000;
-                        tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
-                        tim::restartTimer(TIM2);
-                        gpio::setPinOutput(GPIOC, 13, true);
-                    }
-                    else
-                    {
-                        const uint32_t val = tim::getTimerValue(TIM2);
-                        tim::stopTimer(TIM2);
-                        gpio::setPinOutput(GPIOC, 13, false);
-                        const bool bit = val > 0;
-                        temp.writeByte(bit ? '1' : '0');
-                    }
+                    tim::restartTimer(TIM2);
                 }
             }
             EXTI->PR = EXTI_PR_PR0;
@@ -98,16 +106,17 @@ int main()
 
 
     // TIM2
-    constexpr uint32_t frequency = 1'000;
-    tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
-
+    constexpr uint32_t frequency = 1'000'000;
+    constexpr uint32_t reload_value = 5;
+    tim::setupTimer(TIM2, frequency, reload_value, tim::SINGLE_SHOT | tim::ENABLE_UPDATE_INTERRUPT);
+    NVIC_EnableIRQ(TIM2_IRQn);
 
     // A0
     gpio::setPinMode(GPIOA, 0, gpio::PinMode::InputFloating);
     AFIO->EXTICR[0] &= ~AFIO_EXTICR1_EXTI0;
     EXTI->IMR |= EXTI_IMR_MR0;
-    EXTI->FTSR |= EXTI_FTSR_FT0; // Falling edge
-    EXTI->RTSR |= EXTI_RTSR_RT0; // Rising edge
+    EXTI->FTSR &= ~EXTI_FTSR_FT0; // Falling edge
+    EXTI->RTSR |= EXTI_RTSR_RT0;  // Rising edge
     NVIC_EnableIRQ(EXTI0_IRQn);
 
 
