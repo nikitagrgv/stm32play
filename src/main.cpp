@@ -1,7 +1,7 @@
 #include "Handlers.h"
 #include "Print.h"
 #include "Sleep.h"
-#include "Statistic.h"
+#include "debug/Statistic.h"
 #include "commands/CommandBuffer.h"
 #include "commands/CommandExecutor.h"
 #include "commands/PrintCommand.h"
