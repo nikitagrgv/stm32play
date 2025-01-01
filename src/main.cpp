@@ -134,7 +134,7 @@ int main()
     while (true)
     {
         io::printSyncFmt("time : %lu\n", TIM2->CNT);
-        utils::sleepMsec(50);
+        utils::sleepMsec(500);
 
 
         uint8_t byte;
