@@ -1,5 +1,6 @@
 #include "DataStream.h"
 #include "FixedBitset.h"
+#include "Handlers.h"
 #include "Print.h"
 #include "Sleep.h"
 #include "Statistic.h"
@@ -27,51 +28,6 @@ FixedBitset<5 * 8> dht_data;
 volatile bool listening = false;
 volatile int num_height = 0;
 volatile int num_written_bits = 0;
-extern "C"
-{
-    void USART1_IRQHandler()
-    {
-        if (USART1->SR & USART_SR_RXNE)
-        {
-            const uint8_t data = USART1->DR;
-            usart1_stream.writeByte(data);
-            stat::addReadBytesUsart(1);
-        }
-    }
-
-    void TIM2_IRQHandler()
-    {
-        if (TIM2->SR & TIM_SR_UIF)
-        {
-            TIM2->SR &= ~TIM_SR_UIF;
-            if (num_height >= 3 && num_written_bits < 40)
-            {
-                gpio::setPinOutput(GPIOC, 13, true);
-                sleep1();
-                gpio::setPinOutput(GPIOC, 13, false);
-                const bool bit = gpio::getPinInput(GPIOA, 0);
-                dht_data.set(num_written_bits, bit);
-                ++num_written_bits;
-            }
-        }
-    }
-
-    void EXTI0_IRQHandler()
-    {
-        if (EXTI->PR & EXTI_PR_PR0)
-        {
-            if (listening)
-            {
-                ++num_height;
-                if (num_height >= 3)
-                {
-                    tim::restartTimer(TIM2);
-                }
-            }
-            EXTI->PR = EXTI_PR_PR0;
-        }
-    }
-}
 
 CommandBuffer command_buffer;
 
@@ -122,6 +78,50 @@ int main()
     EXTI->RTSR |= EXTI_RTSR_RT0;  // Rising edge
     NVIC_EnableIRQ(EXTI0_IRQn);
 
+    hnd::setHandler(hnd::HandlerType::SysTickHandler, [](void *) {
+        //
+        ++glob::total_msec;
+    });
+
+    hnd::setHandler(hnd::HandlerType::TIM2Handler, [](void *) {
+        if (TIM2->SR & TIM_SR_UIF)
+        {
+            TIM2->SR &= ~TIM_SR_UIF;
+            if (num_height >= 3 && num_written_bits < 40)
+            {
+                gpio::setPinOutput(GPIOC, 13, true);
+                sleep1();
+                gpio::setPinOutput(GPIOC, 13, false);
+                const bool bit = gpio::getPinInput(GPIOA, 0);
+                dht_data.set(num_written_bits, bit);
+                ++num_written_bits;
+            }
+        }
+    });
+
+    hnd::setHandler(hnd::HandlerType::USART1Handler, [](void *) {
+        if (USART1->SR & USART_SR_RXNE)
+        {
+            const uint8_t data = USART1->DR;
+            usart1_stream.writeByte(data);
+            stat::addReadBytesUsart(1);
+        }
+    });
+
+    hnd::setHandler(hnd::HandlerType::EXTI0Handler, [](void *) {
+        if (EXTI->PR & EXTI_PR_PR0)
+        {
+            if (listening)
+            {
+                ++num_height;
+                if (num_height >= 3)
+                {
+                    tim::restartTimer(TIM2);
+                }
+            }
+            EXTI->PR = EXTI_PR_PR0;
+        }
+    });
 
     __enable_irq(); // enable interrupts
 
