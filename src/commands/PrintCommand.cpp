@@ -1,8 +1,8 @@
 #include "PrintCommand.h"
 
-#include "../utils/HeapUsage.h"
 #include "Print.h"
-#include "Statistic.h"
+#include "debug/Statistic.h"
+#include "utils/HeapUsage.h"
 #include "utils/StringUtils.h"
 
 bool PrintCommand::execute(const char *args)
