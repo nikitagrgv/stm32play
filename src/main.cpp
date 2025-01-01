@@ -21,6 +21,8 @@ void toggleIndicatorLed()
 
 FixedDataStream<1024> usart1_stream;
 
+
+FixedDataStream<1024> temp;
 extern "C"
 {
     void USART1_IRQHandler()
@@ -38,6 +40,8 @@ extern "C"
     {
         if (EXTI->PR & EXTI_PR_PR0)
         {
+            const bool high = gpio::getPinInput(GPIOA, 0);
+            temp.writeByte(high ? 'h' : 'l');
             EXTI->PR = EXTI_PR_PR0;
         }
     }
@@ -87,7 +91,7 @@ int main()
     gpio::setPinMode(GPIOA, 0, gpio::PinMode::InputFloating);
     AFIO->EXTICR[0] &= ~AFIO_EXTICR1_EXTI0;
     EXTI->IMR |= EXTI_IMR_MR0;
-    EXTI->FTSR &= ~EXTI_FTSR_FT0;  // Falling edge
+    EXTI->FTSR |= EXTI_FTSR_FT0; // Falling edge
     EXTI->RTSR |= EXTI_RTSR_RT0; // Rising edge
     NVIC_EnableIRQ(EXTI0_IRQn);
 
@@ -140,10 +144,15 @@ int main()
     };
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
 
+    char GGGG[1024 + 1];
     while (true)
     {
-        io::printSyncFmt("time : %lu\n", TIM2->CNT);
-        utils::sleepMsec(500);
+        const int num_read = temp.readData((uint8_t *)GGGG, 1024);
+        if (num_read)
+        {
+            GGGG[num_read] = 0;
+            io::printSyncFmt("%s", GGGG);
+        }
 
 
         uint8_t byte;
