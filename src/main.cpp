@@ -36,6 +36,8 @@ CommandExecutor command_executor;
 
 int main()
 {
+    __disable_irq();
+
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN | RCC_APB2ENR_AFIOEN
         | RCC_APB2ENR_USART1EN;
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
@@ -78,12 +80,12 @@ int main()
     EXTI->RTSR |= EXTI_RTSR_RT0;  // Rising edge
     NVIC_EnableIRQ(EXTI0_IRQn);
 
-    itr::setHandler(itr::HandlerType::SysTickHandler, [](void *) {
+    itr::setHandler(itr::InterruptType::SysTickHandler, [](void *) {
         //
         ++glob::total_msec;
     });
 
-    itr::setHandler(itr::HandlerType::TIM2Handler, [](void *) {
+    itr::setHandler(itr::InterruptType::TIM2Handler, [](void *) {
         if (TIM2->SR & TIM_SR_UIF)
         {
             TIM2->SR &= ~TIM_SR_UIF;
@@ -99,7 +101,7 @@ int main()
         }
     });
 
-    itr::setHandler(itr::HandlerType::USART1Handler, [](void *) {
+    itr::setHandler(itr::InterruptType::USART1Handler, [](void *) {
         if (USART1->SR & USART_SR_RXNE)
         {
             const uint8_t data = USART1->DR;
@@ -108,7 +110,7 @@ int main()
         }
     });
 
-    itr::setHandler(itr::HandlerType::EXTI0Handler, [](void *) {
+    itr::setHandler(itr::InterruptType::EXTI0Handler, [](void *) {
         if (EXTI->PR & EXTI_PR_PR0)
         {
             if (listening)

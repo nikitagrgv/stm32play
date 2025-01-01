@@ -11,19 +11,21 @@ extern "C"
 namespace itr
 {
 
-enum class HandlerType
+enum class InterruptType
 {
     SysTickHandler = 0,
     USART1Handler,
     TIM2Handler,
     EXTI0Handler,
 
-    NUM_HANDLERS,
+    NUM_INTERRUPT_TYPES,
 };
 
 using HandlerFunc = void (*)(void *opaque);
 
-void setHandler(HandlerType type, HandlerFunc func, void *opaque = nullptr);
-void clearHandler(HandlerType type);
+void setHandler(InterruptType type, HandlerFunc func, void *opaque = nullptr);
+void clearHandler(InterruptType type);
+
+void setInterruptEnabled(InterruptType type, bool enabled);
 
 } // namespace itr
