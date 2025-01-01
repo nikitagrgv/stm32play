@@ -22,8 +22,8 @@ enum class HandlerType
 };
 
 using HandlerFunc = void (*)(void *opaque);
-void setHandler(HandlerType type, HandlerFunc func, void *opaque = nullptr);
 
+void setHandler(HandlerType type, HandlerFunc func, void *opaque = nullptr);
 void clearHandler(HandlerType type);
 
 } // namespace hnd
