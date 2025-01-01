@@ -16,7 +16,7 @@ FixedDataStream<1024> usart1_stream;
 
 void sleep1()
 {
-    volatile uint32_t t = 10;
+    volatile uint32_t t = 4;
     while (--t)
     {}
 }
@@ -25,6 +25,7 @@ void sleep1()
 FixedDataStream<1024> temp;
 volatile bool listening = false;
 volatile int num_height = 0;
+volatile int num_written_bits = 0;
 extern "C"
 {
     void USART1_IRQHandler()
@@ -42,11 +43,23 @@ extern "C"
         if (TIM2->SR & TIM_SR_UIF)
         {
             TIM2->SR &= ~TIM_SR_UIF;
-            gpio::setPinOutput(GPIOC, 13, true);
-            sleep1();
-            gpio::setPinOutput(GPIOC, 13, false);
-            const bool bit = gpio::getPinInput(GPIOA, 0);
-            temp.writeByte(bit ? '1' : '0');
+            if (num_height >= 3 && num_written_bits < 40)
+            {
+                gpio::setPinOutput(GPIOC, 13, true);
+                sleep1();
+                gpio::setPinOutput(GPIOC, 13, false);
+                const bool bit = gpio::getPinInput(GPIOA, 0);
+                if (num_written_bits % 4 == 0)
+                {
+                    temp.writeByte(' ');
+                }
+                if (num_written_bits % 8 == 0)
+                {
+                    temp.writeByte('|');
+                }
+                temp.writeByte(bit ? '1' : '0');
+                ++num_written_bits;
+            }
         }
     }
 
@@ -54,9 +67,6 @@ extern "C"
     {
         if (EXTI->PR & EXTI_PR_PR0)
         {
-            gpio::setPinOutput(GPIOC, 13, true);
-            sleep1();
-            gpio::setPinOutput(GPIOC, 13, false);
             if (listening)
             {
                 ++num_height;
@@ -107,7 +117,7 @@ int main()
 
     // TIM2
     constexpr uint32_t frequency = 1'000'000;
-    constexpr uint32_t reload_value = 5;
+    constexpr uint32_t reload_value = 48;
     tim::setupTimer(TIM2, frequency, reload_value, tim::SINGLE_SHOT | tim::ENABLE_UPDATE_INTERRUPT);
     NVIC_EnableIRQ(TIM2_IRQn);
 
@@ -133,6 +143,7 @@ int main()
         const char *name() override { return "go"; }
         bool execute(const char *args) override
         {
+            num_written_bits = 0;
             gpio::setPinOutput(GPIOC, 13, false);
             io::printSyncFmt("goo\n");
 
