@@ -83,9 +83,6 @@ int main()
             utils::sleepMsec(20);
             gpio::setPinOutput(GPIOB, 12, true);
 
-            static bool go = false;
-            go = !go;
-
             return true;
         }
     };
