@@ -24,7 +24,6 @@ void sleep1()
 
 FixedBitset<5 * 8> dht_data;
 
-FixedDataStream<1024> temp;
 volatile bool listening = false;
 volatile int num_height = 0;
 volatile int num_written_bits = 0;
@@ -52,17 +51,6 @@ extern "C"
                 gpio::setPinOutput(GPIOC, 13, false);
                 const bool bit = gpio::getPinInput(GPIOA, 0);
                 dht_data.set(num_written_bits, bit);
-
-                if (num_written_bits % 4 == 0)
-                {
-                    temp.writeByte(' ');
-                }
-                if (num_written_bits % 8 == 0)
-                {
-                    temp.writeByte('|');
-                }
-                temp.writeByte(bit ? '1' : '0');
-
                 ++num_written_bits;
             }
         }
@@ -238,17 +226,8 @@ int main()
     gpio::setPinOutput(GPIOC, 13, false);
 
 
-    char GGGG[1024 + 1];
     while (true)
     {
-        const int num_read = temp.readData((uint8_t *)GGGG, 1024);
-        if (num_read)
-        {
-            GGGG[num_read] = 0;
-            io::printSyncFmt("%s", GGGG);
-        }
-
-
         uint8_t byte;
         while (usart1_stream.readByte(byte))
         {
