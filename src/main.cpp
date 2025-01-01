@@ -23,7 +23,7 @@ FixedDataStream<1024> usart1_stream;
 
 extern "C"
 {
-    void USART1_IRQHandler(void)
+    void USART1_IRQHandler()
     {
         if (USART1->SR & USART_SR_RXNE)
         {
@@ -31,6 +31,14 @@ extern "C"
             const uint8_t data = USART1->DR;
             usart1_stream.writeByte(data);
             stat::addReadBytesUsart(1);
+        }
+    }
+
+    void EXTI0_IRQHandler()
+    {
+        if (EXTI->PR & EXTI_PR_PR0)
+        {
+            EXTI->PR = EXTI_PR_PR0;
         }
     }
 }
@@ -65,11 +73,20 @@ int main()
     constexpr uint32_t baudrate = 56'000;
     constexpr uint32_t flags = usart::ENABLE_RECEIVE | usart::ENABLE_TRANSMIT | usart::ENABLE_RECEIVE_INTERRUPT;
     usart::setupUsart(USART1, baudrate, flags);
+    NVIC_EnableIRQ(USART1_IRQn);
 
     io::setPrintUsart(USART1);
 
-    NVIC_EnableIRQ(USART1_IRQn);
+
+
+    constexpr uint32_t frequency = 1'000;
+    tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
+
+    tim::runTimer(TIM2);
+
+
     __enable_irq(); // enable interrupts
+
 
     command_executor.addCommand(std::make_unique<PrintCommand>());
 
@@ -114,11 +131,6 @@ int main()
         }
     };
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
-
-    constexpr uint32_t frequency = 1'000;
-    tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
-
-    tim::runTimer(TIM2);
 
     while (true)
     {
