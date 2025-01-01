@@ -36,7 +36,7 @@ CommandExecutor command_executor;
 
 int main()
 {
-    __disable_irq();
+    itr::setInterruptsEnabled(false);
 
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN | RCC_APB2ENR_AFIOEN
         | RCC_APB2ENR_USART1EN;
@@ -124,9 +124,6 @@ int main()
             EXTI->PR = EXTI_PR_PR0;
         }
     });
-
-    __enable_irq(); // enable interrupts
-
 
     // Others
     command_executor.addCommand(std::make_unique<PrintCommand>());
@@ -227,6 +224,7 @@ int main()
 
     gpio::setPinOutput(GPIOC, 13, false);
 
+    itr::setInterruptsEnabled(true);
 
     while (true)
     {

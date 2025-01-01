@@ -79,4 +79,17 @@ void itr::clearHandler(InterruptType type)
 void itr::setInterruptEnabled(InterruptType type, bool enabled)
 {
     const IRQn_Type irqn = get_irqn_by_type(type);
+
+}
+
+void itr::setInterruptsEnabled(bool enabled)
+{
+    if (enabled)
+    {
+        __enable_irq();
+    }
+    else
+    {
+        __disable_irq();
+    }
 }

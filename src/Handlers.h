@@ -28,4 +28,6 @@ void clearHandler(InterruptType type);
 
 void setInterruptEnabled(InterruptType type, bool enabled);
 
+void setInterruptsEnabled(bool enabled);
+
 } // namespace itr
