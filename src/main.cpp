@@ -36,7 +36,7 @@ CommandExecutor command_executor;
 
 int main()
 {
-    itr::setInterruptsEnabled(false);
+    itr::disableInterrupts();
 
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN | RCC_APB2ENR_AFIOEN
         | RCC_APB2ENR_USART1EN;
@@ -224,7 +224,7 @@ int main()
 
     gpio::setPinOutput(GPIOC, 13, false);
 
-    itr::setInterruptsEnabled(true);
+    itr::enableInterrupts();
 
     while (true)
     {
