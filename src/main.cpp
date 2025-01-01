@@ -59,7 +59,7 @@ void setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value, uin
 
     const bool single_shot = flags & SINGLE_SHOT;
 
-    tim->PSC = (glob::SYS_FREQUENCY / 1'000'000) - 1;
+    tim->PSC = prescaler;
     tim->ARR = reload_value - single_shot;
     tim->CNT = 0;
     tim->EGR = TIM_EGR_UG; // Flush ARR and PSC!
@@ -152,7 +152,7 @@ int main()
     };
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
 
-    constexpr uint32_t frequency = 1'000'000;
+    constexpr uint32_t frequency = 1'000;
     tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
 
     tim::runTimer(TIM2);
