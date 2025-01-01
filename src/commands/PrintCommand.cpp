@@ -3,7 +3,7 @@
 #include "HeapUsage.h"
 #include "Print.h"
 #include "Statistic.h"
-#include "StringUtils.h"
+#include "utils/StringUtils.h"
 
 bool PrintCommand::execute(const char *args)
 {

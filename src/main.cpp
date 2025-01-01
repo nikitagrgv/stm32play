@@ -1,5 +1,3 @@
-#include "DataStream.h"
-#include "FixedBitset.h"
 #include "Handlers.h"
 #include "Print.h"
 #include "Sleep.h"
@@ -10,6 +8,8 @@
 #include "periph/GPIO.h"
 #include "periph/TIM.h"
 #include "periph/USART.h"
+#include "utils/DataStream.h"
+#include "utils/FixedBitset.h"
 
 #include <memory>
 #include <stm32f1xx.h>
