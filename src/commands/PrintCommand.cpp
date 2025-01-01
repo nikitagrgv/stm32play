@@ -1,6 +1,6 @@
 #include "PrintCommand.h"
 
-#include "HeapUsage.h"
+#include "../utils/HeapUsage.h"
 #include "Print.h"
 #include "Statistic.h"
 #include "utils/StringUtils.h"
