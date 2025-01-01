@@ -115,8 +115,7 @@ int main()
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
 
 
-
-    TIM2->PSC = (glob::SYS_FREQUENCY / 1'000) - 1;
+    TIM2->PSC = (glob::SYS_FREQUENCY / 1'000'000) - 1;
     TIM2->ARR = 0xFFFF - 1;
     TIM2->CNT = 1;
     TIM2->EGR = TIM_EGR_UG; // Flush ARR and PSC!
@@ -126,7 +125,7 @@ int main()
     while (true)
     {
         io::printSyncFmt("time : %lu\n", TIM2->CNT);
-        utils::sleepMsec(100);
+        utils::sleepMsec(1);
 
 
         uint8_t byte;
