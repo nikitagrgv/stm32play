@@ -32,6 +32,7 @@ constexpr uint32_t getGPIOClearMask(int pos)
 
 inline void setPinMode(GPIO_TypeDef *port, int pin, PinMode mode)
 {
+    MICRO_ASSERT(pin < 16);
     const int is_high = pin >= 8;
     const int pos = pin % 8;
     auto &reg = is_high ? port->CRH : port->CRL;
@@ -42,6 +43,7 @@ inline void setPinMode(GPIO_TypeDef *port, int pin, PinMode mode)
 
 inline void setPinOutput(GPIO_TypeDef *port, int pin, bool value)
 {
+    MICRO_ASSERT(pin < 16);
     const uint32_t mask = value ? GPIO_BSRR_BS0 << pin : GPIO_BSRR_BR0 << pin;
     port->BSRR = mask;
 }
@@ -53,7 +55,15 @@ enum class PullUpOrDownMode
 };
 inline void setPinPullUpOrDown(GPIO_TypeDef *port, int pin, PullUpOrDownMode mode)
 {
+    MICRO_ASSERT(pin < 16);
     setPinOutput(port, pin, mode == PullUpOrDownMode::Up);
+}
+
+inline bool getPinInput(GPIO_TypeDef *port, int pin)
+{
+    MICRO_ASSERT(pin < 16);
+    const uint32_t mask = 1 << pin;
+    return port->IDR & mask;
 }
 
 } // namespace gpio
