@@ -1,4 +1,5 @@
 #include "DataStream.h"
+#include "FixedBitset.h"
 #include "Print.h"
 #include "Sleep.h"
 #include "Statistic.h"
@@ -21,6 +22,7 @@ void sleep1()
     {}
 }
 
+FixedBitset<5 * 8> dht_data;
 
 FixedDataStream<1024> temp;
 volatile bool listening = false;
@@ -49,6 +51,8 @@ extern "C"
                 sleep1();
                 gpio::setPinOutput(GPIOC, 13, false);
                 const bool bit = gpio::getPinInput(GPIOA, 0);
+                dht_data.set(num_written_bits, bit);
+
                 if (num_written_bits % 4 == 0)
                 {
                     temp.writeByte(' ');
@@ -58,6 +62,7 @@ extern "C"
                     temp.writeByte('|');
                 }
                 temp.writeByte(bit ? '1' : '0');
+
                 ++num_written_bits;
             }
         }
@@ -145,7 +150,6 @@ int main()
         {
             num_written_bits = 0;
             gpio::setPinOutput(GPIOC, 13, false);
-            io::printSyncFmt("goo\n");
 
             gpio::setPinOutput(GPIOB, 12, false);
             utils::sleepMsec(20);
@@ -157,6 +161,51 @@ int main()
             listening = false;
 
             gpio::setPinOutput(GPIOC, 13, false);
+
+            const uint32_t start_time_ms = glob::total_msec;
+            constexpr uint32_t TIMEOUT_MS = 100;
+            const uint32_t end_time = start_time_ms + TIMEOUT_MS;
+
+            while (num_written_bits != 40)
+            {
+                if (glob::total_msec > end_time)
+                {
+                    io::printSyncFmt("DHT11: Timeout\n");
+                    return true;
+                }
+            }
+
+            const auto flip_byte = [](uint8_t byte) {
+                uint8_t result = 0;
+                for (int i = 0; i < 8; ++i)
+                {
+                    result |= ((byte >> i) & 1) << (7 - i);
+                }
+                return result;
+            };
+
+
+            uint8_t data[5];
+            dht_data.copyData<uint8_t>(data, 5);
+            for (int i = 0; i < 5; ++i)
+            {
+                data[i] = flip_byte(data[i]);
+            }
+
+            const uint8_t checksum = data[0] + data[1] + data[2] + data[3];
+            if (checksum != data[4])
+            {
+                io::printSyncFmt("DHT11: Invalid checksum\n");
+                return true;
+            }
+
+            float humidity = data[0];
+            humidity += data[1] / 256.0f;
+            float temperature = data[2];
+            temperature += data[3] / 256.0f;
+
+            io::printSyncFmt("temp = %f, hum = %f\n", temperature, humidity);
+
             return true;
         }
     };
