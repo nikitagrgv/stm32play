@@ -92,7 +92,7 @@ int main()
     gpio::setPinMode(GPIOB, 12, gpio::PinMode::GeneralOpenDrain50MHz);
 
     // SysTick
-    SysTick->LOAD = 8'000 - 1;
+    SysTick->LOAD = glob::SYS_FREQUENCY / 1000 - 1; // 1 ms period
     SysTick->VAL = 0;
     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 
