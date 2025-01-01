@@ -47,8 +47,10 @@ enum SetupFlags : uint32_t
     SINGLE_SHOT = TIM_CR1_OPM,
 };
 
-void setupTimer(TIM_TypeDef *tim, uint32_t prescaler, uint32_t reload_value, uint32_t flags = 0)
+void setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value, uint32_t flags = 0)
 {
+    const uint32_t prescaler = (glob::SYS_FREQUENCY / frequency) - 1;
+
     MICRO_ASSERT(prescaler <= 0xFFFF);
     MICRO_ASSERT(reload_value <= 0xFFFF);
 
@@ -147,9 +149,9 @@ int main()
     };
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
 
-    constexpr uint32_t prescaler = (glob::SYS_FREQUENCY / 1'000'000) - 1;
+    constexpr uint32_t frequency = 1'000'000;
     constexpr uint32_t reload_value = 0xFFFF - 1;
-    tim::setupTimer(TIM2, prescaler, reload_value, tim::SINGLE_SHOT);
+    tim::setupTimer(TIM2, frequency, reload_value, tim::SINGLE_SHOT);
 
     tim::runTimer(TIM2);
 
