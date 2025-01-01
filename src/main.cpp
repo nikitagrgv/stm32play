@@ -83,6 +83,15 @@ int main()
     tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
 
 
+    // A0
+    gpio::setPinMode(GPIOA, 0, gpio::PinMode::InputFloating);
+    AFIO->EXTICR[0] &= ~AFIO_EXTICR1_EXTI0;
+    EXTI->IMR |= EXTI_IMR_MR0;
+    EXTI->FTSR &= ~EXTI_FTSR_FT0;  // Falling edge
+    EXTI->RTSR |= EXTI_RTSR_RT0; // Rising edge
+    NVIC_EnableIRQ(EXTI0_IRQn);
+
+
     __enable_irq(); // enable interrupts
 
 
