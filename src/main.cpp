@@ -82,8 +82,6 @@ int main()
     constexpr uint32_t frequency = 1'000;
     tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
 
-    tim::runTimer(TIM2);
-
 
     __enable_irq(); // enable interrupts
 
