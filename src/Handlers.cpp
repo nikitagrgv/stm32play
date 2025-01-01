@@ -31,10 +31,10 @@ FORCE_INLINE IRQn_Type get_irqn_by_type(irq::InterruptType type)
 {
     switch (type)
     {
-    case irq::InterruptType::SysTickHandler: return TIM2_IRQn;
-    case irq::InterruptType::USART1Handler: return USART1_IRQn;
-    case irq::InterruptType::TIM2Handler: return TIM2_IRQn;
-    case irq::InterruptType::EXTI0Handler: return EXTI0_IRQn;
+    case irq::InterruptType::SysTickIRQ: return TIM2_IRQn;
+    case irq::InterruptType::USART1IRQ: return USART1_IRQn;
+    case irq::InterruptType::TIM2IRQ: return TIM2_IRQn;
+    case irq::InterruptType::EXTI0IRQ: return EXTI0_IRQn;
     default: MICRO_ASSERT(0); return HardFault_IRQn;
     }
 }
@@ -45,22 +45,22 @@ extern "C"
 {
     void SysTick_Handler()
     {
-        call_handler(irq::InterruptType::SysTickHandler);
+        call_handler(irq::InterruptType::SysTickIRQ);
     }
 
     void USART1_IRQHandler()
     {
-        call_handler(irq::InterruptType::USART1Handler);
+        call_handler(irq::InterruptType::USART1IRQ);
     }
 
     void TIM2_IRQHandler()
     {
-        call_handler(irq::InterruptType::TIM2Handler);
+        call_handler(irq::InterruptType::TIM2IRQ);
     }
 
     void EXTI0_IRQHandler()
     {
-        call_handler(irq::InterruptType::EXTI0Handler);
+        call_handler(irq::InterruptType::EXTI0IRQ);
     }
 }
 

@@ -13,10 +13,10 @@ namespace irq
 
 enum class InterruptType
 {
-    SysTickHandler = 0,
-    USART1Handler,
-    TIM2Handler,
-    EXTI0Handler,
+    SysTickIRQ = 0,
+    USART1IRQ,
+    TIM2IRQ,
+    EXTI0IRQ,
 
     NUM_INTERRUPT_TYPES,
 };

@@ -61,7 +61,7 @@ int main()
     constexpr uint32_t baudrate = 56'000;
     constexpr uint32_t flags = usart::ENABLE_RECEIVE | usart::ENABLE_TRANSMIT | usart::ENABLE_RECEIVE_INTERRUPT;
     usart::setupUsart(USART1, baudrate, flags);
-    irq::enableInterrupt(irq::InterruptType::USART1Handler);
+    irq::enableInterrupt(irq::InterruptType::USART1IRQ);
 
     io::setPrintUsart(USART1);
 
@@ -70,7 +70,7 @@ int main()
     constexpr uint32_t frequency = 1'000'000;
     constexpr uint32_t reload_value = 48;
     tim::setupTimer(TIM2, frequency, reload_value, tim::SINGLE_SHOT | tim::ENABLE_UPDATE_INTERRUPT);
-    irq::enableInterrupt(irq::InterruptType::TIM2Handler);
+    irq::enableInterrupt(irq::InterruptType::TIM2IRQ);
 
     // A0
     gpio::setPinMode(GPIOA, 0, gpio::PinMode::InputFloating);
@@ -78,14 +78,14 @@ int main()
     EXTI->IMR |= EXTI_IMR_MR0;
     EXTI->FTSR &= ~EXTI_FTSR_FT0; // Falling edge
     EXTI->RTSR |= EXTI_RTSR_RT0;  // Rising edge
-    irq::enableInterrupt(irq::InterruptType::EXTI0Handler);
+    irq::enableInterrupt(irq::InterruptType::EXTI0IRQ);
 
-    irq::setHandler(irq::InterruptType::SysTickHandler, [](void *) {
+    irq::setHandler(irq::InterruptType::SysTickIRQ, [](void *) {
         //
         ++glob::total_msec;
     });
 
-    irq::setHandler(irq::InterruptType::TIM2Handler, [](void *) {
+    irq::setHandler(irq::InterruptType::TIM2IRQ, [](void *) {
         if (TIM2->SR & TIM_SR_UIF)
         {
             TIM2->SR &= ~TIM_SR_UIF;
@@ -101,7 +101,7 @@ int main()
         }
     });
 
-    irq::setHandler(irq::InterruptType::USART1Handler, [](void *) {
+    irq::setHandler(irq::InterruptType::USART1IRQ, [](void *) {
         if (USART1->SR & USART_SR_RXNE)
         {
             const uint8_t data = USART1->DR;
@@ -110,7 +110,7 @@ int main()
         }
     });
 
-    irq::setHandler(irq::InterruptType::EXTI0Handler, [](void *) {
+    irq::setHandler(irq::InterruptType::EXTI0IRQ, [](void *) {
         if (EXTI->PR & EXTI_PR_PR0)
         {
             if (listening)
