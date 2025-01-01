@@ -8,7 +8,7 @@ extern "C"
     void EXTI0_IRQHandler();
 }
 
-namespace itr
+namespace irq
 {
 
 enum class InterruptType
@@ -27,9 +27,11 @@ void setHandler(InterruptType type, HandlerFunc func, void *opaque = nullptr);
 void clearHandler(InterruptType type);
 
 void setInterruptEnabled(InterruptType type, bool enabled);
+void disableInterrupt(InterruptType type);
+void enableInterrupt(InterruptType type);
 
 void setInterruptsEnabled(bool enabled);
 void disableInterrupts();
 void enableInterrupts();
 
-} // namespace itr
+} // namespace irq

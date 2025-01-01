@@ -11,13 +11,13 @@ namespace
 
 struct FuncWithOpaque
 {
-    itr::HandlerFunc func{};
+    irq::HandlerFunc func{};
     void *opaque{};
 };
 
-FuncWithOpaque handlers[(int)itr::InterruptType::NUM_INTERRUPT_TYPES];
+FuncWithOpaque handlers[(int)irq::InterruptType::NUM_INTERRUPT_TYPES];
 
-FORCE_INLINE void call_handler(itr::InterruptType type)
+FORCE_INLINE void call_handler(irq::InterruptType type)
 {
     const FuncWithOpaque &fwo = handlers[(int)type];
     if (!fwo.func)
@@ -27,14 +27,14 @@ FORCE_INLINE void call_handler(itr::InterruptType type)
     (*fwo.func)(fwo.opaque);
 }
 
-FORCE_INLINE IRQn_Type get_irqn_by_type(itr::InterruptType type)
+FORCE_INLINE IRQn_Type get_irqn_by_type(irq::InterruptType type)
 {
     switch (type)
     {
-    case itr::InterruptType::SysTickHandler: return TIM2_IRQn;
-    case itr::InterruptType::USART1Handler: return USART1_IRQn;
-    case itr::InterruptType::TIM2Handler: return TIM2_IRQn;
-    case itr::InterruptType::EXTI0Handler: return EXTI0_IRQn;
+    case irq::InterruptType::SysTickHandler: return TIM2_IRQn;
+    case irq::InterruptType::USART1Handler: return USART1_IRQn;
+    case irq::InterruptType::TIM2Handler: return TIM2_IRQn;
+    case irq::InterruptType::EXTI0Handler: return EXTI0_IRQn;
     default: MICRO_ASSERT(0); return HardFault_IRQn;
     }
 }
@@ -45,43 +45,63 @@ extern "C"
 {
     void SysTick_Handler()
     {
-        call_handler(itr::InterruptType::SysTickHandler);
+        call_handler(irq::InterruptType::SysTickHandler);
     }
 
     void USART1_IRQHandler()
     {
-        call_handler(itr::InterruptType::USART1Handler);
+        call_handler(irq::InterruptType::USART1Handler);
     }
 
     void TIM2_IRQHandler()
     {
-        call_handler(itr::InterruptType::TIM2Handler);
+        call_handler(irq::InterruptType::TIM2Handler);
     }
 
     void EXTI0_IRQHandler()
     {
-        call_handler(itr::InterruptType::EXTI0Handler);
+        call_handler(irq::InterruptType::EXTI0Handler);
     }
 }
 
-void itr::setHandler(InterruptType type, HandlerFunc func, void *opaque)
+void irq::setHandler(InterruptType type, HandlerFunc func, void *opaque)
 {
     FuncWithOpaque &fwo = handlers[(int)type];
     fwo.func = func;
     fwo.opaque = opaque;
 }
 
-void itr::clearHandler(InterruptType type)
+void irq::clearHandler(InterruptType type)
 {
     setHandler(type, nullptr, nullptr);
 }
 
-void itr::setInterruptEnabled(InterruptType type, bool enabled)
+void irq::setInterruptEnabled(InterruptType type, bool enabled)
 {
     const IRQn_Type irqn = get_irqn_by_type(type);
+    if (enabled)
+    {
+        NVIC_EnableIRQ(irqn);
+    }
+    else
+    {
+        NVIC_DisableIRQ(irqn);
+    }
 }
 
-void itr::setInterruptsEnabled(bool enabled)
+void irq::disableInterrupt(InterruptType type)
+{
+    const IRQn_Type irqn = get_irqn_by_type(type);
+    NVIC_DisableIRQ(irqn);
+}
+
+void irq::enableInterrupt(InterruptType type)
+{
+    const IRQn_Type irqn = get_irqn_by_type(type);
+    NVIC_EnableIRQ(irqn);
+}
+
+void irq::setInterruptsEnabled(bool enabled)
 {
     if (enabled)
     {
@@ -93,12 +113,12 @@ void itr::setInterruptsEnabled(bool enabled)
     }
 }
 
-void itr::disableInterrupts()
+void irq::disableInterrupts()
 {
     __disable_irq();
 }
 
-void itr::enableInterrupts()
+void irq::enableInterrupts()
 {
     __enable_irq();
 }
