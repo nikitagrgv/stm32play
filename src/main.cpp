@@ -6,6 +6,7 @@
 #include "commands/CommandExecutor.h"
 #include "commands/PrintCommand.h"
 #include "periph/GPIO.h"
+#include "periph/TIM.h"
 #include "periph/USART.h"
 
 #include <memory>
