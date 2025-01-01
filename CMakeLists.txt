@@ -36,8 +36,9 @@ add_compile_options(-fno-exceptions)
 # uncomment to mitigate c++17 absolute addresses warnings
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --specs=nano.specs")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --specs=nano.specs")
+set(SPECS_FLAGS "--specs=nano.specs -u _printf_float")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${SPECS_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${SPECS_FLAGS}")
 
 # Enable assembler files preprocessing
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
