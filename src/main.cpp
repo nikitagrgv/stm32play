@@ -48,7 +48,7 @@ int main()
 
     gpio::setPinMode(GPIOA, 9, gpio::PinMode::AlternatePushPull50MHz); // USART1 TX
 
-    gpio::setPinMode(GPIOA, 10, gpio::PinMode::InputPullUpOrDown);     // USART1 RX
+    gpio::setPinMode(GPIOA, 10, gpio::PinMode::InputPullUpOrDown); // USART1 RX
     gpio::setPinPullUpOrDown(GPIOA, 10, gpio::PullUpOrDownMode::Up);
 
     gpio::setPinMode(GPIOB, 12, gpio::PinMode::GeneralOpenDrain50MHz);
@@ -70,13 +70,29 @@ int main()
 
     command_executor.addCommand(std::make_unique<PrintCommand>());
 
+    gpio::setPinOutput(GPIOB, 12, true);
+
+    struct TestCommand : public ICommand
+    {
+        const char *name() override { return "go"; }
+        bool execute(const char *args) override
+        {
+            io::printSyncFmt("goo\n");
+
+            gpio::setPinOutput(GPIOB, 12, false);
+            utils::sleepMsec(20);
+            gpio::setPinOutput(GPIOB, 12, true);
+
+            static bool go = false;
+            go = !go;
+
+            return true;
+        }
+    };
+    command_executor.addCommand(std::make_unique<TestCommand>());
+
     while (true)
     {
-        utils::sleepMsec(1);
-        static bool value = false;
-        gpio::setPinOutput(GPIOB, 12, value);
-        value = !value;
-
         uint8_t byte;
         while (usart1_stream.readByte(byte))
         {
