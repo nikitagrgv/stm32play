@@ -78,7 +78,7 @@ int main()
     io::setPrintUsart(USART1);
 
 
-
+    // TIM2
     constexpr uint32_t frequency = 1'000;
     tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
 
@@ -86,6 +86,7 @@ int main()
     __enable_irq(); // enable interrupts
 
 
+    // Others
     command_executor.addCommand(std::make_unique<PrintCommand>());
 
     gpio::setPinOutput(GPIOB, 12, true);
