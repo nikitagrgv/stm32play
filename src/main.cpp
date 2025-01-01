@@ -42,6 +42,9 @@ CommandExecutor command_executor;
 namespace tim
 {
 
+constexpr uint32_t MAX_PRESCALER = 0xFFFF;
+constexpr uint32_t MAX_RELOAD_VALUE = 0xFFFF;
+
 enum SetupFlags : uint32_t
 {
     SINGLE_SHOT = TIM_CR1_OPM,
@@ -51,8 +54,8 @@ void setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value, uin
 {
     const uint32_t prescaler = (glob::SYS_FREQUENCY / frequency) - 1;
 
-    MICRO_ASSERT(prescaler <= 0xFFFF);
-    MICRO_ASSERT(reload_value <= 0xFFFF);
+    MICRO_ASSERT(prescaler <= MAX_PRESCALER);
+    MICRO_ASSERT(reload_value <= MAX_RELOAD_VALUE);
 
     const bool single_shot = flags & SINGLE_SHOT;
 
@@ -150,8 +153,7 @@ int main()
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
 
     constexpr uint32_t frequency = 1'000'000;
-    constexpr uint32_t reload_value = 0xFFFF - 1;
-    tim::setupTimer(TIM2, frequency, reload_value, tim::SINGLE_SHOT);
+    tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
 
     tim::runTimer(TIM2);
 
