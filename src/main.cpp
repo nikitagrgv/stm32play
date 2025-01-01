@@ -12,24 +12,18 @@
 #include <memory>
 #include <stm32f1xx.h>
 
-volatile bool led_state = false;
-void toggleIndicatorLed()
-{
-    gpio::setPinOutput(GPIOC, 13, led_state);
-    led_state = !led_state;
-}
-
 FixedDataStream<1024> usart1_stream;
 
 
 FixedDataStream<1024> temp;
+volatile bool listening = false;
+volatile int num_height = 0;
 extern "C"
 {
     void USART1_IRQHandler()
     {
         if (USART1->SR & USART_SR_RXNE)
         {
-            toggleIndicatorLed();
             const uint8_t data = USART1->DR;
             usart1_stream.writeByte(data);
             stat::addReadBytesUsart(1);
@@ -40,8 +34,29 @@ extern "C"
     {
         if (EXTI->PR & EXTI_PR_PR0)
         {
-            const bool high = gpio::getPinInput(GPIOA, 0);
-            temp.writeByte(high ? 'h' : 'l');
+            if (listening)
+            {
+                const bool high = gpio::getPinInput(GPIOA, 0);
+                num_height += high;
+                if (num_height >= 3)
+                {
+                    if (high)
+                    {
+                        constexpr uint32_t frequency = 1'000;
+                        tim::setupTimer(TIM2, frequency, tim::MAX_RELOAD_VALUE, tim::SINGLE_SHOT);
+                        tim::restartTimer(TIM2);
+                        gpio::setPinOutput(GPIOC, 13, true);
+                    }
+                    else
+                    {
+                        const uint32_t val = tim::getTimerValue(TIM2);
+                        tim::stopTimer(TIM2);
+                        gpio::setPinOutput(GPIOC, 13, false);
+                        const bool bit = val > 0;
+                        temp.writeByte(bit ? '1' : '0');
+                    }
+                }
+            }
             EXTI->PR = EXTI_PR_PR0;
         }
     }
@@ -109,12 +124,19 @@ int main()
         const char *name() override { return "go"; }
         bool execute(const char *args) override
         {
+            gpio::setPinOutput(GPIOC, 13, false);
             io::printSyncFmt("goo\n");
 
             gpio::setPinOutput(GPIOB, 12, false);
             utils::sleepMsec(20);
-            gpio::setPinOutput(GPIOB, 12, true);
 
+            listening = true;
+            num_height = 0;
+            gpio::setPinOutput(GPIOB, 12, true);
+            utils::sleepMsec(10);
+            listening = false;
+
+            gpio::setPinOutput(GPIOC, 13, false);
             return true;
         }
     };
@@ -138,11 +160,14 @@ int main()
         const char *name() override { return "reset"; }
         bool execute(const char *args) override
         {
-            tim::runTimer(TIM2);
+            tim::restartTimer(TIM2);
             return true;
         }
     };
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
+
+    gpio::setPinOutput(GPIOC, 13, false);
+
 
     char GGGG[1024 + 1];
     while (true)
@@ -175,7 +200,5 @@ int main()
         }
 
         command_buffer.flushCurrentCommand();
-
-        toggleIndicatorLed();
     }
 }

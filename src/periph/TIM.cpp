@@ -21,8 +21,18 @@ void tim::setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value
     tim->CR1 = cr1;
 }
 
-void tim::runTimer(TIM_TypeDef *tim)
+void tim::restartTimer(TIM_TypeDef *tim)
 {
     tim->CNT = 0;
     tim->CR1 |= TIM_CR1_CEN;
+}
+
+void tim::stopTimer(TIM_TypeDef *tim)
+{
+    tim->CR1 &= ~TIM_CR1_CEN;
+}
+
+uint32_t tim::getTimerValue(TIM_TypeDef *tim)
+{
+    return tim->CNT;
 }

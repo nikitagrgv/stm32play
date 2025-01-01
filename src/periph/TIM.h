@@ -16,6 +16,9 @@ enum SetupFlags : uint32_t
 
 void setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value, uint32_t flags = 0);
 
-void runTimer(TIM_TypeDef *tim);
+void restartTimer(TIM_TypeDef *tim);
+void stopTimer(TIM_TypeDef *tim);
+
+uint32_t getTimerValue(TIM_TypeDef *tim);
 
 } // namespace tim
