@@ -78,12 +78,12 @@ int main()
     EXTI->RTSR |= EXTI_RTSR_RT0;  // Rising edge
     NVIC_EnableIRQ(EXTI0_IRQn);
 
-    hnd::setHandler(hnd::HandlerType::SysTickHandler, [](void *) {
+    itr::setHandler(itr::HandlerType::SysTickHandler, [](void *) {
         //
         ++glob::total_msec;
     });
 
-    hnd::setHandler(hnd::HandlerType::TIM2Handler, [](void *) {
+    itr::setHandler(itr::HandlerType::TIM2Handler, [](void *) {
         if (TIM2->SR & TIM_SR_UIF)
         {
             TIM2->SR &= ~TIM_SR_UIF;
@@ -99,7 +99,7 @@ int main()
         }
     });
 
-    hnd::setHandler(hnd::HandlerType::USART1Handler, [](void *) {
+    itr::setHandler(itr::HandlerType::USART1Handler, [](void *) {
         if (USART1->SR & USART_SR_RXNE)
         {
             const uint8_t data = USART1->DR;
@@ -108,7 +108,7 @@ int main()
         }
     });
 
-    hnd::setHandler(hnd::HandlerType::EXTI0Handler, [](void *) {
+    itr::setHandler(itr::HandlerType::EXTI0Handler, [](void *) {
         if (EXTI->PR & EXTI_PR_PR0)
         {
             if (listening)
