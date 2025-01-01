@@ -1,5 +1,6 @@
 #include "DataStream.h"
 #include "Print.h"
+#include "Sleep.h"
 #include "Statistic.h"
 #include "commands/CommandBuffer.h"
 #include "commands/CommandExecutor.h"
@@ -46,8 +47,11 @@ int main()
     gpio::setPinMode(GPIOC, 13, gpio::PinMode::GeneralOpenDrain50MHz);
 
     gpio::setPinMode(GPIOA, 9, gpio::PinMode::AlternatePushPull50MHz); // USART1 TX
+
     gpio::setPinMode(GPIOA, 10, gpio::PinMode::InputPullUpOrDown);     // USART1 RX
     gpio::setPinPullUpOrDown(GPIOA, 10, gpio::PullUpOrDownMode::Up);
+
+    gpio::setPinMode(GPIOB, 12, gpio::PinMode::GeneralOpenDrain50MHz);
 
     // SysTick
     SysTick->LOAD = 8'000 - 1;
@@ -68,6 +72,11 @@ int main()
 
     while (true)
     {
+        utils::sleepMsec(1);
+        static bool value = false;
+        gpio::setPinOutput(GPIOB, 12, value);
+        value = !value;
+
         uint8_t byte;
         while (usart1_stream.readByte(byte))
         {
