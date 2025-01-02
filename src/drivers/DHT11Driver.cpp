@@ -33,10 +33,8 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     cleanup();
 
     // Edge detection
-    constexpr GPIOPort edge_detection_port = GPIOPort::B;
-    constexpr int edge_detection_pin = 5;
-    gpio::setPinMode(edge_detection_port, edge_detection_pin, gpio::PinMode::InputFloating);
-    exti::setupEXTI(edge_detection_port, edge_detection_pin, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
+    gpio::setPinMode(input_pin_, gpio::PinMode::InputFloating);
+    exti::setupEXTI(input_pin_, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
     irq::enableInterrupt(exti_interrupt_type_);
 
     irq::setHandler(
@@ -57,12 +55,12 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 
 
     num_written_bits = 0;
-    gpio::setPinOutput(GPIOPort::B, 12, false);
+    gpio::setPinOutput(output_pin_, false);
     utils::sleepMsec(20);
 
     listening = true;
     num_height = 0;
-    gpio::setPinOutput(GPIOPort::B, 12, true);
+    gpio::setPinOutput(output_pin_, true);
     utils::sleepMsec(10);
     listening = false;
 
@@ -145,7 +143,7 @@ void DHT11Driver::tim_handler()
         if (num_height >= 3 && num_written_bits < 40)
         {
             sleep1();
-            const bool bit = gpio::getPinInput(GPIOPort::B, 5);
+            const bool bit = gpio::getPinInput(input_pin_);
             dht_data.set(num_written_bits, bit);
             ++num_written_bits;
         }

@@ -34,14 +34,14 @@ int main()
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
     // C13 open drain
-    gpio::setPinMode(GPIOPort::C, 13, gpio::PinMode::GeneralOpenDrain50MHz);
+    gpio::setPinMode({GPIOPort::C, 13}, gpio::PinMode::GeneralOpenDrain50MHz);
 
-    gpio::setPinMode(GPIOPort::A, 9, gpio::PinMode::AlternatePushPull50MHz); // USART1 TX
+    gpio::setPinMode({GPIOPort::A, 9}, gpio::PinMode::AlternatePushPull50MHz); // USART1 TX
 
-    gpio::setPinMode(GPIOPort::A, 10, gpio::PinMode::InputPullUpOrDown); // USART1 RX
-    gpio::setPinPullUpOrDown(GPIOPort::A, 10, gpio::PullUpOrDownMode::Up);
+    gpio::setPinMode({GPIOPort::A, 10}, gpio::PinMode::InputPullUpOrDown); // USART1 RX
+    gpio::setPinPullUpOrDown({GPIOPort::A, 10}, gpio::PullUpOrDownMode::Up);
 
-    gpio::setPinMode(GPIOPort::B, 12, gpio::PinMode::GeneralOpenDrain50MHz);
+    gpio::setPinMode({GPIOPort::B, 12}, gpio::PinMode::GeneralOpenDrain50MHz);
 
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
@@ -80,7 +80,7 @@ int main()
     // Others
     command_executor.addCommand(std::make_unique<PrintCommand>());
 
-    gpio::setPinOutput(GPIOPort::B, 12, true);
+    gpio::setPinOutput({GPIOPort::B, 12}, true);
 
     struct TestCommand : public ICommand
     {
@@ -145,7 +145,7 @@ int main()
     };
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
 
-    gpio::setPinOutput(GPIOPort::C, 13, false);
+    gpio::setPinOutput({GPIOPort::C, 13}, false);
 
     irq::enableInterrupts();
 

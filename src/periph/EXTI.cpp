@@ -28,20 +28,20 @@ FORCE_INLINE constexpr int get_port_index(GPIOPort port)
 
 } // namespace
 
-void exti::setupEXTI(GPIOPort port, int pin, TriggerMode mode, uint32_t flags)
+void exti::setupEXTI(Pin pin, TriggerMode mode, uint32_t flags)
 {
-    MICRO_ASSERT(pin >= 0 && pin < 16);
+    MICRO_ASSERT(pin.num >= 0 && pin.num < 16);
 
-    const int port_index = get_port_index(port);
-    const int cr_reg_index = pin / 4;
-    const int cr_reg_exti_pos = pin % 4;
+    const int port_index = get_port_index(pin.port);
+    const int cr_reg_index = pin.num / 4;
+    const int cr_reg_exti_pos = pin.num % 4;
 
     const uint32_t clear_mask = get_clear_mask(cr_reg_exti_pos);
     const uint32_t mask = get_mask(port_index, cr_reg_exti_pos);
     auto &reg = AFIO->EXTICR[cr_reg_index];
     reg = (reg & clear_mask) | mask;
 
-    const uint32_t pin_bit_mask = 1UL << pin;
+    const uint32_t pin_bit_mask = 1UL << pin.num;
 
     // Setup edges
     if ((uint32_t)mode & (uint32_t)TriggerMode::FallingEdges)

@@ -35,40 +35,39 @@ FORCE_INLINE constexpr GPIO_TypeDef *get_port_register(GPIOPort port)
 
 } // namespace
 
-void gpio::setPinMode(GPIOPort port, int pin, PinMode mode)
+void gpio::setPinMode(Pin pin, PinMode mode)
 {
-    GPIO_TypeDef *port_reg = get_port_register(port);
+    GPIO_TypeDef *port_reg = get_port_register(pin.port);
 
-    MICRO_ASSERT(pin >= 0 && pin < 16);
-    const int is_high = pin >= 8;
-    const int pos = pin % 8;
+    MICRO_ASSERT(pin.isValid());
+    const int is_high = pin.num >= 8;
+    const int pos = pin.num % 8;
     auto &reg = is_high ? port_reg->CRH : port_reg->CRL;
     const uint32_t clear_mask = get_clear_mask(pos);
     const uint32_t mask = get_mask(mode, pos);
     reg = (reg & clear_mask) | mask;
 }
 
-void gpio::disablePin(GPIOPort port, int pin)
+void gpio::disablePin(Pin pin)
 {
-    setPinMode(port, pin, PinMode::InputFloating);
+    setPinMode(pin, PinMode::InputFloating);
 }
 
-bool gpio::getPinInput(GPIOPort port, int pin)
+bool gpio::getPinInput(Pin pin)
 {
-    MICRO_ASSERT(pin >= 0 && pin < 16);
-    const uint32_t mask = 1 << pin;
-    return get_port_register(port)->IDR & mask;
+    MICRO_ASSERT(pin.isValid());
+    const uint32_t mask = 1 << pin.num;
+    return get_port_register(pin.port)->IDR & mask;
 }
 
-void gpio::setPinOutput(GPIOPort port, int pin, bool value)
+void gpio::setPinOutput(Pin pin, bool value)
 {
-    MICRO_ASSERT(pin >= 0 && pin < 16);
-    const uint32_t mask = value ? GPIO_BSRR_BS0 << pin : GPIO_BSRR_BR0 << pin;
-    get_port_register(port)->BSRR = mask;
+    MICRO_ASSERT(pin.isValid());
+    const uint32_t mask = value ? GPIO_BSRR_BS0 << pin.num : GPIO_BSRR_BR0 << pin.num;
+    get_port_register(pin.port)->BSRR = mask;
 }
 
-void gpio::setPinPullUpOrDown(GPIOPort port, int pin, PullUpOrDownMode mode)
+void gpio::setPinPullUpOrDown(Pin pin, PullUpOrDownMode mode)
 {
-    MICRO_ASSERT(pin >= 0 && pin < 16);
-    setPinOutput(port, pin, mode == PullUpOrDownMode::Up);
+    setPinOutput(pin, mode == PullUpOrDownMode::Up);
 }

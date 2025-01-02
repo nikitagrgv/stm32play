@@ -22,12 +22,12 @@ enum class PullUpOrDownMode
     Up = 1,
 };
 
-void setPinMode(GPIOPort port, int pin, PinMode mode);
-void disablePin(GPIOPort port, int pin);
+void setPinMode(Pin pin, PinMode mode);
+void disablePin(Pin pin);
 
-bool getPinInput(GPIOPort port, int pin);
-void setPinOutput(GPIOPort port, int pin, bool value);
+bool getPinInput(Pin pin);
+void setPinOutput(Pin pin, bool value);
 
-void setPinPullUpOrDown(GPIOPort port, int pin, PullUpOrDownMode mode);
+void setPinPullUpOrDown(Pin pin, PullUpOrDownMode mode);
 
 } // namespace gpio

@@ -45,6 +45,8 @@ struct Pin
         MICRO_ASSERT(num >= 0 && num < 16);
     }
 
+    FORCE_INLINE constexpr bool isValid() const { return num >= 0 && num < 16; }
+
     GPIOPort port{GPIOPort::A};
     int num{0};
 };

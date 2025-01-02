@@ -19,7 +19,7 @@ enum SetupFlags : uint32_t
     ENABLE_INTERRUPT = 1 << 0,
 };
 
-void setupEXTI(GPIOPort port, int pin, TriggerMode mode, uint32_t flags);
+void setupEXTI(Pin pin, TriggerMode mode, uint32_t flags);
 
 InterruptType getInterruptType(int pin);
 
