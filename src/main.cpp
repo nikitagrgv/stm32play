@@ -46,15 +46,15 @@ int main()
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
     // Edge detection
-    constexpr GPIOPort edge_detection_port = GPIOPort::A;
-    constexpr int edge_detection_pin = 0;
+    constexpr GPIOPort edge_detection_port = GPIOPort::B;
+    constexpr int edge_detection_pin = 5;
     gpio::setPinMode(edge_detection_port, edge_detection_pin, gpio::PinMode::InputFloating);
     exti::setupEXTI(edge_detection_port, edge_detection_pin, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
     const InterruptType exti_interrupt = exti::getInterruptType(edge_detection_pin);
     irq::enableInterrupt(exti_interrupt);
 
     irq::setHandler(exti_interrupt, [](void *) {
-        if (EXTI->PR & EXTI_PR_PR0)
+        if (EXTI->PR & EXTI_PR_PR5)
         {
             if (listening)
             {
@@ -64,7 +64,23 @@ int main()
                     tim::restartTimer(TIM2);
                 }
             }
-            EXTI->PR = EXTI_PR_PR0;
+            EXTI->PR = EXTI_PR_PR5;
+        }
+    });
+
+    irq::setHandler(InterruptType::TIM2IRQ, [](void *) {
+        if (TIM2->SR & TIM_SR_UIF)
+        {
+            TIM2->SR &= ~TIM_SR_UIF;
+            if (num_height >= 3 && num_written_bits < 40)
+            {
+                gpio::setPinOutput(GPIOPort::C, 13, true);
+                sleep1();
+                gpio::setPinOutput(GPIOPort::C, 13, false);
+                const bool bit = gpio::getPinInput(GPIOPort::B, 5);
+                dht_data.set(num_written_bits, bit);
+                ++num_written_bits;
+            }
         }
     });
 
@@ -101,22 +117,6 @@ int main()
     irq::setHandler(InterruptType::SysTickIRQ, [](void *) {
         //
         ++glob::total_msec;
-    });
-
-    irq::setHandler(InterruptType::TIM2IRQ, [](void *) {
-        if (TIM2->SR & TIM_SR_UIF)
-        {
-            TIM2->SR &= ~TIM_SR_UIF;
-            if (num_height >= 3 && num_written_bits < 40)
-            {
-                gpio::setPinOutput(GPIOPort::C, 13, true);
-                sleep1();
-                gpio::setPinOutput(GPIOPort::C, 13, false);
-                const bool bit = gpio::getPinInput(GPIOPort::A, 0);
-                dht_data.set(num_written_bits, bit);
-                ++num_written_bits;
-            }
-        }
     });
 
     irq::setHandler(InterruptType::USART1IRQ, [](void *) {

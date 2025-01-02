@@ -76,7 +76,15 @@ void exti::setupEXTI(GPIOPort port, int pin, TriggerMode mode, uint32_t flags)
 InterruptType exti::getInterruptType(int pin)
 {
     MICRO_ASSERT(pin >= 0 && pin < 16);
-    const int exti_line = pin / 4;
-    const int type = (int)InterruptType::EXTI0IRQ + exti_line;
-    return (InterruptType)(type);
+
+    if (pin < 5)
+    {
+        const int type = (int)InterruptType::EXTI0IRQ + pin;
+        return (InterruptType)(type);
+    }
+    if (pin < 10)
+    {
+        return InterruptType::EXTI5_9_IRQn;
+    }
+    return InterruptType::EXTI10_15_IRQn;
 }

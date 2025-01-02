@@ -38,6 +38,9 @@ FORCE_INLINE IRQn_Type get_irqn_by_type(InterruptType type)
     case InterruptType::EXTI1IRQ: return EXTI1_IRQn;
     case InterruptType::EXTI2IRQ: return EXTI2_IRQn;
     case InterruptType::EXTI3IRQ: return EXTI3_IRQn;
+    case InterruptType::EXTI4IRQ: return EXTI4_IRQn;
+    case InterruptType::EXTI5_9_IRQn: return EXTI9_5_IRQn;
+    case InterruptType::EXTI10_15_IRQn: return EXTI15_10_IRQn;
     default: MICRO_ASSERT(0); return HardFault_IRQn;
     }
 }
@@ -79,6 +82,21 @@ extern "C"
     void EXTI3_IRQHandler()
     {
         call_handler(InterruptType::EXTI3IRQ);
+    }
+
+    void EXTI4_IRQHandler()
+    {
+        call_handler(InterruptType::EXTI4IRQ);
+    }
+
+    void EXTI9_5_IRQHandler()
+    {
+        call_handler(InterruptType::EXTI5_9_IRQn);
+    }
+
+    void EXTI15_10_IRQHandler()
+    {
+        call_handler(InterruptType::EXTI10_15_IRQn);
     }
 }
 
