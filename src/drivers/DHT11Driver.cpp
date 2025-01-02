@@ -6,18 +6,6 @@
 #include "periph/GPIO.h"
 #include "periph/IRQ.h"
 
-namespace
-{
-
-void sleep1()
-{
-    volatile uint32_t t = 4;
-    while (--t)
-    {}
-}
-
-
-} // namespace
 
 DHT11Driver::DHT11Driver(Pin input_pin, Pin output_pin, TIM_TypeDef *timer)
     : input_pin_(input_pin)
@@ -152,7 +140,6 @@ void DHT11Driver::tim_handler()
         return;
     }
 
-    sleep1();
     const bool bit = gpio::getPinInput(input_pin_);
     dht_data.set(num_written_bits, bit);
     ++num_written_bits;
