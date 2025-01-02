@@ -50,6 +50,7 @@ void tim::setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value
 
 void tim::restartTimer(TIM_TypeDef *tim)
 {
+    tim->SR = 0; // Clear interrupt flags
     tim->CNT = 0;
     tim->CR1 |= TIM_CR1_CEN;
 }
@@ -57,6 +58,7 @@ void tim::restartTimer(TIM_TypeDef *tim)
 void tim::stopTimer(TIM_TypeDef *tim)
 {
     tim->CR1 &= ~TIM_CR1_CEN;
+    tim->SR = 0; // Clear interrupt flags
 }
 
 uint32_t tim::getTimerValue(TIM_TypeDef *tim)
