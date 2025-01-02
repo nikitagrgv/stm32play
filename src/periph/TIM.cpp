@@ -41,9 +41,11 @@ void tim::setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value
     tim->PSC = prescaler;
     tim->ARR = reload_value - single_shot;
     tim->CNT = 0;
-    tim->EGR = TIM_EGR_UG; // Flush ARR and PSC!
+    tim->EGR = TIM_EGR_UG; // Trigger interrupt to Flush ARR and PSC!
     tim->DIER = get_dier_flags(setup_flags);
     tim->CR1 = get_cr1_flags(setup_flags);
+
+    tim->SR = 0; // Clear interrupt flags
 }
 
 void tim::restartTimer(TIM_TypeDef *tim)
