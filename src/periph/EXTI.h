@@ -21,4 +21,6 @@ enum SetupFlags : uint32_t
 
 void setupEXTI(GPIOPort port, int pin, TriggerMode mode, uint32_t flags);
 
+
+
 } // namespace exti

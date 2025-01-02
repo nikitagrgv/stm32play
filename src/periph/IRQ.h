@@ -1,29 +1,9 @@
 #pragma once
 
-extern "C"
-{
-    void SysTick_Handler();
-    void USART1_IRQHandler();
-    void TIM2_IRQHandler();
-    void EXTI0_IRQHandler();
-}
+#include "PeriphBase.h"
 
 namespace irq
 {
-
-enum class InterruptType
-{
-    SysTickIRQ = 0,
-    USART1IRQ,
-    TIM2IRQ,
-
-    EXTI0IRQ,
-    EXTI1IRQ,
-    EXTI2IRQ,
-    EXTI3IRQ,
-
-    NUM_INTERRUPT_TYPES,
-};
 
 using HandlerFunc = void (*)(void *opaque);
 

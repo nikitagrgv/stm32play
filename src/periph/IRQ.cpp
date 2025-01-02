@@ -15,9 +15,9 @@ struct FuncWithOpaque
     void *opaque{};
 };
 
-FuncWithOpaque handlers[(int)irq::InterruptType::NUM_INTERRUPT_TYPES];
+FuncWithOpaque handlers[(int)InterruptType::NUM_INTERRUPT_TYPES];
 
-FORCE_INLINE void call_handler(irq::InterruptType type)
+FORCE_INLINE void call_handler(InterruptType type)
 {
     const FuncWithOpaque &fwo = handlers[(int)type];
     if (!fwo.func)
@@ -27,17 +27,17 @@ FORCE_INLINE void call_handler(irq::InterruptType type)
     (*fwo.func)(fwo.opaque);
 }
 
-FORCE_INLINE IRQn_Type get_irqn_by_type(irq::InterruptType type)
+FORCE_INLINE IRQn_Type get_irqn_by_type(InterruptType type)
 {
     switch (type)
     {
-    case irq::InterruptType::SysTickIRQ: return SysTick_IRQn;
-    case irq::InterruptType::USART1IRQ: return USART1_IRQn;
-    case irq::InterruptType::TIM2IRQ: return TIM2_IRQn;
-    case irq::InterruptType::EXTI0IRQ: return EXTI0_IRQn;
-    case irq::InterruptType::EXTI1IRQ: return EXTI1_IRQn;
-    case irq::InterruptType::EXTI2IRQ: return EXTI2_IRQn;
-    case irq::InterruptType::EXTI3IRQ: return EXTI3_IRQn;
+    case InterruptType::SysTickIRQ: return SysTick_IRQn;
+    case InterruptType::USART1IRQ: return USART1_IRQn;
+    case InterruptType::TIM2IRQ: return TIM2_IRQn;
+    case InterruptType::EXTI0IRQ: return EXTI0_IRQn;
+    case InterruptType::EXTI1IRQ: return EXTI1_IRQn;
+    case InterruptType::EXTI2IRQ: return EXTI2_IRQn;
+    case InterruptType::EXTI3IRQ: return EXTI3_IRQn;
     default: MICRO_ASSERT(0); return HardFault_IRQn;
     }
 }
@@ -48,37 +48,37 @@ extern "C"
 {
     void SysTick_Handler()
     {
-        call_handler(irq::InterruptType::SysTickIRQ);
+        call_handler(InterruptType::SysTickIRQ);
     }
 
     void USART1_IRQHandler()
     {
-        call_handler(irq::InterruptType::USART1IRQ);
+        call_handler(InterruptType::USART1IRQ);
     }
 
     void TIM2_IRQHandler()
     {
-        call_handler(irq::InterruptType::TIM2IRQ);
+        call_handler(InterruptType::TIM2IRQ);
     }
 
     void EXTI0_IRQHandler()
     {
-        call_handler(irq::InterruptType::EXTI0IRQ);
+        call_handler(InterruptType::EXTI0IRQ);
     }
 
     void EXTI1_IRQHandler()
     {
-        call_handler(irq::InterruptType::EXTI1IRQ);
+        call_handler(InterruptType::EXTI1IRQ);
     }
 
     void EXTI2_IRQHandler()
     {
-        call_handler(irq::InterruptType::EXTI2IRQ);
+        call_handler(InterruptType::EXTI2IRQ);
     }
 
     void EXTI3_IRQHandler()
     {
-        call_handler(irq::InterruptType::EXTI3IRQ);
+        call_handler(InterruptType::EXTI3IRQ);
     }
 }
 
