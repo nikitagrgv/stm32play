@@ -24,6 +24,8 @@ void stopTimer(TIM_TypeDef *tim);
 
 uint32_t getTimerValue(TIM_TypeDef *tim);
 
+bool checkPendingUpdateAndClear(TIM_TypeDef *tim);
+
 InterruptType getUpdateInterruptType(const TIM_TypeDef *tim);
 
 } // namespace tim

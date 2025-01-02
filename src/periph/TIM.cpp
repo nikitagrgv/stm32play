@@ -66,6 +66,16 @@ uint32_t tim::getTimerValue(TIM_TypeDef *tim)
     return tim->CNT;
 }
 
+bool tim::checkPendingUpdateAndClear(TIM_TypeDef *tim)
+{
+    if (tim->SR & TIM_SR_UIF)
+    {
+        tim->SR = ~TIM_SR_UIF; // NOTE: write 0 to clear
+        return true;
+    }
+    return false;
+}
+
 InterruptType tim::getUpdateInterruptType(const TIM_TypeDef *tim)
 {
     if (tim == TIM1)

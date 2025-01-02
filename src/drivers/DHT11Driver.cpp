@@ -142,15 +142,18 @@ void DHT11Driver::exti_handler()
 
 void DHT11Driver::tim_handler()
 {
-    if (TIM2->SR & TIM_SR_UIF)
+    if (!tim::checkPendingUpdateAndClear(timer_))
     {
-        TIM2->SR &= ~TIM_SR_UIF;
-        if (num_height >= 3 && num_written_bits < 40)
-        {
-            sleep1();
-            const bool bit = gpio::getPinInput(input_pin_);
-            dht_data.set(num_written_bits, bit);
-            ++num_written_bits;
-        }
+        return;
     }
+
+    if (num_height < 3 || num_written_bits >= 40)
+    {
+        return;
+    }
+
+    sleep1();
+    const bool bit = gpio::getPinInput(input_pin_);
+    dht_data.set(num_written_bits, bit);
+    ++num_written_bits;
 }
