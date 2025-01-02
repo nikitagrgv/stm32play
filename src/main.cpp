@@ -4,6 +4,7 @@
 #include "commands/CommandExecutor.h"
 #include "commands/PrintCommand.h"
 #include "debug/Statistic.h"
+#include "drivers/DHT11Driver.h"
 #include "periph/EXTI.h"
 #include "periph/GPIO.h"
 #include "periph/IRQ.h"
@@ -19,19 +20,6 @@
 
 FixedDataStream<1024> usart1_stream;
 
-void sleep1()
-{
-    volatile uint32_t t = 4;
-    while (--t)
-    {}
-}
-
-FixedBitset<5 * 8> dht_data;
-
-volatile bool listening = false;
-volatile int num_height = 0;
-volatile int num_written_bits = 0;
-
 CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
@@ -44,45 +32,6 @@ int main()
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN | RCC_APB2ENR_AFIOEN
         | RCC_APB2ENR_USART1EN;
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
-
-    // Edge detection
-    constexpr GPIOPort edge_detection_port = GPIOPort::B;
-    constexpr int edge_detection_pin = 5;
-    gpio::setPinMode(edge_detection_port, edge_detection_pin, gpio::PinMode::InputFloating);
-    exti::setupEXTI(edge_detection_port, edge_detection_pin, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
-    const InterruptType exti_interrupt = exti::getInterruptType(edge_detection_pin);
-    irq::enableInterrupt(exti_interrupt);
-
-    irq::setHandler(exti_interrupt, [](void *) {
-        if (EXTI->PR & EXTI_PR_PR5)
-        {
-            if (listening)
-            {
-                ++num_height;
-                if (num_height >= 3)
-                {
-                    tim::restartTimer(TIM2);
-                }
-            }
-            EXTI->PR = EXTI_PR_PR5;
-        }
-    });
-
-    irq::setHandler(InterruptType::TIM2IRQ, [](void *) {
-        if (TIM2->SR & TIM_SR_UIF)
-        {
-            TIM2->SR &= ~TIM_SR_UIF;
-            if (num_height >= 3 && num_written_bits < 40)
-            {
-                gpio::setPinOutput(GPIOPort::C, 13, true);
-                sleep1();
-                gpio::setPinOutput(GPIOPort::C, 13, false);
-                const bool bit = gpio::getPinInput(GPIOPort::B, 5);
-                dht_data.set(num_written_bits, bit);
-                ++num_written_bits;
-            }
-        }
-    });
 
     // C13 open drain
     gpio::setPinMode(GPIOPort::C, 13, gpio::PinMode::GeneralOpenDrain50MHz);
@@ -138,61 +87,32 @@ int main()
         const char *name() override { return "go"; }
         bool execute(const char *args) override
         {
-            num_written_bits = 0;
-            gpio::setPinOutput(GPIOPort::C, 13, false);
+            Pin output_pin{GPIOPort::B, 12};
+            Pin input_pin{GPIOPort::B, 5};
+            TIM_TypeDef *timer = TIM2;
+            DHT11Driver dht11{input_pin, output_pin, timer};
 
-            gpio::setPinOutput(GPIOPort::B, 12, false);
-            utils::sleepMsec(20);
+            float temperature = 0.0f;
+            float humidity = 0.0f;
+            const DHT11Driver::ErrorCode code = dht11.run(temperature, humidity);
 
-            listening = true;
-            num_height = 0;
-            gpio::setPinOutput(GPIOPort::B, 12, true);
-            utils::sleepMsec(10);
-            listening = false;
-
-            gpio::setPinOutput(GPIOPort::C, 13, false);
-
-            const uint32_t start_time_ms = glob::total_msec;
-            constexpr uint32_t TIMEOUT_MS = 100;
-            const uint32_t end_time = start_time_ms + TIMEOUT_MS;
-
-            while (num_written_bits != 40)
+            if (code == DHT11Driver::ErrorCode::Timeout)
             {
-                if (glob::total_msec > end_time)
-                {
-                    io::printSyncFmt("DHT11: Timeout\n");
-                    return true;
-                }
+                io::printSyncFmt("DHT11: Timeout\n");
+                return true;
             }
 
-            const auto flip_byte = [](uint8_t byte) {
-                uint8_t result = 0;
-                for (int i = 0; i < 8; ++i)
-                {
-                    result |= ((byte >> i) & 1) << (7 - i);
-                }
-                return result;
-            };
-
-
-            uint8_t data[5];
-            dht_data.copyData<uint8_t>(data, 5);
-            for (int i = 0; i < 5; ++i)
-            {
-                data[i] = flip_byte(data[i]);
-            }
-
-            const uint8_t checksum = data[0] + data[1] + data[2] + data[3];
-            if (checksum != data[4])
+            if (code == DHT11Driver::ErrorCode::InvalidChecksum)
             {
                 io::printSyncFmt("DHT11: Invalid checksum\n");
                 return true;
             }
 
-            float humidity = data[0];
-            humidity += data[1] / 256.0f;
-            float temperature = data[2];
-            temperature += data[3] / 256.0f;
+            if (code != DHT11Driver::ErrorCode::Success)
+            {
+                io::printSyncFmt("DHT11: Unexpected error\n");
+                return true;
+            }
 
             io::printSyncFmt("temp = %f, hum = %f\n", temperature, humidity);
 
