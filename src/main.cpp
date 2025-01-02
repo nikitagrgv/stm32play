@@ -45,11 +45,13 @@ int main()
         | RCC_APB2ENR_USART1EN;
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
-    // A0
-    gpio::setPinMode(GPIOPort::A, 0, gpio::PinMode::InputFloating);
-    exti::setupEXTI(GPIOPort::A, 0, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
-
-    irq::enableInterrupt(InterruptType::EXTI0IRQ);
+    // Edge detection
+    constexpr GPIOPort edge_detection_port = GPIOPort::A;
+    constexpr int edge_detection_pin = 0;
+    gpio::setPinMode(edge_detection_port, edge_detection_pin, gpio::PinMode::InputFloating);
+    exti::setupEXTI(edge_detection_port, edge_detection_pin, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
+    const InterruptType exti_interrupt = exti::getInterruptType(edge_detection_pin);
+    irq::enableInterrupt(exti_interrupt);
 
     irq::setHandler(InterruptType::EXTI0IRQ, [](void *) {
         if (EXTI->PR & EXTI_PR_PR0)

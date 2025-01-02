@@ -72,3 +72,11 @@ void exti::setupEXTI(GPIOPort port, int pin, TriggerMode mode, uint32_t flags)
         EXTI->IMR &= ~pin_bit_mask;
     }
 }
+
+InterruptType exti::getInterruptType(int pin)
+{
+    MICRO_ASSERT(pin >= 0 && pin < 16);
+    const int exti_line = pin / 4;
+    const int type = (int)InterruptType::EXTI0IRQ + exti_line;
+    return (InterruptType)(type);
+}
