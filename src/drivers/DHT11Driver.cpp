@@ -53,8 +53,6 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 
 
     num_written_bits = 0;
-    gpio::setPinOutput(GPIOPort::C, 13, false);
-
     gpio::setPinOutput(GPIOPort::B, 12, false);
     utils::sleepMsec(20);
 
@@ -63,8 +61,6 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     gpio::setPinOutput(GPIOPort::B, 12, true);
     utils::sleepMsec(10);
     listening = false;
-
-    gpio::setPinOutput(GPIOPort::C, 13, false);
 
     const uint32_t start_time_ms = glob::total_msec;
     constexpr uint32_t TIMEOUT_MS = 100;
@@ -130,9 +126,7 @@ void DHT11Driver::tim_handler()
         TIM2->SR &= ~TIM_SR_UIF;
         if (num_height >= 3 && num_written_bits < 40)
         {
-            gpio::setPinOutput(GPIOPort::C, 13, true);
             sleep1();
-            gpio::setPinOutput(GPIOPort::C, 13, false);
             const bool bit = gpio::getPinInput(GPIOPort::B, 5);
             dht_data.set(num_written_bits, bit);
             ++num_written_bits;
