@@ -17,34 +17,8 @@ enum class PinMode
     AlternateOpenDrain50MHz = 0b1111,
 };
 
-constexpr uint32_t getGPIOMask(PinMode mode, int pos)
-{
-    MICRO_ASSERT(pos < 8);
-    const int bit_pos = pos * 4;
-    return (uint32_t)mode << bit_pos;
-}
-
-constexpr uint32_t getGPIOClearMask(int pos)
-{
-    MICRO_ASSERT(pos < 8);
-    return ~(0b1111UL << (pos * 4));
-}
-
-inline void setPinMode(GPIO_TypeDef *port, int pin, PinMode mode)
-{
-    MICRO_ASSERT(pin < 16);
-    const int is_high = pin >= 8;
-    const int pos = pin % 8;
-    auto &reg = is_high ? port->CRH : port->CRL;
-    const uint32_t clear_mask = getGPIOClearMask(pos);
-    const uint32_t mask = getGPIOMask(mode, pos);
-    reg = (reg & clear_mask) | mask;
-}
-
-inline void disablePin(GPIO_TypeDef *port, int pin)
-{
-    setPinMode(port, pin, PinMode::InputFloating);
-}
+void setPinMode(GPIO_TypeDef *port, int pin, PinMode mode);
+void disablePin(GPIO_TypeDef *port, int pin);
 
 inline void setPinOutput(GPIO_TypeDef *port, int pin, bool value)
 {
