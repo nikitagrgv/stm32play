@@ -128,6 +128,21 @@ int main()
     exti::setupEXTI(GPIOPort::A, 0, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
     irq::enableInterrupt(irq::InterruptType::EXTI0IRQ);
 
+    irq::setHandler(irq::InterruptType::EXTI0IRQ, [](void *) {
+        if (EXTI->PR & EXTI_PR_PR0)
+        {
+            if (listening)
+            {
+                ++num_height;
+                if (num_height >= 3)
+                {
+                    tim::restartTimer(TIM2);
+                }
+            }
+            EXTI->PR = EXTI_PR_PR0;
+        }
+    });
+
     // C13 open drain
     gpio::setPinMode(GPIOPort::C, 13, gpio::PinMode::GeneralOpenDrain50MHz);
 
@@ -185,21 +200,6 @@ int main()
             const uint8_t data = USART1->DR;
             usart1_stream.writeByte(data);
             stat::addReadBytesUsart(1);
-        }
-    });
-
-    irq::setHandler(irq::InterruptType::EXTI0IRQ, [](void *) {
-        if (EXTI->PR & EXTI_PR_PR0)
-        {
-            if (listening)
-            {
-                ++num_height;
-                if (num_height >= 3)
-                {
-                    tim::restartTimer(TIM2);
-                }
-            }
-            EXTI->PR = EXTI_PR_PR0;
         }
     });
 
