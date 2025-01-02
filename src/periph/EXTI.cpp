@@ -30,7 +30,9 @@ FORCE_INLINE constexpr int get_port_index(GPIOPort port)
 
 void exti::setupEXTI(Pin pin, TriggerMode mode, uint32_t flags)
 {
-    MICRO_ASSERT(pin.num >= 0 && pin.num < 16);
+    MICRO_ASSERT(pin.isValid());
+
+    disableEXTI(pin.num);
 
     const int port_index = get_port_index(pin.port);
     const int cr_reg_index = pin.num / 4;
@@ -71,6 +73,19 @@ void exti::setupEXTI(Pin pin, TriggerMode mode, uint32_t flags)
     {
         EXTI->IMR &= ~pin_bit_mask;
     }
+}
+
+void exti::disableEXTI(int line)
+{
+    const uint32_t line_bit_mask = 1UL << line;
+    const uint32_t line_bit_clear_mask = ~line_bit_mask;
+
+    EXTI->FTSR &= line_bit_clear_mask;
+    EXTI->RTSR &= line_bit_clear_mask;
+    EXTI->SWIER &= line_bit_clear_mask;
+    EXTI->IMR &= line_bit_clear_mask;
+    EXTI->EMR &= line_bit_clear_mask;
+    EXTI->PR = line_bit_mask; // NOTE: write 1 to clear
 }
 
 InterruptType exti::getInterruptType(int pin)

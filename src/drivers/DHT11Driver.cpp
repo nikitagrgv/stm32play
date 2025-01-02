@@ -32,10 +32,15 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 {
     cleanup();
 
-    // Edge detection
     gpio::setPinMode(input_pin_, gpio::PinMode::InputFloating);
     exti::setupEXTI(input_pin_, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
     irq::enableInterrupt(exti_interrupt_type_);
+
+    num_written_bits = 0;
+    gpio::setPinOutput(output_pin_, false);
+    utils::sleepMsec(20);
+
+    listening = true;
 
     irq::setHandler(
         exti_interrupt_type_,
@@ -53,12 +58,6 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
         },
         this);
 
-
-    num_written_bits = 0;
-    gpio::setPinOutput(output_pin_, false);
-    utils::sleepMsec(20);
-
-    listening = true;
     num_height = 0;
     gpio::setPinOutput(output_pin_, true);
     utils::sleepMsec(10);
@@ -114,6 +113,9 @@ void DHT11Driver::cleanup()
     listening = false;
     num_height = 0;
     num_written_bits = 0;
+
+    tim::stopTimer(timer_);
+    exti::disableEXTI(input_pin_.num);
 
     irq::clearHandler(exti_interrupt_type_);
     irq::clearHandler(tim_interrupt_type_);
