@@ -53,7 +53,7 @@ int main()
     const InterruptType exti_interrupt = exti::getInterruptType(edge_detection_pin);
     irq::enableInterrupt(exti_interrupt);
 
-    irq::setHandler(InterruptType::EXTI0IRQ, [](void *) {
+    irq::setHandler(exti_interrupt, [](void *) {
         if (EXTI->PR & EXTI_PR_PR0)
         {
             if (listening)
