@@ -73,4 +73,12 @@ inline bool compareTrimmed(const char *str, const char *base)
     return allAreSpaces(str);
 }
 
+// Lightweight version. If you don't want to link with _printf_float increasing code size
+inline void floatToString(float value, const char* buf, int buf_size)
+{
+    constexpr int DIV_INT = 100;
+    constexpr float DIV_FLOAT = DIV_INT;
+    float frac = value * DIV_INT;
+}
+
 } // namespace str_utils
