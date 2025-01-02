@@ -1,5 +1,8 @@
 #pragma once
 
+#include "core/Base.h"
+#include "core/MicroAssert.h"
+
 enum class GPIOPort
 {
     A = 0,
@@ -24,4 +27,19 @@ enum class InterruptType
     EXTI10_15_IRQn,
 
     NUM_INTERRUPT_TYPES,
+};
+
+struct Pin
+{
+    FORCE_INLINE constexpr Pin() = default;
+
+    FORCE_INLINE constexpr Pin(GPIOPort port, int num)
+        : port(port)
+        , num(num)
+    {
+        MICRO_ASSERT(num >= 0 && num < 16);
+    }
+
+    GPIOPort port{GPIOPort::A};
+    int num{0};
 };
