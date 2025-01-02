@@ -75,9 +75,7 @@ add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR
 add_link_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 add_link_options(-T ${LINKER_SCRIPT})
 add_link_options(--specs=nano.specs)
-
-# uncomment to be able to use %f in printf-like functions. Increases flash consumption!
-#add_link_options(-u _printf_float)
+add_link_options(-u _printf_float)
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 
