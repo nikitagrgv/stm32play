@@ -42,6 +42,14 @@ int main()
         | RCC_APB2ENR_USART1EN;
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
+    // A0
+    gpio::setPinMode(GPIOA, 0, gpio::PinMode::InputFloating);
+    AFIO->EXTICR[0] &= ~AFIO_EXTICR1_EXTI0;
+    EXTI->IMR |= EXTI_IMR_MR0;
+    EXTI->FTSR &= ~EXTI_FTSR_FT0; // Falling edge
+    EXTI->RTSR |= EXTI_RTSR_RT0;  // Rising edge
+    irq::enableInterrupt(irq::InterruptType::EXTI0IRQ);
+
     // C13 open drain
     gpio::setPinMode(GPIOC, 13, gpio::PinMode::GeneralOpenDrain50MHz);
 
@@ -71,14 +79,6 @@ int main()
     constexpr uint32_t reload_value = 48;
     tim::setupTimer(TIM2, frequency, reload_value, tim::SINGLE_SHOT | tim::ENABLE_UPDATE_INTERRUPT);
     irq::enableInterrupt(irq::InterruptType::TIM2IRQ);
-
-    // A0
-    gpio::setPinMode(GPIOA, 0, gpio::PinMode::InputFloating);
-    AFIO->EXTICR[0] &= ~AFIO_EXTICR1_EXTI0;
-    EXTI->IMR |= EXTI_IMR_MR0;
-    EXTI->FTSR &= ~EXTI_FTSR_FT0; // Falling edge
-    EXTI->RTSR |= EXTI_RTSR_RT0;  // Rising edge
-    irq::enableInterrupt(irq::InterruptType::EXTI0IRQ);
 
     irq::setHandler(irq::InterruptType::SysTickIRQ, [](void *) {
         //
