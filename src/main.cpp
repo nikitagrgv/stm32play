@@ -124,19 +124,19 @@ int main()
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
     // A0
-    gpio::setPinMode(GPIOA, 0, gpio::PinMode::InputFloating);
+    gpio::setPinMode(GPIOPort::A, 0, gpio::PinMode::InputFloating);
     exti::setupEXTI(GPIOPort::A, 0, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
     irq::enableInterrupt(irq::InterruptType::EXTI0IRQ);
 
     // C13 open drain
-    gpio::setPinMode(GPIOC, 13, gpio::PinMode::GeneralOpenDrain50MHz);
+    gpio::setPinMode(GPIOPort::C, 13, gpio::PinMode::GeneralOpenDrain50MHz);
 
-    gpio::setPinMode(GPIOA, 9, gpio::PinMode::AlternatePushPull50MHz); // USART1 TX
+    gpio::setPinMode(GPIOPort::A, 9, gpio::PinMode::AlternatePushPull50MHz); // USART1 TX
 
-    gpio::setPinMode(GPIOA, 10, gpio::PinMode::InputPullUpOrDown); // USART1 RX
-    gpio::setPinPullUpOrDown(GPIOA, 10, gpio::PullUpOrDownMode::Up);
+    gpio::setPinMode(GPIOPort::A, 10, gpio::PinMode::InputPullUpOrDown); // USART1 RX
+    gpio::setPinPullUpOrDown(GPIOPort::A, 10, gpio::PullUpOrDownMode::Up);
 
-    gpio::setPinMode(GPIOB, 12, gpio::PinMode::GeneralOpenDrain50MHz);
+    gpio::setPinMode(GPIOPort::B, 12, gpio::PinMode::GeneralOpenDrain50MHz);
 
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
@@ -169,10 +169,10 @@ int main()
             TIM2->SR &= ~TIM_SR_UIF;
             if (num_height >= 3 && num_written_bits < 40)
             {
-                gpio::setPinOutput(GPIOC, 13, true);
+                gpio::setPinOutput(GPIOPort::C, 13, true);
                 sleep1();
-                gpio::setPinOutput(GPIOC, 13, false);
-                const bool bit = gpio::getPinInput(GPIOA, 0);
+                gpio::setPinOutput(GPIOPort::C, 13, false);
+                const bool bit = gpio::getPinInput(GPIOPort::A, 0);
                 dht_data.set(num_written_bits, bit);
                 ++num_written_bits;
             }
@@ -206,7 +206,7 @@ int main()
     // Others
     command_executor.addCommand(std::make_unique<PrintCommand>());
 
-    gpio::setPinOutput(GPIOB, 12, true);
+    gpio::setPinOutput(GPIOPort::B, 12, true);
 
     struct TestCommand : public ICommand
     {
@@ -214,18 +214,18 @@ int main()
         bool execute(const char *args) override
         {
             num_written_bits = 0;
-            gpio::setPinOutput(GPIOC, 13, false);
+            gpio::setPinOutput(GPIOPort::C, 13, false);
 
-            gpio::setPinOutput(GPIOB, 12, false);
+            gpio::setPinOutput(GPIOPort::B, 12, false);
             utils::sleepMsec(20);
 
             listening = true;
             num_height = 0;
-            gpio::setPinOutput(GPIOB, 12, true);
+            gpio::setPinOutput(GPIOPort::B, 12, true);
             utils::sleepMsec(10);
             listening = false;
 
-            gpio::setPinOutput(GPIOC, 13, false);
+            gpio::setPinOutput(GPIOPort::C, 13, false);
 
             const uint32_t start_time_ms = glob::total_msec;
             constexpr uint32_t TIMEOUT_MS = 100;
@@ -300,7 +300,7 @@ int main()
     };
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
 
-    gpio::setPinOutput(GPIOC, 13, false);
+    gpio::setPinOutput(GPIOPort::C, 13, false);
 
     irq::enableInterrupts();
 
