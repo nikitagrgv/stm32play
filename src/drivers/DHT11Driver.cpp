@@ -123,17 +123,20 @@ void DHT11Driver::cleanup()
 
 void DHT11Driver::exti_handler()
 {
-    if (EXTI->PR & EXTI_PR_PR5)
+    if (!exti::checkPendingAndClear(input_pin_.num))
     {
-        if (listening)
-        {
-            ++num_height;
-            if (num_height >= 3)
-            {
-                tim::restartTimer(timer_);
-            }
-        }
-        EXTI->PR = EXTI_PR_PR5;
+        return;
+    }
+
+    if (!listening)
+    {
+        return;
+    }
+
+    ++num_height;
+    if (num_height >= 3)
+    {
+        tim::restartTimer(timer_);
     }
 }
 

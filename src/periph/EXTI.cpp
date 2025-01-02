@@ -88,6 +88,17 @@ void exti::disableEXTI(int line)
     EXTI->PR = line_bit_mask; // NOTE: write 1 to clear
 }
 
+bool checkPendingAndClear(int line)
+{
+    const uint32_t line_bit_mask = 1UL << line;
+    if (EXTI->PR & line_bit_mask)
+    {
+        EXTI->PR = line_bit_mask;
+        return true;
+    }
+    return false;
+}
+
 InterruptType exti::getInterruptType(int pin)
 {
     MICRO_ASSERT(pin >= 0 && pin < 16);

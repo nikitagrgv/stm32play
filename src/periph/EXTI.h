@@ -22,6 +22,8 @@ enum SetupFlags : uint32_t
 void setupEXTI(Pin pin, TriggerMode mode, uint32_t flags);
 void disableEXTI(int line);
 
+bool checkPendingAndClear(int line);
+
 InterruptType getInterruptType(int pin);
 
 } // namespace exti
