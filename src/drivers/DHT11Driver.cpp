@@ -23,20 +23,24 @@ DHT11Driver::DHT11Driver(Pin input_pin, Pin output_pin, TIM_TypeDef *timer)
     : input_pin_(input_pin)
     , output_pin_(output_pin)
     , timer_(timer)
-{}
+{
+    exti_interrupt_type_ = exti::getInterruptType(input_pin_.num);
+    tim_interrupt_type_ = tim::getUpdateInterruptType(timer_);
+}
 
 DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 {
+    cleanup();
+
     // Edge detection
     constexpr GPIOPort edge_detection_port = GPIOPort::B;
     constexpr int edge_detection_pin = 5;
     gpio::setPinMode(edge_detection_port, edge_detection_pin, gpio::PinMode::InputFloating);
     exti::setupEXTI(edge_detection_port, edge_detection_pin, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
-    const InterruptType exti_interrupt = exti::getInterruptType(edge_detection_pin);
-    irq::enableInterrupt(exti_interrupt);
+    irq::enableInterrupt(exti_interrupt_type_);
 
     irq::setHandler(
-        exti_interrupt,
+        exti_interrupt_type_,
         [](void *opaque) {
             auto *self = (DHT11Driver *)opaque;
             self->exti_handler();
@@ -44,7 +48,7 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
         this);
 
     irq::setHandler(
-        InterruptType::TIM2IRQ,
+        tim_interrupt_type_,
         [](void *opaque) {
             auto *self = (DHT11Driver *)opaque;
             self->tim_handler();
@@ -70,6 +74,7 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     {
         if (glob::total_msec > end_time)
         {
+            cleanup();
             return ErrorCode::Timeout;
         }
     }
@@ -94,13 +99,26 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     const uint8_t checksum = data[0] + data[1] + data[2] + data[3];
     if (checksum != data[4])
     {
+        cleanup();
         return ErrorCode::InvalidChecksum;
     }
 
     humidity = (float)data[0] + (float)data[1] / 256.0f;
     temperature = (float)data[2] + (float)data[3] / 256.0f;
 
+    cleanup();
     return ErrorCode::Success;
+}
+
+void DHT11Driver::cleanup()
+{
+    dht_data.clearAll();
+    listening = false;
+    num_height = 0;
+    num_written_bits = 0;
+
+    irq::clearHandler(exti_interrupt_type_);
+    irq::clearHandler(tim_interrupt_type_);
 }
 
 void DHT11Driver::exti_handler()
@@ -112,7 +130,7 @@ void DHT11Driver::exti_handler()
             ++num_height;
             if (num_height >= 3)
             {
-                tim::restartTimer(TIM2);
+                tim::restartTimer(timer_);
             }
         }
         EXTI->PR = EXTI_PR_PR5;

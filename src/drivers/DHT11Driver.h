@@ -20,6 +20,8 @@ public:
     ErrorCode run(float &temperature, float &humidity);
 
 private:
+    void cleanup();
+
     void exti_handler();
     void tim_handler();
 
@@ -29,6 +31,9 @@ private:
     Pin input_pin_{};
     Pin output_pin_{};
     TIM_TypeDef *timer_{};
+
+    InterruptType exti_interrupt_type_{};
+    InterruptType tim_interrupt_type_{};
 
     volatile bool listening = false;
     volatile int num_height = 0;

@@ -15,8 +15,13 @@ enum class GPIOPort
 enum class InterruptType
 {
     SysTickIRQ = 0,
+
     USART1IRQ,
+
+    TIM1_UP_IRQ,
     TIM2IRQ,
+    TIM3IRQ,
+    TIM4IRQ,
 
     EXTI0IRQ,
     EXTI1IRQ,

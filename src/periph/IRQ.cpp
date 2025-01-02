@@ -32,8 +32,14 @@ FORCE_INLINE IRQn_Type get_irqn_by_type(InterruptType type)
     switch (type)
     {
     case InterruptType::SysTickIRQ: return SysTick_IRQn;
+
     case InterruptType::USART1IRQ: return USART1_IRQn;
+
+    case InterruptType::TIM1_UP_IRQ: return TIM1_UP_IRQn;
     case InterruptType::TIM2IRQ: return TIM2_IRQn;
+    case InterruptType::TIM3IRQ: return TIM3_IRQn;
+    case InterruptType::TIM4IRQ: return TIM4_IRQn;
+
     case InterruptType::EXTI0IRQ: return EXTI0_IRQn;
     case InterruptType::EXTI1IRQ: return EXTI1_IRQn;
     case InterruptType::EXTI2IRQ: return EXTI2_IRQn;
@@ -41,6 +47,7 @@ FORCE_INLINE IRQn_Type get_irqn_by_type(InterruptType type)
     case InterruptType::EXTI4IRQ: return EXTI4_IRQn;
     case InterruptType::EXTI5_9_IRQn: return EXTI9_5_IRQn;
     case InterruptType::EXTI10_15_IRQn: return EXTI15_10_IRQn;
+
     default: MICRO_ASSERT(0); return HardFault_IRQn;
     }
 }

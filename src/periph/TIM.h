@@ -1,5 +1,7 @@
 #pragma once
 
+#include "PeriphBase.h"
+
 #include <cstdint>
 #include <stm32f1xx.h>
 
@@ -21,5 +23,7 @@ void restartTimer(TIM_TypeDef *tim);
 void stopTimer(TIM_TypeDef *tim);
 
 uint32_t getTimerValue(TIM_TypeDef *tim);
+
+InterruptType getUpdateInterruptType(const TIM_TypeDef *tim);
 
 } // namespace tim

@@ -65,3 +65,26 @@ uint32_t tim::getTimerValue(TIM_TypeDef *tim)
 {
     return tim->CNT;
 }
+
+InterruptType tim::getUpdateInterruptType(const TIM_TypeDef *tim)
+{
+    if (tim == TIM1)
+    {
+        return InterruptType::TIM1_UP_IRQ;
+    }
+    if (tim == TIM2)
+    {
+        return InterruptType::TIM2IRQ;
+    }
+    if (tim == TIM3)
+    {
+        return InterruptType::TIM3IRQ;
+    }
+    if (tim == TIM4)
+    {
+        return InterruptType::TIM4IRQ;
+    }
+
+    MICRO_ASSERT(0);
+    return InterruptType::SysTickIRQ;
+}
