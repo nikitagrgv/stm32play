@@ -126,6 +126,7 @@ int main()
     // A0
     gpio::setPinMode(GPIOPort::A, 0, gpio::PinMode::InputFloating);
     exti::setupEXTI(GPIOPort::A, 0, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
+
     irq::enableInterrupt(irq::InterruptType::EXTI0IRQ);
 
     irq::setHandler(irq::InterruptType::EXTI0IRQ, [](void *) {
