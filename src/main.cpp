@@ -6,6 +6,7 @@
 #include "debug/Statistic.h"
 #include "periph/GPIO.h"
 #include "periph/IRQ.h"
+#include "periph/PeriphBase.h"
 #include "periph/SysTick.h"
 #include "periph/TIM.h"
 #include "periph/USART.h"
@@ -34,6 +35,86 @@ CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
+namespace exti
+{
+
+enum class TriggerMode
+{
+    FallingEdges = 1 << 0,
+    RisingEdges = 1 << 1,
+    BothEdges = FallingEdges | RisingEdges,
+};
+
+enum SetupFlags : uint32_t
+{
+    ENABLE_INTERRUPT = 1 << 0,
+};
+
+FORCE_INLINE constexpr uint32_t get_mask(int port_index, int pos)
+{
+    MICRO_ASSERT(pos >= 0 && pos < 8);
+    const int bit_pos = pos * 4;
+    return (uint32_t)port_index << bit_pos;
+}
+
+FORCE_INLINE constexpr uint32_t get_clear_mask(int pos)
+{
+    MICRO_ASSERT(pos >= 0 && pos < 8);
+    return ~(0b1111UL << (pos * 4));
+}
+
+FORCE_INLINE constexpr int get_port_index(GPIOPort port)
+{
+    return int(port);
+}
+
+void setupEXTI(GPIOPort port, int pin, TriggerMode mode, uint32_t flags)
+{
+    MICRO_ASSERT(pin >= 0 && pin < 16);
+
+    const int port_index = get_port_index(port);
+    const int cr_reg_index = pin / 4;
+    const int cr_reg_exti_pos = pin % 4;
+
+    const uint32_t clear_mask = get_clear_mask(cr_reg_exti_pos);
+    const uint32_t mask = get_mask(port_index, cr_reg_exti_pos);
+    auto &reg = AFIO->EXTICR[cr_reg_index];
+    reg = (reg & clear_mask) | mask;
+
+    const uint32_t pin_bit_mask = 1UL << pin;
+
+    // Setup edges
+    if ((uint32_t)mode & (uint32_t)TriggerMode::FallingEdges)
+    {
+        EXTI->FTSR |= pin_bit_mask;
+    }
+    else
+    {
+        EXTI->FTSR &= ~pin_bit_mask;
+    }
+
+    if ((uint32_t)mode & (uint32_t)TriggerMode::RisingEdges)
+    {
+        EXTI->RTSR |= pin_bit_mask;
+    }
+    else
+    {
+        EXTI->RTSR &= ~pin_bit_mask;
+    }
+
+    // Setup interrupts
+    if (flags & ENABLE_INTERRUPT)
+    {
+        EXTI->IMR |= pin_bit_mask;
+    }
+    else
+    {
+        EXTI->IMR &= ~pin_bit_mask;
+    }
+}
+
+} // namespace exti
+
 int main()
 {
     irq::disableInterrupts();
@@ -44,10 +125,7 @@ int main()
 
     // A0
     gpio::setPinMode(GPIOA, 0, gpio::PinMode::InputFloating);
-    AFIO->EXTICR[0] &= ~AFIO_EXTICR1_EXTI0;
-    EXTI->IMR |= EXTI_IMR_MR0;
-    EXTI->FTSR &= ~EXTI_FTSR_FT0; // Falling edge
-    EXTI->RTSR |= EXTI_RTSR_RT0;  // Rising edge
+    exti::setupEXTI(GPIOPort::A, 0, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
     irq::enableInterrupt(irq::InterruptType::EXTI0IRQ);
 
     // C13 open drain

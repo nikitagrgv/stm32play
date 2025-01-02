@@ -7,14 +7,14 @@ namespace
 
 FORCE_INLINE constexpr uint32_t get_mask(gpio::PinMode mode, int pos)
 {
-    MICRO_ASSERT(pos < 8);
+    MICRO_ASSERT(pos >= 0 && pos < 8);
     const int bit_pos = pos * 4;
     return (uint32_t)mode << bit_pos;
 }
 
 FORCE_INLINE constexpr uint32_t get_clear_mask(int pos)
 {
-    MICRO_ASSERT(pos < 8);
+    MICRO_ASSERT(pos >= 0 && pos < 8);
     return ~(0b1111UL << (pos * 4));
 }
 
