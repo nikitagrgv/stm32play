@@ -6,6 +6,7 @@
 #include "debug/Statistic.h"
 #include "periph/GPIO.h"
 #include "periph/IRQ.h"
+#include "periph/SysTick.h"
 #include "periph/TIM.h"
 #include "periph/USART.h"
 #include "utils/DataStream.h"
@@ -32,40 +33,6 @@ volatile int num_written_bits = 0;
 CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
-
-
-namespace systick
-{
-
-enum SetupFlags : uint32_t
-{
-    ENABLE_INTERRUPT = 1 << 0,
-};
-
-uint32_t get_ctrl_flags(uint32_t setup_flags)
-{
-    uint32_t flags = 0;
-    if (setup_flags & ENABLE_INTERRUPT)
-    {
-        flags |= SysTick_CTRL_TICKINT_Msk;
-    }
-    return flags;
-}
-
-void setupTimer(uint32_t frequency, uint32_t setup_flags = 0)
-{
-    SysTick->LOAD = glob::SYS_FREQUENCY / frequency - 1;
-    SysTick->VAL = 0;
-    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | get_ctrl_flags(setup_flags);
-}
-
-void restartTimer()
-{
-    SysTick->VAL = 0;
-    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
-}
-
-} // namespace systick
 
 int main()
 {
