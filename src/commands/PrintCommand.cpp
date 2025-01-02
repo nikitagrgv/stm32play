@@ -1,6 +1,7 @@
 #include "PrintCommand.h"
 
 #include "Print.h"
+#include "core/Globals.h"
 #include "debug/Statistic.h"
 #include "utils/HeapUsage.h"
 #include "utils/StringUtils.h"
@@ -10,6 +11,12 @@ bool PrintCommand::execute(const char *args)
     if (str_utils::isEmpty(args))
     {
         return false;
+    }
+    if (str_utils::compareTrimmed(args, "time"))
+    {
+        io::printSyncFmt("total msec = %u\n", glob::total_msec);
+        io::printSyncFmt("sys freq = %u\n", glob::SYS_FREQUENCY);
+        return true;
     }
     if (str_utils::compareTrimmed(args, "datastat"))
     {
@@ -35,6 +42,7 @@ bool PrintCommand::execute(const char *args)
 bool PrintCommand::help()
 {
     io::printSync("print entries:\n");
+    io::printSync("  time\n");
     io::printSync("  datastat\n");
     io::printSync("  heapstat\n");
     return true;

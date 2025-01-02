@@ -41,6 +41,11 @@ inline void setPinMode(GPIO_TypeDef *port, int pin, PinMode mode)
     reg = (reg & clear_mask) | mask;
 }
 
+inline void disablePin(GPIO_TypeDef *port, int pin)
+{
+    setPinMode(port, pin, PinMode::InputFloating);
+}
+
 inline void setPinOutput(GPIO_TypeDef *port, int pin, bool value)
 {
     MICRO_ASSERT(pin < 16);

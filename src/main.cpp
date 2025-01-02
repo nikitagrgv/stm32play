@@ -34,6 +34,39 @@ CommandBuffer command_buffer;
 CommandExecutor command_executor;
 
 
+namespace systick
+{
+
+enum SetupFlags : uint32_t
+{
+    ENABLE_INTERRUPT = 1 << 0,
+};
+
+uint32_t get_ctrl_flags(uint32_t setup_flags)
+{
+    uint32_t flags = 0;
+    if (setup_flags & ENABLE_INTERRUPT)
+    {
+        flags |= SysTick_CTRL_TICKINT_Msk;
+    }
+    return flags;
+}
+
+void setupTimer(uint32_t frequency, uint32_t setup_flags = 0)
+{
+    SysTick->LOAD = glob::SYS_FREQUENCY / frequency - 1;
+    SysTick->VAL = 0;
+    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | get_ctrl_flags(setup_flags);
+}
+
+void restartTimer()
+{
+    SysTick->VAL = 0;
+    SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+}
+
+} // namespace systick
+
 int main()
 {
     irq::disableInterrupts();
@@ -56,6 +89,10 @@ int main()
     SysTick->LOAD = glob::SYS_FREQUENCY / 1000 - 1; // 1 ms period
     SysTick->VAL = 0;
     SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+
+    constexpr uint32_t systick_frequency = 1000;
+    systick::setupTimer(systick_frequency, systick::ENABLE_INTERRUPT);
+    systick::restartTimer();
 
     // USART1
     constexpr uint32_t baudrate = 56'000;
