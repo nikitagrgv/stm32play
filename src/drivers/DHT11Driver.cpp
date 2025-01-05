@@ -45,7 +45,6 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     irq::enableInterrupt(tim_interrupt_type_);
 
     gpio::setPinOutput(output_pin_, true);
-    utils::sleepMsec(timer_, 10);
 
     const uint32_t start_time_ms = glob::total_msec;
     constexpr uint32_t TIMEOUT_MS = 100;
