@@ -34,21 +34,8 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     gpio::setPinOutput(output_pin_, false);
     utils::sleepMsec(20);
 
-    irq::setHandler(
-        exti_interrupt_type_,
-        [](void *opaque) {
-            auto *self = (DHT11Driver *)opaque;
-            self->exti_handler();
-        },
-        this);
-
-    irq::setHandler(
-        tim_interrupt_type_,
-        [](void *opaque) {
-            auto *self = (DHT11Driver *)opaque;
-            self->tim_handler();
-        },
-        this);
+    irq::setHandlerMethod<&DHT11Driver::exti_handler>(exti_interrupt_type_, this);
+    irq::setHandlerMethod<&DHT11Driver::tim_handler>(tim_interrupt_type_, this);
 
     constexpr uint32_t frequency = 1'000'000;
     constexpr uint32_t reload_value = 48;

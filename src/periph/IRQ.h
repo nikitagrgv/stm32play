@@ -18,4 +18,16 @@ void setInterruptsEnabled(bool enabled);
 void disableInterrupts();
 void enableInterrupts();
 
+template<auto Func, typename T>
+FORCE_INLINE void setHandlerMethod(InterruptType type, T *self = nullptr)
+{
+    irq::setHandler(
+        type,
+        [](void *opaque) {
+            auto *s = static_cast<T *>(opaque);
+            (s->*Func)();
+        },
+        self);
+}
+
 } // namespace irq
