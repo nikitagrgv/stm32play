@@ -63,9 +63,9 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 
     uint8_t data[5];
     dht_data_.copyData<uint8_t>(data, 5);
-    for (int i = 0; i < 5; ++i)
+    for (uint8_t &b : data)
     {
-        data[i] = utils::flipByte(data[i]);
+        b = utils::flipByte(b);
     }
 
     const uint8_t checksum = data[0] + data[1] + data[2] + data[3];
