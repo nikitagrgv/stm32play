@@ -16,6 +16,11 @@ DHT11Driver::DHT11Driver(Pin input_pin, Pin output_pin, TIM_TypeDef *timer)
     tim_interrupt_type_ = tim::getUpdateInterruptType(timer_);
 }
 
+DHT11Driver::~DHT11Driver()
+{
+    cleanup();
+}
+
 DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 {
     cleanup();
