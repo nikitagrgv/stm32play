@@ -32,7 +32,7 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     exti::setupEXTI(input_pin_, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
 
     gpio::setPinOutput(output_pin_, false);
-    utils::sleepMsec(20);
+    utils::sleepMsec(timer_, 20);
 
     irq::setHandlerMethod<&DHT11Driver::exti_handler>(exti_interrupt_type_, this);
     irq::setHandlerMethod<&DHT11Driver::tim_handler>(tim_interrupt_type_, this);
@@ -45,7 +45,7 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     irq::enableInterrupt(tim_interrupt_type_);
 
     gpio::setPinOutput(output_pin_, true);
-    utils::sleepMsec(10);
+    utils::sleepMsec(timer_, 10);
 
     const uint32_t start_time_ms = glob::total_msec;
     constexpr uint32_t TIMEOUT_MS = 100;
