@@ -20,6 +20,9 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 {
     cleanup();
 
+    irq::disableInterrupt(exti_interrupt_type_);
+    irq::disableInterrupt(tim_interrupt_type_);
+
     gpio::setPinMode(input_pin_, gpio::PinMode::InputFloating);
     exti::setupEXTI(input_pin_, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
 
