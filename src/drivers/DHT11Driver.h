@@ -33,7 +33,7 @@ private:
     static constexpr int NUM_DATA_BITS = 40;
 
 private:
-    FixedBitset<NUM_DATA_BITS> dht_data;
+    FixedBitset<NUM_DATA_BITS> dht_data_;
 
     Pin input_pin_{};
     Pin output_pin_{};

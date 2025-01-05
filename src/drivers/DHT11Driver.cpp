@@ -5,6 +5,7 @@
 #include "periph/EXTI.h"
 #include "periph/GPIO.h"
 #include "periph/IRQ.h"
+#include "utils/BitUtils.h"
 
 
 DHT11Driver::DHT11Driver(Pin input_pin, Pin output_pin, TIM_TypeDef *timer)
@@ -60,21 +61,11 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
         }
     }
 
-    const auto flip_byte = [](uint8_t byte) {
-        uint8_t result = 0;
-        for (int i = 0; i < 8; ++i)
-        {
-            result |= ((byte >> i) & 1) << (7 - i);
-        }
-        return result;
-    };
-
-
     uint8_t data[5];
-    dht_data.copyData<uint8_t>(data, 5);
+    dht_data_.copyData<uint8_t>(data, 5);
     for (int i = 0; i < 5; ++i)
     {
-        data[i] = flip_byte(data[i]);
+        data[i] = utils::flipByte(data[i]);
     }
 
     const uint8_t checksum = data[0] + data[1] + data[2] + data[3];
@@ -93,7 +84,7 @@ void DHT11Driver::cleanup()
 {
     stop();
 
-    dht_data.clearAll();
+    dht_data_.clearAll();
     num_rising_edges_ = 0;
     num_written_bits_ = 0;
 }
@@ -134,7 +125,7 @@ void DHT11Driver::tim_handler()
     }
 
     const bool bit = gpio::getPinInput(input_pin_);
-    dht_data.set(num_written_bits_, bit);
+    dht_data_.set(num_written_bits_, bit);
     ++num_written_bits_;
 
     if (num_written_bits_ >= NUM_DATA_BITS)
