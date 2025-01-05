@@ -37,7 +37,7 @@ private:
     InterruptType exti_interrupt_type_{};
     InterruptType tim_interrupt_type_{};
 
-    std::atomic<bool> listening = false;
-    std::atomic<uint32_t> num_height = 0;
-    std::atomic<uint32_t> num_written_bits = 0;
+    std::atomic<bool> listening_ = false;
+    std::atomic<uint32_t> num_rising_edges_ = 0;
+    std::atomic<uint32_t> num_written_bits_ = 0;
 };

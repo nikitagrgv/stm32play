@@ -31,6 +31,8 @@ FORCE_INLINE uint32_t get_dier_flags(uint32_t setup_flags)
 
 void tim::setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value, uint32_t setup_flags)
 {
+    stopTimer(tim);
+
     const uint32_t prescaler = (glob::SYS_FREQUENCY / frequency) - 1;
 
     MICRO_ASSERT(prescaler <= MAX_PRESCALER);

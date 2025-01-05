@@ -56,13 +56,6 @@ int main()
 
     io::setPrintUsart(USART1);
 
-
-    // TIM2
-    constexpr uint32_t frequency = 1'000'000;
-    constexpr uint32_t reload_value = 48;
-    tim::setupTimer(TIM2, frequency, reload_value, tim::SINGLE_SHOT | tim::ENABLE_UPDATE_INTERRUPT);
-    irq::enableInterrupt(InterruptType::TIM2IRQ);
-
     irq::setHandler(InterruptType::SysTickIRQ, [](void *) {
         //
         ++glob::total_msec;

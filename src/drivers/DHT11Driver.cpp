@@ -22,13 +22,12 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 
     gpio::setPinMode(input_pin_, gpio::PinMode::InputFloating);
     exti::setupEXTI(input_pin_, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
-    irq::enableInterrupt(exti_interrupt_type_);
 
-    num_written_bits = 0;
+    num_written_bits_ = 0;
     gpio::setPinOutput(output_pin_, false);
     utils::sleepMsec(20);
 
-    listening = true;
+    listening_ = true;
 
     irq::setHandler(
         exti_interrupt_type_,
@@ -46,16 +45,23 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
         },
         this);
 
-    num_height = 0;
+    constexpr uint32_t frequency = 1'000'000;
+    constexpr uint32_t reload_value = 48;
+    tim::setupTimer(timer_, frequency, reload_value, tim::SINGLE_SHOT | tim::ENABLE_UPDATE_INTERRUPT);
+
+    irq::enableInterrupt(exti_interrupt_type_);
+    irq::enableInterrupt(tim_interrupt_type_);
+
+    num_rising_edges_ = 0;
     gpio::setPinOutput(output_pin_, true);
     utils::sleepMsec(10);
-    listening = false;
+    listening_ = false;
 
     const uint32_t start_time_ms = glob::total_msec;
     constexpr uint32_t TIMEOUT_MS = 100;
     const uint32_t end_time = start_time_ms + TIMEOUT_MS;
 
-    while (num_written_bits != 40)
+    while (num_written_bits_ != 40)
     {
         if (glob::total_msec > end_time)
         {
@@ -98,9 +104,9 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 void DHT11Driver::cleanup()
 {
     dht_data.clearAll();
-    listening = false;
-    num_height = 0;
-    num_written_bits = 0;
+    listening_ = false;
+    num_rising_edges_ = 0;
+    num_written_bits_ = 0;
 
     tim::stopTimer(timer_);
     exti::disableEXTI(input_pin_.num);
@@ -116,13 +122,13 @@ void DHT11Driver::exti_handler()
         return;
     }
 
-    if (!listening)
+    if (!listening_)
     {
         return;
     }
 
-    ++num_height;
-    if (num_height >= 3)
+    ++num_rising_edges_;
+    if (num_rising_edges_ >= 3)
     {
         tim::restartTimer(timer_);
     }
@@ -135,12 +141,12 @@ void DHT11Driver::tim_handler()
         return;
     }
 
-    if (num_height < 3 || num_written_bits >= 40)
+    if (num_rising_edges_ < 2 || num_written_bits_ >= 40)
     {
         return;
     }
 
     const bool bit = gpio::getPinInput(input_pin_);
-    dht_data.set(num_written_bits, bit);
-    ++num_written_bits;
+    dht_data.set(num_written_bits_, bit);
+    ++num_written_bits_;
 }
