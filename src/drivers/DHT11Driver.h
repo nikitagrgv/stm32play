@@ -23,12 +23,16 @@ public:
 
 private:
     void cleanup();
+    void stop();
 
     void exti_handler();
     void tim_handler();
 
 private:
-    FixedBitset<5 * 8> dht_data;
+    static constexpr int NUM_DATA_BITS = 40;
+
+private:
+    FixedBitset<NUM_DATA_BITS> dht_data;
 
     Pin input_pin_{};
     Pin output_pin_{};
@@ -37,7 +41,6 @@ private:
     InterruptType exti_interrupt_type_{};
     InterruptType tim_interrupt_type_{};
 
-    std::atomic<bool> listening_ = false;
     std::atomic<uint32_t> num_rising_edges_ = 0;
     std::atomic<uint32_t> num_written_bits_ = 0;
 };
