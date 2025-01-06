@@ -112,30 +112,6 @@ int main()
     };
     command_executor.addCommand(std::make_unique<TestCommand>());
 
-    struct CheckTimerCommand : public ICommand
-    {
-        const char *name() override { return "time"; }
-        bool execute(const char *args) override
-        {
-            const uint32_t value = TIM2->CNT;
-            io::printSyncFmt("time : %lu\n", value);
-            return true;
-        }
-    };
-    command_executor.addCommand(std::make_unique<CheckTimerCommand>());
-
-
-    struct ResetTimerCommand : public ICommand
-    {
-        const char *name() override { return "reset"; }
-        bool execute(const char *args) override
-        {
-            tim::restartTimer(TIM2);
-            return true;
-        }
-    };
-    command_executor.addCommand(std::make_unique<ResetTimerCommand>());
-
     gpio::setPinOutput(led_pin, false);
 
     irq::enableInterrupts();
