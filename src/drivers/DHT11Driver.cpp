@@ -9,11 +9,10 @@
 
 
 DHT11Driver::DHT11Driver(Pin input_pin, Pin output_pin, TIM_TypeDef *timer)
-    : input_pin_(input_pin)
-    , output_pin_(output_pin)
+    : pin_(input_pin)
     , timer_(timer)
 {
-    exti_interrupt_type_ = exti::getInterruptType(input_pin_.num);
+    exti_interrupt_type_ = exti::getInterruptType(pin_.num);
     tim_interrupt_type_ = tim::getUpdateInterruptType(timer_);
 }
 
@@ -29,10 +28,10 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     irq::disableInterrupt(exti_interrupt_type_);
     irq::disableInterrupt(tim_interrupt_type_);
 
-    gpio::setPinMode(input_pin_, gpio::PinMode::InputFloating);
-    exti::setupEXTI(input_pin_, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
+    gpio::disablePin(pin_);
+    gpio::setPinOutput(pin_, false);
+    gpio::setPinMode(pin_, gpio::PinMode::GeneralOpenDrain50MHz);
 
-    gpio::setPinOutput(output_pin_, false);
     utils::sleepMsec(timer_, 20);
 
     irq::setHandlerMethod<&DHT11Driver::exti_handler>(exti_interrupt_type_, this);
@@ -45,7 +44,9 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     irq::enableInterrupt(exti_interrupt_type_);
     irq::enableInterrupt(tim_interrupt_type_);
 
-    gpio::setPinOutput(output_pin_, true);
+    exti::setupEXTI(pin_, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
+    gpio::setPinOutput(pin_, true);
+    gpio::setPinMode(pin_, gpio::PinMode::InputFloating);
 
     const uint32_t start_time_ms = glob::total_msec;
     constexpr uint32_t TIMEOUT_MS = 100;
@@ -92,7 +93,7 @@ void DHT11Driver::cleanup()
 void DHT11Driver::stop()
 {
     tim::stopTimer(timer_);
-    exti::disableEXTI(input_pin_.num);
+    exti::disableEXTI(pin_.num);
 
     irq::clearHandler(exti_interrupt_type_);
     irq::clearHandler(tim_interrupt_type_);
@@ -100,7 +101,7 @@ void DHT11Driver::stop()
 
 void DHT11Driver::exti_handler()
 {
-    if (!exti::checkPendingAndClear(input_pin_.num))
+    if (!exti::checkPendingAndClear(pin_.num))
     {
         return;
     }
@@ -124,7 +125,7 @@ void DHT11Driver::tim_handler()
         return;
     }
 
-    const bool bit = gpio::getPinInput(input_pin_);
+    const bool bit = gpio::getPinInput(pin_);
     dht_data_.set(num_written_bits_, bit);
     ++num_written_bits_;
 

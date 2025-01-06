@@ -35,8 +35,7 @@ private:
 private:
     FixedBitset<NUM_DATA_BITS> dht_data_;
 
-    Pin input_pin_{};
-    Pin output_pin_{};
+    Pin pin_{};
     TIM_TypeDef *timer_{};
 
     InterruptType exti_interrupt_type_{};
