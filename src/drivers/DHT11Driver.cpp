@@ -34,22 +34,20 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 
     utils::sleepMsec(timer_, 20);
 
-    irq::setHandlerMethod<&DHT11Driver::exti_handler>(exti_interrupt_type_, this);
-    irq::setHandlerMethod<&DHT11Driver::tim_handler>(tim_interrupt_type_, this);
-
     constexpr uint32_t frequency = 1'000'000;
     constexpr uint32_t reload_value = 48;
     tim::setupTimer(timer_, frequency, reload_value, tim::SINGLE_SHOT | tim::ENABLE_UPDATE_INTERRUPT);
-
-    irq::enableInterrupt(exti_interrupt_type_);
+    irq::setHandlerMethod<&DHT11Driver::tim_handler>(tim_interrupt_type_, this);
     irq::enableInterrupt(tim_interrupt_type_);
 
     exti::setupEXTI(pin_, exti::TriggerMode::RisingEdges, exti::ENABLE_INTERRUPT);
+    irq::setHandlerMethod<&DHT11Driver::exti_handler>(exti_interrupt_type_, this);
+    irq::enableInterrupt(exti_interrupt_type_);
+
     gpio::setPinOutput(pin_, true);
     gpio::setPinMode(pin_, gpio::PinMode::InputFloating);
 
     const uint32_t start_time_ms = glob::total_msec;
-    constexpr uint32_t TIMEOUT_MS = 100;
     const uint32_t end_time = start_time_ms + TIMEOUT_MS;
 
     SCOPE_EXIT([&] { cleanup(); });

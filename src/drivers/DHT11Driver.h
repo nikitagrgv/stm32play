@@ -30,6 +30,7 @@ private:
 
 private:
     static constexpr int NUM_DATA_BITS = 40;
+    static constexpr int TIMEOUT_MS = 100;
 
 private:
     FixedBitset<NUM_DATA_BITS> dht_data_;
