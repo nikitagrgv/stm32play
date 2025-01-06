@@ -2,6 +2,7 @@
 #include "Sleep.h"
 #include "commands/CommandBuffer.h"
 #include "commands/CommandExecutor.h"
+#include "commands/DHT11Command.h"
 #include "commands/PrintCommand.h"
 #include "debug/Statistic.h"
 #include "drivers/DHT11Driver.h"
@@ -73,44 +74,7 @@ int main()
 
     // Others
     command_executor.addCommand(std::make_unique<PrintCommand>());
-
-    struct TestCommand : public ICommand
-    {
-        const char *name() override { return "go"; }
-        bool execute(const char *args) override
-        {
-            constexpr Pin input_pin{GPIOPort::B, 5};
-            TIM_TypeDef *timer = TIM2;
-            DHT11Driver dht11{input_pin, timer};
-
-            float temperature = 0.0f;
-            float humidity = 0.0f;
-            const DHT11Driver::ErrorCode code = dht11.run(temperature, humidity);
-
-            if (code == DHT11Driver::ErrorCode::Timeout)
-            {
-                io::printSyncFmt("DHT11: Timeout\n");
-                return true;
-            }
-
-            if (code == DHT11Driver::ErrorCode::InvalidChecksum)
-            {
-                io::printSyncFmt("DHT11: Invalid checksum\n");
-                return true;
-            }
-
-            if (code != DHT11Driver::ErrorCode::Success)
-            {
-                io::printSyncFmt("DHT11: Unexpected error\n");
-                return true;
-            }
-
-            io::printSyncFmt("temp = %f, hum = %f\n", temperature, humidity);
-
-            return true;
-        }
-    };
-    command_executor.addCommand(std::make_unique<TestCommand>());
+    command_executor.addCommand(std::make_unique<DHT11Command>());
 
     gpio::setPinOutput(led_pin, false);
 
