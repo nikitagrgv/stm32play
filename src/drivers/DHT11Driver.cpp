@@ -62,8 +62,8 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
         }
     }
 
-    uint8_t data[5];
-    dht_data_.copyData<uint8_t>(data, 5);
+    uint8_t data[NUM_DATA_BITS / 8];
+    dht_data_.copyData<uint8_t>(data, NUM_DATA_BITS / 8);
     for (uint8_t &b : data)
     {
         b = utils::flipByte(b);
