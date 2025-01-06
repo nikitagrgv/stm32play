@@ -6,11 +6,14 @@
 
 #include <stm32f1xx.h>
 
+DHT11Command::DHT11Command(const Pin &pin, TIM_TypeDef *timer)
+    : pin_(pin)
+    , timer_(timer)
+{}
+
 bool DHT11Command::execute(const char *args)
 {
-    constexpr Pin input_pin{GPIOPort::B, 5};
-    TIM_TypeDef *timer = TIM2;
-    DHT11Driver dht11{input_pin, timer};
+    DHT11Driver dht11{pin_, timer_};
 
     float temperature = 0.0f;
     float humidity = 0.0f;

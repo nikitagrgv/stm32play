@@ -74,7 +74,10 @@ int main()
 
     // Others
     command_executor.addCommand(std::make_unique<PrintCommand>());
-    command_executor.addCommand(std::make_unique<DHT11Command>());
+
+    constexpr Pin dht_pin{GPIOPort::B, 5};
+    TIM_TypeDef *dht_timer = TIM2;
+    command_executor.addCommand(std::make_unique<DHT11Command>(dht_pin, dht_timer));
 
     gpio::setPinOutput(led_pin, false);
 
