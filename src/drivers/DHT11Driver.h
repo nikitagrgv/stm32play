@@ -17,7 +17,7 @@ public:
     };
 
     // TODO: use the same pin
-    DHT11Driver(Pin input_pin, Pin output_pin, TIM_TypeDef *timer);
+    DHT11Driver(Pin input_pin, TIM_TypeDef *timer);
     ~DHT11Driver();
 
     ErrorCode run(float &temperature, float &humidity);

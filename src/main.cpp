@@ -41,8 +41,6 @@ int main()
     gpio::setPinMode({GPIOPort::A, 10}, gpio::PinMode::InputPullUpOrDown); // USART1 RX
     gpio::setPinPullUpOrDown({GPIOPort::A, 10}, gpio::PullUpOrDownMode::Up);
 
-    gpio::setPinMode({GPIOPort::B, 12}, gpio::PinMode::GeneralOpenDrain50MHz);
-
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
     systick::setupTimer(systick_frequency, systick::ENABLE_INTERRUPT);
@@ -73,17 +71,14 @@ int main()
     // Others
     command_executor.addCommand(std::make_unique<PrintCommand>());
 
-    gpio::setPinOutput({GPIOPort::B, 12}, true);
-
     struct TestCommand : public ICommand
     {
         const char *name() override { return "go"; }
         bool execute(const char *args) override
         {
-            Pin output_pin{GPIOPort::B, 12};
             Pin input_pin{GPIOPort::B, 5};
             TIM_TypeDef *timer = TIM2;
-            DHT11Driver dht11{input_pin, output_pin, timer};
+            DHT11Driver dht11{input_pin, timer};
 
             float temperature = 0.0f;
             float humidity = 0.0f;

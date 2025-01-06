@@ -8,7 +8,7 @@
 #include "utils/BitUtils.h"
 
 
-DHT11Driver::DHT11Driver(Pin input_pin, Pin output_pin, TIM_TypeDef *timer)
+DHT11Driver::DHT11Driver(Pin input_pin, TIM_TypeDef *timer)
     : pin_(input_pin)
     , timer_(timer)
 {
