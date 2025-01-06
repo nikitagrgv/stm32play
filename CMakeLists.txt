@@ -87,38 +87,3 @@ add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
         COMMENT "Building ${HEX_FILE}
 Building ${BIN_FILE}")
-
-
-#
-#execute_process(
-#        COMMAND cmd.exe /C echo %date% %time%
-#        OUTPUT_VARIABLE BUILD_TIME
-#        OUTPUT_STRIP_TRAILING_WHITESPACE
-#)
-#
-#message(STATUS "BUILD_TIME: ${BUILD_TIME}")
-#
-#configure_file(
-#        "${CMAKE_SOURCE_DIR}/cmake/configs/BuiltTimestamp.cpp.in"
-#        "${CMAKE_SOURCE_DIR}/src/build_timestamp/BuiltTimestamp.cpp"
-#)
-
-
-# Add a custom command to generate build_time.h before each build
-add_custom_command(
-        OUTPUT "${CMAKE_SOURCE_DIR}/src/build_timestamp/BuiltTimestamp.cpp"  # The output file
-        COMMAND ${CMAKE_COMMAND} -E echo "#pragma once" > "${CMAKE_SOURCE_DIR}/src/build_timestamp/BuiltTimestamp.cpp"
-        COMMAND ${CMAKE_COMMAND} -E echo "#define BUILD_TIME" >> "${CMAKE_SOURCE_DIR}/src/build_timestamp/BuiltTimestamp.cpp"
-        DEPENDS ${CMAKE_SOURCE_DIR}/CMakeLists.txt
-        COMMENT "Generating build_time.h with current build time"
-)
-
-# Add the custom command as a dependency for your target to ensure it runs before compilation
-add_custom_target(
-        generate_build_time_header
-        DEPENDS "${CMAKE_SOURCE_DIR}/src/build_timestamp/BuiltTimestamp.cpp"
-)
-
-# Make sure the build process depends on this target
-add_dependencies(${PROJECT_NAME}.elf generate_build_time_header)
-
