@@ -16,7 +16,6 @@ public:
         InvalidChecksum,
     };
 
-    // TODO: use the same pin
     DHT11Driver(Pin input_pin, TIM_TypeDef *timer);
     ~DHT11Driver();
 
