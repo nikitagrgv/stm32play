@@ -142,6 +142,8 @@ int main()
 
     irq::enableInterrupts();
 
+    io::printSyncFmt("--- Device is ready ---\n");
+
     while (true)
     {
         uint8_t byte;
