@@ -34,12 +34,15 @@ int main()
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
     // C13 open drain
-    gpio::setPinMode({GPIOPort::C, 13}, gpio::PinMode::GeneralOpenDrain50MHz);
+    constexpr Pin led_pin{GPIOPort::C, 13};
+    constexpr Pin usart_tx_pin{GPIOPort::A, 9};
+    constexpr Pin usart_rx_pin{GPIOPort::A, 10};
 
-    gpio::setPinMode({GPIOPort::A, 9}, gpio::PinMode::AlternatePushPull50MHz); // USART1 TX
+    gpio::setPinMode(led_pin, gpio::PinMode::GeneralOpenDrain50MHz);
 
-    gpio::setPinMode({GPIOPort::A, 10}, gpio::PinMode::InputPullUpOrDown); // USART1 RX
-    gpio::setPinPullUpOrDown({GPIOPort::A, 10}, gpio::PullUpOrDownMode::Up);
+    gpio::setPinMode(usart_tx_pin, gpio::PinMode::AlternatePushPull50MHz);
+    gpio::setPinMode(usart_rx_pin, gpio::PinMode::InputPullUpOrDown);
+    gpio::setPinPullUpOrDown(usart_rx_pin, gpio::PullUpOrDownMode::Up);
 
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
@@ -76,7 +79,7 @@ int main()
         const char *name() override { return "go"; }
         bool execute(const char *args) override
         {
-            Pin input_pin{GPIOPort::B, 5};
+            constexpr Pin input_pin{GPIOPort::B, 5};
             TIM_TypeDef *timer = TIM2;
             DHT11Driver dht11{input_pin, timer};
 
@@ -133,7 +136,7 @@ int main()
     };
     command_executor.addCommand(std::make_unique<ResetTimerCommand>());
 
-    gpio::setPinOutput({GPIOPort::C, 13}, false);
+    gpio::setPinOutput(led_pin, false);
 
     irq::enableInterrupts();
 
