@@ -54,7 +54,7 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 
     SCOPE_EXIT([&] { cleanup(); });
 
-    while (num_written_bits_ != 40)
+    while (num_written_bits_ != NUM_DATA_BITS)
     {
         if (glob::total_msec > end_time)
         {
