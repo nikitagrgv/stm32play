@@ -1,70 +1,89 @@
-#include "DataStream.h"
 #include "Print.h"
-#include "Statistic.h"
+#include "Sleep.h"
 #include "commands/CommandBuffer.h"
 #include "commands/CommandExecutor.h"
+#include "commands/DHT11Command.h"
 #include "commands/PrintCommand.h"
+#include "debug/Statistic.h"
+#include "drivers/DHT11Driver.h"
+#include "periph/EXTI.h"
 #include "periph/GPIO.h"
+#include "periph/IRQ.h"
+#include "periph/PeriphBase.h"
+#include "periph/SysTick.h"
+#include "periph/TIM.h"
 #include "periph/USART.h"
+#include "utils/DataStream.h"
+#include "utils/FixedBitset.h"
 
 #include <memory>
 #include <stm32f1xx.h>
 
-volatile bool led_state = false;
-void toggleIndicatorLed()
-{
-    gpio::setPinOutput(GPIOC, 13, led_state);
-    led_state = !led_state;
-}
-
 FixedDataStream<1024> usart1_stream;
-
-extern "C"
-{
-    void USART1_IRQHandler(void)
-    {
-        if (USART1->SR & USART_SR_RXNE)
-        {
-            toggleIndicatorLed();
-            const uint8_t data = USART1->DR;
-            usart1_stream.writeByte(data);
-            stat::addReadBytesUsart(1);
-        }
-    }
-}
 
 CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
+
 int main()
 {
+    irq::disableInterrupts();
+
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN | RCC_APB2ENR_AFIOEN
         | RCC_APB2ENR_USART1EN;
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
 
     // C13 open drain
-    gpio::setPinMode(GPIOC, 13, gpio::PinMode::GeneralOpenDrain50MHz);
+    constexpr Pin led_pin{GPIOPort::C, 13};
+    constexpr Pin usart_tx_pin{GPIOPort::A, 9};
+    constexpr Pin usart_rx_pin{GPIOPort::A, 10};
 
-    gpio::setPinMode(GPIOA, 9, gpio::PinMode::AlternatePushPull50MHz); // USART1 TX
-    gpio::setPinMode(GPIOA, 10, gpio::PinMode::InputPullUpOrDown);     // USART1 RX
-    gpio::setPinPullUpOrDown(GPIOA, 10, gpio::PullUpOrDownMode::Up);
+    gpio::setPinMode(led_pin, gpio::PinMode::GeneralOpenDrain50MHz);
+
+    gpio::setPinMode(usart_tx_pin, gpio::PinMode::AlternatePushPull50MHz);
+    gpio::setPinMode(usart_rx_pin, gpio::PinMode::InputPullUpOrDown);
+    gpio::setPinPullUpOrDown(usart_rx_pin, gpio::PullUpOrDownMode::Up);
 
     // SysTick
-    SysTick->LOAD = 8'000 - 1;
-    SysTick->VAL = 0;
-    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+    constexpr uint32_t systick_frequency = 1000;
+    systick::setupTimer(systick_frequency, systick::ENABLE_INTERRUPT);
+    systick::restartTimer();
 
     // USART1
     constexpr uint32_t baudrate = 56'000;
     constexpr uint32_t flags = usart::ENABLE_RECEIVE | usart::ENABLE_TRANSMIT | usart::ENABLE_RECEIVE_INTERRUPT;
     usart::setupUsart(USART1, baudrate, flags);
+    irq::enableInterrupt(InterruptType::USART1IRQ);
 
     io::setPrintUsart(USART1);
 
-    NVIC_EnableIRQ(USART1_IRQn);
-    __enable_irq(); // enable interrupts
+    irq::setHandler(InterruptType::SysTickIRQ, [](void *) {
+        //
+        ++glob::total_msec;
+    });
 
+    irq::setHandler(InterruptType::USART1IRQ, [](void *) {
+        if (USART1->SR & USART_SR_RXNE)
+        {
+            const uint8_t data = USART1->DR;
+            usart1_stream.writeByte(data);
+            stat::addReadBytesUsart(1);
+        }
+    });
+
+    // Others
     command_executor.addCommand(std::make_unique<PrintCommand>());
+
+    constexpr Pin dht_pin{GPIOPort::B, 5};
+    TIM_TypeDef *dht_timer = TIM2;
+    command_executor.addCommand(std::make_unique<DHT11Command>(dht_pin, dht_timer));
+
+    gpio::setPinOutput(led_pin, false);
+
+    irq::enableInterrupts();
+
+    io::printSyncFmt("--- Device is ready ---\n");
 
     while (true)
     {
@@ -88,7 +107,5 @@ int main()
         }
 
         command_buffer.flushCurrentCommand();
-
-        toggleIndicatorLed();
     }
 }

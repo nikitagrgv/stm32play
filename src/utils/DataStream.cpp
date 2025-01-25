@@ -1,7 +1,7 @@
 #include "DataStream.h"
 
-#include "Sleep.h"
-#include "core/Globals.h"
+#include "../Sleep.h"
+#include "../core/Globals.h"
 
 DataStream::DataStream(volatile uint8_t *buf_begin, volatile uint8_t *buf_end)
 {

@@ -1,7 +1,7 @@
 #include "CommandExecutor.h"
 
 #include "Print.h"
-#include "StringUtils.h"
+#include "utils/StringUtils.h"
 
 void CommandExecutor::addCommand(std::unique_ptr<ICommand> command)
 {

@@ -36,9 +36,6 @@ add_compile_options(-fno-exceptions)
 # uncomment to mitigate c++17 absolute addresses warnings
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --specs=nano.specs")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --specs=nano.specs")
-
 # Enable assembler files preprocessing
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
@@ -77,6 +74,8 @@ set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F103C8TX_FLASH.ld)
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
 add_link_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 add_link_options(-T ${LINKER_SCRIPT})
+add_link_options(--specs=nano.specs)
+add_link_options(-u _printf_float)
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
 
