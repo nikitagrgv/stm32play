@@ -31,7 +31,6 @@ set(CMAKE_C_STANDARD 11)
 #Uncomment for software floating point
 #add_compile_options(-mfloat-abi=soft)
 
-add_compile_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
 
 add_compile_options(-fno-exceptions)
@@ -69,6 +68,7 @@ if ("${DEVICE_NAME}" STREQUAL "STM32F103")
     include_directories(Drivers/CMSIS/Device/ST/STM32F1xx/Include)
     set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/stm32f103c8tx_flash.ld)
     add_link_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
+    add_compile_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 elseif ("${DEVICE_NAME}" STREQUAL "STM32F401")
     message(STATUS "Selected Device: F401")
 
@@ -76,6 +76,7 @@ elseif ("${DEVICE_NAME}" STREQUAL "STM32F401")
     include_directories(Drivers/CMSIS/Device/ST/STM32F4xx/Include)
     set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/stm32f401ccux_flash.ld)
     add_link_options(-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
+    add_compile_options(-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
 else ()
     message(FATAL_ERROR "Invalid Device Name")
 endif ()
