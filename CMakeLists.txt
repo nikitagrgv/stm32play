@@ -5,6 +5,9 @@ cmake_minimum_required(VERSION 3.27)
 option(ENABLE_DATA_STATISTIC "Enable Data Statistic" ON)
 option(DEBUG_OPTIMIZED "Use -Og instead of -O0" OFF)
 
+set(DEVICE_NAME "STM32F103" CACHE STRING "STM32F103 or STM32F401")
+set_property(CACHE DEVICE_NAME PROPERTY STRINGS "STM32F103" "STM32F401")
+
 # specify cross-compilers and tools
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
 set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
@@ -59,15 +62,23 @@ else ()
     add_definitions(-DDEBUG)
 endif ()
 
-add_definitions(-DSTM32F103xB)
+if ("${DEVICE_NAME}" STREQUAL "STM32F103")
+    add_definitions(-DSTM32F103xB)
+    include_directories(Drivers/CMSIS/Device/ST/STM32F1xx/Include)
+    set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/stm32f103c8tx_flash.ld)
+elseif ("${DEVICE_NAME}" STREQUAL "STM32F401")
+    add_definitions(-DSTM32F401xC)
+    include_directories(Drivers/CMSIS/Device/ST/STM32F4xx/Include)
+    set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/stm32f401ccux_flash.ld)
+else ()
+    message(FATAL_ERROR "Invalid Device Name")
+endif ()
 
-include_directories(src Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include)
+include_directories(src Drivers/CMSIS/Include)
 
 if (ENABLE_DATA_STATISTIC)
     add_definitions(-DENABLE_DATA_STATISTIC)
 endif ()
-
-set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F103C8TX_FLASH.ld)
 
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
 add_link_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
@@ -87,5 +98,5 @@ set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
         COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${EXECUTABLE_NAME}> ${HEX_FILE}
         COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${EXECUTABLE_NAME}> ${BIN_FILE}
-        COMMENT "Building ${HEX_FILE}
-Building ${BIN_FILE}")
+        COMMENT " Building ${HEX_FILE}
+            Building ${BIN_FILE}")
