@@ -47,16 +47,6 @@ void configure(Pin pin, uint32_t mode_mask)
 } // namespace
 
 
-// enum class PinMode
-// {
-//     InputFloating = 0b0100,
-//     InputPullUpOrDown = 0b1000,
-//     GeneralPushPull50MHz = 0b0011,
-//     GeneralOpenDrain50MHz = 0b0111,
-//     AlternatePushPull50MHz = 0b1011,
-//     AlternateOpenDrain50MHz = 0b1111,
-// };
-
 void gpio::configureOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode)
 {
     UNUSED(pull_mode); // F103 doesn't support this
