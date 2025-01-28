@@ -53,9 +53,8 @@ int main()
 
     gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
-    gpio::setPinMode(usart_tx_pin, gpio::PinMode::AlternatePushPull50MHz);
-    gpio::setPinMode(usart_rx_pin, gpio::PinMode::InputPullUpOrDown);
-    gpio::setPinPullUpOrDown(usart_rx_pin, gpio::PullMode::Up);
+    gpio::configureAlternateOutput(usart_tx_pin, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
+    gpio::configureAlternateInput(usart_rx_pin, gpio::PullMode::Up);
 
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
