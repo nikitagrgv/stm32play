@@ -82,6 +82,31 @@ void gpio::configureOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode
     configure(pin, mode_mask);
 }
 
+void gpio::configureAlternateOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode)
+{
+    UNUSED(pull_mode); // F103 doesn't support this
+
+    uint32_t mode_mask = 0;
+
+    switch (mode)
+    {
+    case OutputMode::PushPull: mode_mask |= 0b1000; break;
+    case OutputMode::OpenDrain: mode_mask |= 0b1100; break;
+    default: MICRO_ASSERT(0); break;
+    }
+
+    switch (speed)
+    {
+    case OutputSpeed::Low: mode_mask |= 0b0010; break;
+    case OutputSpeed::Medium: mode_mask |= 0b0001; break;
+    case OutputSpeed::High:
+    case OutputSpeed::Max: mode_mask |= 0b0011; break;
+    default: MICRO_ASSERT(0); break;
+    }
+
+    configure(pin, mode_mask);
+}
+
 void gpio::configureInput(Pin pin, PullMode pull_mode)
 {
     uint32_t mode_mask = 0;
@@ -103,6 +128,12 @@ void gpio::configureInput(Pin pin, PullMode pull_mode)
     {
         setPinOutput(pin, pull_mode == PullMode::Up);
     }
+}
+
+void gpio::configureAlternateInput(Pin pin, PullMode pull_mode)
+{
+    // F103 doesn't have alternate input modes
+    configureInput(pin, pull_mode);
 }
 
 void gpio::disablePin(Pin pin)
