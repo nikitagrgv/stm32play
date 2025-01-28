@@ -65,7 +65,6 @@ void io::printSyncFmt(const char *fmt, ...)
 {
     if (!PRINT_USART)
     {
-        // TODO: is it safe to return here (va_list)?
         return;
     }
 
