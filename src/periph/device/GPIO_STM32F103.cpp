@@ -31,7 +31,7 @@ FORCE_INLINE constexpr uint32_t get_clear_mask(int pos)
     return ~(0b1111UL << (pos * 4));
 }
 
-FORCE_INLINE constexpr void configure(Pin pin, uint32_t mode_mask)
+FORCE_INLINE void configure(Pin pin, uint32_t mode_mask)
 {
     GPIO_TypeDef *port_reg = get_port_register(pin.port);
 
