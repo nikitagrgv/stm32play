@@ -17,7 +17,7 @@
 #include "utils/FixedBitset.h"
 
 #include <memory>
-#include <stm32f1xx.h>
+#include "DeviceCMSIS.h"
 
 FixedDataStream<1024> usart1_stream;
 

@@ -4,7 +4,7 @@
 
 #include <cstdarg>
 #include <cstdio>
-#include <stm32f1xx.h>
+#include "DeviceCMSIS.h"
 
 namespace
 {

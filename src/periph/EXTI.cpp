@@ -3,7 +3,7 @@
 #include "core/Base.h"
 #include "core/MicroAssert.h"
 
-#include <stm32f1xx.h>
+#include "DeviceCMSIS.h"
 
 namespace
 {

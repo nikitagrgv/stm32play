@@ -4,7 +4,7 @@
 #include "drivers/DHT11Driver.h"
 #include "periph/PeriphBase.h"
 
-#include <stm32f1xx.h>
+#include "DeviceCMSIS.h"
 
 DHT11Command::DHT11Command(const Pin &pin, TIM_TypeDef *timer)
     : pin_(pin)
