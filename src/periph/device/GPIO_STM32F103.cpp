@@ -31,7 +31,7 @@ FORCE_INLINE constexpr uint32_t get_clear_mask(int pos)
     return ~(0b1111UL << (pos * 4));
 }
 
-FORCE_INLINE constexpr void configure(Pin pin, uint32_t mode)
+FORCE_INLINE constexpr void configure(Pin pin, uint32_t mode_mask)
 {
     GPIO_TypeDef *port_reg = get_port_register(pin.port);
 
@@ -40,15 +40,70 @@ FORCE_INLINE constexpr void configure(Pin pin, uint32_t mode)
     const int pos = pin.num % 8;
     auto &reg = is_high ? port_reg->CRH : port_reg->CRL;
     const uint32_t clear_mask = get_clear_mask(pos);
-    const uint32_t mask = get_mask(mode, pos);
+    const uint32_t mask = get_mask(mode_mask, pos);
     reg = (reg & clear_mask) | mask;
 }
 
 } // namespace
 
-void gpio::configureOutput(Pin pin, OutputSpeed speed, PullMode pull_mode) {}
 
-void gpio::configureInput(Pin pin, PullMode pull_mode) {}
+// enum class PinMode
+// {
+//     InputFloating = 0b0100,
+//     InputPullUpOrDown = 0b1000,
+//     GeneralPushPull50MHz = 0b0011,
+//     GeneralOpenDrain50MHz = 0b0111,
+//     AlternatePushPull50MHz = 0b1011,
+//     AlternateOpenDrain50MHz = 0b1111,
+// };
+
+void gpio::configureOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode)
+{
+    UNUSED(pull_mode); // F103 doesn't support this
+
+    uint32_t mode_mask = 0;
+
+    switch (mode)
+    {
+    case OutputMode::PushPull: mode_mask |= 0b0000; break;
+    case OutputMode::OpenDrain: mode_mask |= 0b0100; break;
+    default: MICRO_ASSERT(0); break;
+    }
+
+    switch (speed)
+    {
+    case OutputSpeed::Low: mode_mask |= 0b0010; break;
+    case OutputSpeed::Medium: mode_mask |= 0b0001; break;
+    case OutputSpeed::High:
+    case OutputSpeed::Max: mode_mask |= 0b0011; break;
+    default: MICRO_ASSERT(0); break;
+    }
+
+    configure(pin, mode_mask);
+}
+
+void gpio::configureInput(Pin pin, PullMode pull_mode)
+{
+    uint32_t mode_mask = 0;
+
+    const bool has_pull = pull_mode != PullMode::None;
+
+    if (has_pull)
+    {
+        mode_mask |= 0b1000;
+    }
+    else
+    {
+        mode_mask |= 0b0100;
+    }
+
+    configure(pin, mode_mask);
+
+    if (has_pull)
+    {
+        setPinOutput(pin, pull_mode == PullMode::Up);
+    }
+}
 
 void gpio::disablePin(Pin pin)
 {

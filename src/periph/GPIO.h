@@ -13,6 +13,12 @@ enum class PullMode
     Up
 };
 
+enum class OutputMode
+{
+    PushPull,
+    OpenDrain,
+};
+
 enum class OutputSpeed
 {
     Low,
@@ -21,7 +27,7 @@ enum class OutputSpeed
     Max
 };
 
-void configureOutput(Pin pin, OutputSpeed speed, PullMode pull_mode);
+void configureOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode);
 void configureInput(Pin pin, PullMode pull_mode);
 
 void disablePin(Pin pin);
