@@ -27,8 +27,8 @@ enum class OutputSpeed
     Max
 };
 
-void configureOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode);
-void configureInput(Pin pin, PullMode pull_mode);
+void configureOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode = PullMode::None);
+void configureInput(Pin pin, PullMode pull_mode = PullMode::None);
 
 void disablePin(Pin pin);
 
