@@ -33,9 +33,10 @@ FORCE_INLINE constexpr uint32_t get_clear_mask(int pos)
 
 void configure(Pin pin, uint32_t mode_mask)
 {
+    MICRO_ASSERT(pin.isValid());
+
     GPIO_TypeDef *port_reg = get_port_register(pin.port);
 
-    MICRO_ASSERT(pin.isValid());
     const int is_high = pin.num >= 8;
     const int pos = pin.num % 8;
     auto &reg = is_high ? port_reg->CRH : port_reg->CRL;
