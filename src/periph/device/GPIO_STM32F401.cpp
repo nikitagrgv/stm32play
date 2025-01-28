@@ -88,14 +88,53 @@ void gpio::configureOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode
     default: MICRO_ASSERT(0); break;
     }
 
-    configure(pin, mode_mask, otype, ospeed, pupd);
+    configure(pin, mode_mask, otype, ospeed, pupd, 0);
 }
 
-void gpio::configureInput(Pin pin, PullMode pull_mode) {}
+void gpio::configureInput(Pin pin, PullMode pull_mode)
+{
+    const uint32_t mode_mask = 0b00;
+    const uint32_t otype = 0;
+    const uint32_t ospeed = 0;
 
-void gpio::configureAlternateOutput(Pin pin, int alt_func, OutputMode mode, OutputSpeed speed, PullMode pull_mode) {}
+    uint32_t pupd = 0;
+    switch (pull_mode)
+    {
+    case PullMode::None: pupd = 0b00; break;
+    case PullMode::Down: pupd = 0b10; break;
+    case PullMode::Up: pupd = 0b01; break;
+    default: MICRO_ASSERT(0); break;
+    }
 
-void gpio::configureAlternateInput(Pin pin, int alt_func, PullMode pull_mode) {}
+    configure(pin, mode_mask, otype, ospeed, pupd, 0);
+}
+
+void gpio::configureAlternate(Pin pin, int alt_func, OutputMode mode, OutputSpeed speed, PullMode pull_mode)
+{
+    const uint32_t mode_mask = 0b10;
+    const uint32_t otype = mode == OutputMode::PushPull ? 0 : 1;
+
+    uint32_t ospeed = 0;
+    switch (speed)
+    {
+    case OutputSpeed::Low: ospeed = 0b00; break;
+    case OutputSpeed::Medium: ospeed = 0b01; break;
+    case OutputSpeed::High: ospeed = 0b10; break;
+    case OutputSpeed::Max: ospeed = 0b11; break;
+    default: MICRO_ASSERT(0); break;
+    }
+
+    uint32_t pupd = 0;
+    switch (pull_mode)
+    {
+    case PullMode::None: pupd = 0b00; break;
+    case PullMode::Down: pupd = 0b10; break;
+    case PullMode::Up: pupd = 0b01; break;
+    default: MICRO_ASSERT(0); break;
+    }
+
+    configure(pin, mode_mask, otype, ospeed, pupd, alt_func);
+}
 
 void gpio::disablePin(Pin pin)
 {
