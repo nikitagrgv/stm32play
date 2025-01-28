@@ -51,7 +51,7 @@ int main()
     constexpr Pin usart_tx_pin{GPIOPort::A, 9};
     constexpr Pin usart_rx_pin{GPIOPort::A, 10};
 
-    gpio::setPinMode(led_pin, gpio::PinMode::GeneralOpenDrain50MHz);
+    gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
     gpio::setPinMode(usart_tx_pin, gpio::PinMode::AlternatePushPull50MHz);
     gpio::setPinMode(usart_rx_pin, gpio::PinMode::InputPullUpOrDown);
