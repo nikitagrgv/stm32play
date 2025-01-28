@@ -34,9 +34,10 @@ FORCE_INLINE constexpr void get_masks(uint32_t base_mask, int pos, int size, uin
     MICRO_ASSERT((mask & clear_mask) == 0);
 }
 
-void configure(Pin pin, uint32_t mode, uint32_t otype, uint32_t ospeed, uint32_t pupd)
+void configure(Pin pin, uint32_t mode, uint32_t otype, uint32_t ospeed, uint32_t pupd, int alt_func)
 {
     MICRO_ASSERT(pin.isValid());
+    MICRO_ASSERT(alt_func < 16);
 
     GPIO_TypeDef *port_reg = get_port_register(pin.port);
 
@@ -54,6 +55,10 @@ void configure(Pin pin, uint32_t mode, uint32_t otype, uint32_t ospeed, uint32_t
 
     get_masks(pupd, pin.num, 2, mask, clear_mask);
     port_reg->PUPDR = (port_reg->PUPDR & clear_mask) | mask;
+
+    get_masks(alt_func, pin.num % 8, 4, mask, clear_mask);
+    const uint8_t afr_index = pin.num / 8;
+    port_reg->AFR[afr_index] = (port_reg->AFR[afr_index] & clear_mask) | mask;
 }
 
 } // namespace
@@ -86,17 +91,11 @@ void gpio::configureOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode
     configure(pin, mode_mask, otype, ospeed, pupd);
 }
 
-void gpio::configureAlternateOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode)
-{
+void gpio::configureInput(Pin pin, PullMode pull_mode) {}
 
-}
+void gpio::configureAlternateOutput(Pin pin, int alt_func, OutputMode mode, OutputSpeed speed, PullMode pull_mode) {}
 
-void gpio::configureInput(Pin pin, PullMode pull_mode)
-{
-
-}
-
-void gpio::configureAlternateInput(Pin pin, PullMode pull_mode) {}
+void gpio::configureAlternateInput(Pin pin, int alt_func, PullMode pull_mode) {}
 
 void gpio::disablePin(Pin pin)
 {
