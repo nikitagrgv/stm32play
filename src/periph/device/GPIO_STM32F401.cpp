@@ -20,28 +20,40 @@ FORCE_INLINE constexpr GPIO_TypeDef *get_port_register(GPIOPort port)
 
 FORCE_INLINE constexpr uint32_t number_to_mask(int k)
 {
+    MICRO_ASSERT(k < 32);
     return (1U << k) - 1;
 }
 
 FORCE_INLINE constexpr void get_masks(uint32_t base_mask, int pos, int size, uint32_t &mask, uint32_t &clear_mask)
 {
     MICRO_ASSERT(pos >= 0 && pos < 16);
+    MICRO_ASSERT(pos * size < 32);
     const int bit_pos = pos * size;
     mask = base_mask << bit_pos;
     clear_mask = ~(number_to_mask(size) << bit_pos);
+    MICRO_ASSERT((mask & clear_mask) == 0);
 }
 
-void configure(Pin pin, uint32_t mode_mask)
+void configure(Pin pin, uint32_t mode, uint32_t otype, uint32_t ospeed, uint32_t pupd)
 {
+    MICRO_ASSERT(pin.isValid());
+
     GPIO_TypeDef *port_reg = get_port_register(pin.port);
 
-    MICRO_ASSERT(pin.isValid());
-    const int is_high = pin.num >= 8;
-    const int pos = pin.num % 8;
-    auto &reg = is_high ? port_reg->CRH : port_reg->CRL;
-    const uint32_t clear_mask = get_clear_mask(pos);
-    const uint32_t mask = get_mask(mode_mask, pos);
-    reg = (reg & clear_mask) | mask;
+    uint32_t mask;
+    uint32_t clear_mask;
+
+    get_masks(mode, pin.num, 2, mask, clear_mask);
+    port_reg->MODER = (port_reg->MODER & clear_mask) | mask;
+
+    get_masks(otype, pin.num, 1, mask, clear_mask);
+    port_reg->OTYPER = (port_reg->OTYPER & clear_mask) | mask;
+
+    get_masks(ospeed, pin.num, 2, mask, clear_mask);
+    port_reg->OSPEEDR = (port_reg->OSPEEDR & clear_mask) | mask;
+
+    get_masks(pupd, pin.num, 2, mask, clear_mask);
+    port_reg->PUPDR = (port_reg->PUPDR & clear_mask) | mask;
 }
 
 } // namespace
@@ -49,82 +61,42 @@ void configure(Pin pin, uint32_t mode_mask)
 
 void gpio::configureOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode)
 {
-    UNUSED(pull_mode); // F103 doesn't support this
+    const uint32_t mode_mask = 0b01;
+    const uint32_t otype = mode == OutputMode::PushPull ? 0 : 1;
 
-    uint32_t mode_mask = 0;
-
-    switch (mode)
-    {
-    case OutputMode::PushPull: mode_mask |= 0b0000; break;
-    case OutputMode::OpenDrain: mode_mask |= 0b0100; break;
-    default: MICRO_ASSERT(0); break;
-    }
-
+    uint32_t ospeed = 0;
     switch (speed)
     {
-    case OutputSpeed::Low: mode_mask |= 0b0010; break;
-    case OutputSpeed::Medium: mode_mask |= 0b0001; break;
-    case OutputSpeed::High:
-    case OutputSpeed::Max: mode_mask |= 0b0011; break;
+    case OutputSpeed::Low: ospeed = 0b00; break;
+    case OutputSpeed::Medium: ospeed = 0b01; break;
+    case OutputSpeed::High: ospeed = 0b10; break;
+    case OutputSpeed::Max: ospeed = 0b11; break;
     default: MICRO_ASSERT(0); break;
     }
 
-    configure(pin, mode_mask);
+    uint32_t pupd = 0;
+    switch (pull_mode)
+    {
+    case PullMode::None: pupd = 0b00; break;
+    case PullMode::Down: pupd = 0b10; break;
+    case PullMode::Up: pupd = 0b01; break;
+    default: MICRO_ASSERT(0); break;
+    }
+
+    configure(pin, mode_mask, otype, ospeed, pupd);
 }
 
 void gpio::configureAlternateOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode)
 {
-    UNUSED(pull_mode); // F103 doesn't support this
 
-    uint32_t mode_mask = 0;
-
-    switch (mode)
-    {
-    case OutputMode::PushPull: mode_mask |= 0b1000; break;
-    case OutputMode::OpenDrain: mode_mask |= 0b1100; break;
-    default: MICRO_ASSERT(0); break;
-    }
-
-    switch (speed)
-    {
-    case OutputSpeed::Low: mode_mask |= 0b0010; break;
-    case OutputSpeed::Medium: mode_mask |= 0b0001; break;
-    case OutputSpeed::High:
-    case OutputSpeed::Max: mode_mask |= 0b0011; break;
-    default: MICRO_ASSERT(0); break;
-    }
-
-    configure(pin, mode_mask);
 }
 
 void gpio::configureInput(Pin pin, PullMode pull_mode)
 {
-    uint32_t mode_mask = 0;
 
-    const bool has_pull = pull_mode != PullMode::None;
-
-    if (has_pull)
-    {
-        mode_mask |= 0b1000;
-    }
-    else
-    {
-        mode_mask |= 0b0100;
-    }
-
-    configure(pin, mode_mask);
-
-    if (has_pull)
-    {
-        setPinOutput(pin, pull_mode == PullMode::Up);
-    }
 }
 
-void gpio::configureAlternateInput(Pin pin, PullMode pull_mode)
-{
-    // F103 doesn't have alternate input modes
-    configureInput(pin, pull_mode);
-}
+void gpio::configureAlternateInput(Pin pin, PullMode pull_mode) {}
 
 void gpio::disablePin(Pin pin)
 {
