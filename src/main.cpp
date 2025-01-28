@@ -1,3 +1,4 @@
+#include "DeviceCMSIS.h"
 #include "Print.h"
 #include "Sleep.h"
 #include "commands/CommandBuffer.h"
@@ -17,7 +18,6 @@
 #include "utils/FixedBitset.h"
 
 #include <memory>
-#include "DeviceCMSIS.h"
 
 FixedDataStream<1024> usart1_stream;
 
@@ -30,9 +30,21 @@ int main()
 {
     irq::disableInterrupts();
 
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN | RCC_APB2ENR_AFIOEN
-        | RCC_APB2ENR_USART1EN;
+    // TODO! MOVE TO periph/RCC !!!
+
+#ifdef STM32F103
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN;
+    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
     RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+    RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+#elifdef STM32F401
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN;
+    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+    RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+#else
+    #error
+#endif
 
     // C13 open drain
     constexpr Pin led_pin{GPIOPort::C, 13};
