@@ -1,9 +1,8 @@
 #include "EXTI.h"
 
+#include "DeviceCMSIS.h"
 #include "core/Base.h"
 #include "core/MicroAssert.h"
-
-#include "DeviceCMSIS.h"
 
 namespace
 {
@@ -40,7 +39,15 @@ void exti::setupEXTI(Pin pin, TriggerMode mode, uint32_t flags)
 
     const uint32_t clear_mask = get_clear_mask(cr_reg_exti_pos);
     const uint32_t mask = get_mask(port_index, cr_reg_exti_pos);
+
+#ifdef STM32F103
     auto &reg = AFIO->EXTICR[cr_reg_index];
+#elifdef STM32F401
+    auto &reg = SYSCFG->EXTICR[cr_reg_index];
+#else
+    #error
+#endif
+
     reg = (reg & clear_mask) | mask;
 
     const uint32_t pin_bit_mask = 1UL << pin.num;
