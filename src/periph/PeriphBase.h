@@ -12,6 +12,13 @@ enum class GPIOPort
     E = 4,
 };
 
+enum class USART
+{
+    USART_1,
+    USART_2,
+    USART_3,
+};
+
 enum class InterruptType
 {
     SysTickIRQ = 0,

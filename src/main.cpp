@@ -5,6 +5,7 @@
 #include "commands/CommandExecutor.h"
 #include "commands/DHT11Command.h"
 #include "commands/PrintCommand.h"
+#include "core/Globals.h"
 #include "debug/Statistic.h"
 #include "drivers/DHT11Driver.h"
 #include "periph/EXTI.h"
@@ -64,7 +65,7 @@ int main()
     // USART1
     constexpr uint32_t baudrate = 56'000;
     constexpr uint32_t flags = usart::ENABLE_RECEIVE | usart::ENABLE_TRANSMIT | usart::ENABLE_RECEIVE_INTERRUPT;
-    usart::setupUsart(USART1, baudrate, flags);
+    usart::setupUsart(USART::USART_1, baudrate, flags);
     irq::enableInterrupt(InterruptType::USART1IRQ);
 
     io::setPrintUsart(USART1);
