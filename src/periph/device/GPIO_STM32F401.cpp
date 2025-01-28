@@ -18,6 +18,19 @@ FORCE_INLINE constexpr GPIO_TypeDef *get_port_register(GPIOPort port)
     }
 }
 
+FORCE_INLINE constexpr uint32_t number_to_mask(int k)
+{
+    return (1U << k) - 1;
+}
+
+FORCE_INLINE constexpr void get_masks(uint32_t base_mask, int pos, int size, uint32_t &mask, uint32_t &clear_mask)
+{
+    MICRO_ASSERT(pos >= 0 && pos < 16);
+    const int bit_pos = pos * size;
+    mask = base_mask << bit_pos;
+    clear_mask = ~(number_to_mask(size) << bit_pos);
+}
+
 FORCE_INLINE constexpr uint32_t get_mask(uint32_t mode, int pos)
 {
     MICRO_ASSERT(pos >= 0 && pos < 8);
