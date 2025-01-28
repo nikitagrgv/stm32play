@@ -34,8 +34,7 @@ void configureInput(Pin pin, PullMode pull_mode = PullMode::None);
 void configureAlternateOutput(Pin pin, OutputMode output_mode, OutputSpeed speed, PullMode pull_mode = PullMode::None);
 void configureAlternateInput(Pin pin, PullMode pull_mode = PullMode::None);
 #elifdef STM32F401
-void configureAlternate(Pin pin, int alt_func, OutputMode output_mode, OutputSpeed speed,
-    PullMode pull_mode = PullMode::None);
+void configureAlternate(Pin pin, int alt_func, OutputMode output_mode, OutputSpeed speed, PullMode pull_mode = PullMode::None);
 #endif
 
 void disablePin(Pin pin);
