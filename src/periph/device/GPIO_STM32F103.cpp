@@ -96,13 +96,13 @@ void gpio::configureInput(Pin pin, PullMode pull_mode)
     }
 }
 
-void gpio::configureAlternateOutput(Pin pin, OutputMode mode, OutputSpeed speed, PullMode pull_mode)
+void gpio::configureAlternateOutput(Pin pin, OutputMode output_mode, OutputSpeed speed, PullMode pull_mode)
 {
     UNUSED(pull_mode); // F103 doesn't support this
 
     uint32_t mode_mask = 0;
 
-    switch (mode)
+    switch (output_mode)
     {
     case OutputMode::PushPull: mode_mask |= 0b1000; break;
     case OutputMode::OpenDrain: mode_mask |= 0b1100; break;
