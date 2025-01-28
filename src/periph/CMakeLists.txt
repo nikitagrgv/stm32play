@@ -1,8 +1,9 @@
 
+add_subdirectory(device)
+
 target_sources(${EXECUTABLE_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/EXTI.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/EXTI.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/GPIO.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/GPIO.h
         ${CMAKE_CURRENT_SOURCE_DIR}/IRQ.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/IRQ.h

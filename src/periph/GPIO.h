@@ -6,28 +6,27 @@
 namespace gpio
 {
 
-enum class PinMode
+enum class PullMode
 {
-    InputFloating = 0b0100,
-    InputPullUpOrDown = 0b1000,
-    GeneralPushPull50MHz = 0b0011,
-    GeneralOpenDrain50MHz = 0b0111,
-    AlternatePushPull50MHz = 0b1011,
-    AlternateOpenDrain50MHz = 0b1111,
+    None,
+    Down,
+    Up
 };
 
-enum class PullUpOrDownMode
+enum class OutputSpeed
 {
-    Down = 0,
-    Up = 1,
+    Low,
+    Medium,
+    High,
+    Max
 };
 
-void setPinMode(Pin pin, PinMode mode);
+void configureOutput(Pin pin, OutputSpeed speed, PullMode pull_mode);
+void configureInput(Pin pin, PullMode pull_mode);
+
 void disablePin(Pin pin);
 
 bool getPinInput(Pin pin);
 void setPinOutput(Pin pin, bool value);
-
-void setPinPullUpOrDown(Pin pin, PullUpOrDownMode mode);
 
 } // namespace gpio

@@ -1,24 +1,9 @@
-#include "GPIO.h"
-
-#include "core/Base.h"
-
 #include "DeviceCMSIS.h"
+#include "core/Base.h"
+#include "periph/GPIO.h"
 
 namespace
 {
-
-FORCE_INLINE constexpr uint32_t get_mask(gpio::PinMode mode, int pos)
-{
-    MICRO_ASSERT(pos >= 0 && pos < 8);
-    const int bit_pos = pos * 4;
-    return (uint32_t)mode << bit_pos;
-}
-
-FORCE_INLINE constexpr uint32_t get_clear_mask(int pos)
-{
-    MICRO_ASSERT(pos >= 0 && pos < 8);
-    return ~(0b1111UL << (pos * 4));
-}
 
 FORCE_INLINE constexpr GPIO_TypeDef *get_port_register(GPIOPort port)
 {
@@ -33,9 +18,20 @@ FORCE_INLINE constexpr GPIO_TypeDef *get_port_register(GPIOPort port)
     }
 }
 
-} // namespace
+FORCE_INLINE constexpr uint32_t get_mask(uint32_t mode, int pos)
+{
+    MICRO_ASSERT(pos >= 0 && pos < 8);
+    const int bit_pos = pos * 4;
+    return mode << bit_pos;
+}
 
-void gpio::setPinMode(Pin pin, PinMode mode)
+FORCE_INLINE constexpr uint32_t get_clear_mask(int pos)
+{
+    MICRO_ASSERT(pos >= 0 && pos < 8);
+    return ~(0b1111UL << (pos * 4));
+}
+
+FORCE_INLINE constexpr void configure(Pin pin, uint32_t mode)
 {
     GPIO_TypeDef *port_reg = get_port_register(pin.port);
 
@@ -48,9 +44,15 @@ void gpio::setPinMode(Pin pin, PinMode mode)
     reg = (reg & clear_mask) | mask;
 }
 
+} // namespace
+
+void gpio::configureOutput(Pin pin, OutputSpeed speed, PullMode pull_mode) {}
+
+void gpio::configureInput(Pin pin, PullMode pull_mode) {}
+
 void gpio::disablePin(Pin pin)
 {
-    setPinMode(pin, PinMode::InputFloating);
+    configureInput(pin, PullMode::None);
 }
 
 bool gpio::getPinInput(Pin pin)
@@ -65,9 +67,4 @@ void gpio::setPinOutput(Pin pin, bool value)
     MICRO_ASSERT(pin.isValid());
     const uint32_t mask = value ? GPIO_BSRR_BS0 << pin.num : GPIO_BSRR_BR0 << pin.num;
     get_port_register(pin.port)->BSRR = mask;
-}
-
-void gpio::setPinPullUpOrDown(Pin pin, PullUpOrDownMode mode)
-{
-    setPinOutput(pin, mode == PullUpOrDownMode::Up);
 }

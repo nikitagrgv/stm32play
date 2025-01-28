@@ -55,7 +55,7 @@ int main()
 
     gpio::setPinMode(usart_tx_pin, gpio::PinMode::AlternatePushPull50MHz);
     gpio::setPinMode(usart_rx_pin, gpio::PinMode::InputPullUpOrDown);
-    gpio::setPinPullUpOrDown(usart_rx_pin, gpio::PullUpOrDownMode::Up);
+    gpio::setPinPullUpOrDown(usart_rx_pin, gpio::PullMode::Up);
 
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
