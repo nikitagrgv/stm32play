@@ -14,15 +14,18 @@ extern "C"
             ; // Wait until HSE is ready
 
         // Step 2: Configure Flash prefetch and latency
-        FLASH->ACR |= FLASH_ACR_PRFTBE;    // Enable prefetch buffesr
-        FLASH->ACR &= ~FLASH_ACR_LATENCY;  // Clear latency settings
-        FLASH->ACR |= FLASH_ACR_LATENCY_2; // Set 2 wait states for 72 MHz
+        FLASH->ACR |= FLASH_ACR_PRFTEN;   // Enable prefetch buffer
+        FLASH->ACR &= ~FLASH_ACR_LATENCY; // Clear latency settings
+        FLASH->ACR
+            |= FLASH_ACR_LATENCY_2WS; // Set 2 wait states for 84 MHz <button class="citation-flag" data-index="6">
 
         // Step 3: Configure the PLL
-        RCC->CFGR &= ~RCC_CFGR_PLLSRC;  // Clear PLL source
-        RCC->CFGR |= RCC_CFGR_PLLSRC;   // Set PLL source to HSE
-        RCC->CFGR &= ~RCC_CFGR_PLLMULL; // Clear PLL multiplier bits
-        RCC->CFGR |= RCC_CFGR_PLLMULL9; // Set PLL multiplier to 9 (8 MHz × 9 = 72 MHz)
+        RCC->PLLCFGR = 0;                                        // Reset PLL configuration
+        RCC->PLLCFGR |= RCC_PLLCFGR_PLLSRC_HSE;                  // Set PLL source to HSE
+        RCC->PLLCFGR |= RCC_PLLCFGR_PLLM_2 | RCC_PLLCFGR_PLLM_0; // Divide HSE by 8 (assuming 8 MHz crystal)
+        RCC->PLLCFGR |= RCC_PLLCFGR_PLLN_4 | RCC_PLLCFGR_PLLN_3 | RCC_PLLCFGR_PLLN_2 | RCC_PLLCFGR_PLLN_1
+            | RCC_PLLCFGR_PLLN_0;           // Multiply by 168
+        RCC->PLLCFGR |= RCC_PLLCFGR_PLLP_1; // Divide by 2 to get 84 MHz
 
         // Step 4: Enable the PLL
         RCC->CR |= RCC_CR_PLLON; // Enable PLL
@@ -36,11 +39,11 @@ extern "C"
             ; // Wait until PLL is the system clock source
 
         // Step 6: Configure the AHB, APB1, and APB2 prescalers
-        RCC->CFGR &= ~RCC_CFGR_HPRE;  // AHB prescaler: SYSCLK / 1
-        RCC->CFGR &= ~RCC_CFGR_PPRE1; // APB1 prescaler: HCLK / 2
-        RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;
-        RCC->CFGR &= ~RCC_CFGR_PPRE2; // APB2 prescaler: HCLK / 1
+        RCC->CFGR |= RCC_CFGR_HPRE_DIV1;  // AHB prescaler: SYSCLK / 1
+        RCC->CFGR |= RCC_CFGR_PPRE1_DIV2; // APB1 prescaler: HCLK / 2
+        RCC->CFGR |= RCC_CFGR_PPRE2_DIV1; // APB2 prescaler: HCLK / 1
 
-        glob::SYS_FREQUENCY = 72'000'000;
+        // Update global system frequency variable
+        glob::SYS_FREQUENCY = 84'000'000;
     }
 }
