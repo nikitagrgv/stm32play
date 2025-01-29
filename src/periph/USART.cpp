@@ -12,7 +12,9 @@ USART_TypeDef *get_usart_register(USART usart)
     {
     case USART::USART_1: return USART1; break;
     case USART::USART_2: return USART2; break;
+#ifdef STM32F103
     case USART::USART_3: return USART3; break;
+#endif
     default: MICRO_ASSERT(0); return nullptr;
     }
 }

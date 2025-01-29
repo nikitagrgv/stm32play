@@ -16,7 +16,10 @@ enum class USART
 {
     USART_1,
     USART_2,
+
+#ifdef STM32F103
     USART_3,
+#endif
 };
 
 enum class InterruptType
