@@ -54,8 +54,13 @@ int main()
 
     gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
+#ifdef STM32F103
     gpio::configureAlternateOutput(usart_tx_pin, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
     gpio::configureAlternateInput(usart_rx_pin, gpio::PullMode::Up);
+#elifdef STM32F401
+    gpio::configureAlternate(usart_tx_pin, 7, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
+    gpio::configureAlternate(usart_rx_pin, 7, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
+#endif
 
     // SysTick
     constexpr uint32_t systick_frequency = 1000;

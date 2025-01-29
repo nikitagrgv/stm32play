@@ -86,7 +86,7 @@ void configure(Pin pin, uint32_t mode, OutputMode output_mode, OutputSpeed speed
     default: MICRO_ASSERT(0); break;
     }
 
-    configure(pin, mode, otype, ospeed, pupd, 0);
+    configure(pin, mode, otype, ospeed, pupd, alt_func);
 }
 
 
