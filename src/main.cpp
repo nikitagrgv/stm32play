@@ -75,10 +75,65 @@ extern "C"
         }
     }
 }
+
+
+#define HSE_VALUE ((uint32_t)25000000) /*!< Default value of the External oscillator in Hz */
+
+#define HSI_VALUE ((uint32_t)16000000) /*!< Value of the Internal oscillator in Hz*/
+
+
+uint32_t SystemCoreClock = 16000000;
+const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
+const uint8_t APBPrescTable[8] = {0, 0, 0, 0, 1, 2, 3, 4};
+
+
+int pll_is_hse = 0;
+
+void SystemCoreClockUpdate(void)
+{
+    pll_is_hse = 0;
+
+    uint32_t tmp = 0, pllvco = 0, pllp = 2, pllsource = 0, pllm = 2;
+
+    tmp = RCC->CFGR & RCC_CFGR_SWS;
+
+    switch (tmp)
+    {
+    case 0x00: /* HSI used as system clock source */ SystemCoreClock = HSI_VALUE; break;
+    case 0x04: /* HSE used as system clock source */ SystemCoreClock = HSE_VALUE; break;
+    case 0x08: /* PLL used as system clock source */
+
+        /* PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N
+           SYSCLK = PLL_VCO / PLL_P
+           */
+        pllsource = (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC) >> 22;
+        pllm = RCC->PLLCFGR & RCC_PLLCFGR_PLLM;
+
+        if (pllsource != 0)
+        {
+            pll_is_hse = 1;
+            /* HSE used as PLL clock source */
+            pllvco = (HSE_VALUE / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);
+        }
+        else
+        {
+            /* HSI used as PLL clock source */
+            pllvco = (HSI_VALUE / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);
+        }
+
+        pllp = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLP) >> 16) + 1) * 2;
+        SystemCoreClock = pllvco / pllp;
+        break;
+    default: SystemCoreClock = HSI_VALUE; break;
+    }
+    tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
+    SystemCoreClock >>= tmp;
+}
+
+
 int main(void)
 {
     SCB->CPACR |= ((3UL << 10 * 2) | (3UL << 11 * 2)); /* set CP10 and CP11 Full Access */
-
 
 
     RCC->CFGR = 0;
@@ -86,33 +141,48 @@ int main(void)
     {}
 
     {
-        // Enable HSE Oscillator
+        // Enable HSE (High-Speed External) oscillator
         RCC->CR |= RCC_CR_HSEON;
         while (!(RCC->CR & RCC_CR_HSERDY))
         {
-            // Wait for HSE to become ready
+            // Wait until HSE is ready
         }
 
-        // Configure PLL
-        constexpr uint32_t g2 = (25 << RCC_PLLCFGR_PLLM_Pos) | // PLLM = 25
-            (336 << RCC_PLLCFGR_PLLN_Pos) |                    // PLLN = 336
-            (1 << RCC_PLLCFGR_PLLP_Pos) |                      // PLLP = 2 (0 corresponds to division by 2)
-            RCC_PLLCFGR_PLLSRC_HSE;                            // PLL source is HSE
-        RCC->PLLCFGR = g2;
+        // Configure the PLL
+        // PLL_M = 25, PLL_N = 336, PLL_P = 4, PLL_Q = 7
+        RCC->PLLCFGR = (25 << RCC_PLLCFGR_PLLM_Pos) | // PLL_M
+            (336 << RCC_PLLCFGR_PLLN_Pos) |           // PLL_N
+            (1 << RCC_PLLCFGR_PLLP_Pos) |             // PLL_P (00: PLLP = 2; 01: PLLP = 4; 10: PLLP = 6; 11: PLLP = 8)
+            (RCC_PLLCFGR_PLLSRC_HSE) |                // PLL source
+            (7 << RCC_PLLCFGR_PLLQ_Pos);              // PLL_Q
 
-        // Enable PLL
+        // Enable the PLL
         RCC->CR |= RCC_CR_PLLON;
         while (!(RCC->CR & RCC_CR_PLLRDY))
         {
-            // Wait for PLL to become ready
+            // Wait until PLL is ready
         }
 
-        // Set PLL as system clock source
-        RCC->CFGR = 0;
-        RCC->CFGR |= RCC_CFGR_SW_PLL | (0b100 << RCC_CFGR_PPRE1_Pos);
+        // Configure Flash prefetch, Instruction cache, Data cache, and wait state
+        FLASH->ACR = FLASH_ACR_PRFTEN | // Enable prefetch
+            FLASH_ACR_ICEN |            // Instruction cache enable
+            FLASH_ACR_DCEN |            // Data cache enable
+            FLASH_ACR_LATENCY_2WS;      // Flash latency (2 wait states for 84 MHz)
+
+        // Configure the AHB prescaler (HCLK)
+        RCC->CFGR |= RCC_CFGR_HPRE_DIV1; // AHB prescaler: SYSCLK not divided
+
+        // Configure the APB1 prescaler (PCLK1)
+        RCC->CFGR |= RCC_CFGR_PPRE1_DIV2; // APB1 prescaler: HCLK divided by 2 (max 42 MHz)
+
+        // Configure the APB2 prescaler (PCLK2)
+        RCC->CFGR |= RCC_CFGR_PPRE2_DIV1; // APB2 prescaler: HCLK not divided
+
+        // Select the PLL as the system clock source
+        RCC->CFGR |= RCC_CFGR_SW_PLL;
         while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL)
         {
-            // Wait for PLL to be used as system clock
+            // Wait until PLL is used as the system clock source
         }
     }
 
@@ -130,12 +200,13 @@ int main(void)
     SysTick->CTRL = 0;
     SysTick->LOAD = one_ms_ticks - 1; // -1 because the counter counts down to zero
     SysTick->VAL = 0;
-    SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+    // SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
 
 
     // Main loop
     while (1)
     {
+        gpio::setPinOutput(led_pin, pll_is_hse);
         // Toggle an LED or perform some action every 1 second
         // For example:
         // GPIO_ToggleBits(GPIOD, GPIO_Pin_12);  // Assuming an LED is connected to PD12
