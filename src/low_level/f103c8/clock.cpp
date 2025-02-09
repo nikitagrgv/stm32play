@@ -2,61 +2,65 @@
 
 #include "DeviceCMSIS.h"
 
-#define HSE_VALUE ((uint32_t)25000000) // Default value of the External oscillator in Hz
-#define HSI_VALUE ((uint32_t)16000000) // Value of the Internal oscillator in Hz
+#define HSE_VALUE ((uint32_t)8000000U) // Default value of the External oscillator in Hz
+#define HSI_VALUE ((uint32_t)8000000U) // Value of the Internal oscillator in Hz
 
-const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
-const uint8_t APBPrescTable[8] = {0, 0, 0, 0, 1, 2, 3, 4};
+const uint8_t AHBPrescTable[16U] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
+const uint8_t APBPrescTable[8U] = {0, 0, 0, 0, 1, 2, 3, 4};
 
 uint32_t calcSystemCoreClock()
 {
-    uint32_t ret = 0;
-    uint32_t tmp = 0;
+    uint32_t ret = 0U;
+    uint32_t tmp = 0U;
 
     tmp = RCC->CFGR & RCC_CFGR_SWS;
 
     switch (tmp)
     {
-    case 0x00:
-        // HSI used as system clock source
-            ret = HSI_VALUE;
+    case 0x00U:
+        // HSI used as system clock
+        ret = HSI_VALUE;
         break;
-    case 0x04:
-        // HSE used as system clock source
-            ret = HSE_VALUE;
+    case 0x04U:
+        // HSE used as system clock
+        ret = HSE_VALUE;
         break;
-    case 0x08:
+    case 0x08U:
     {
         // PLL used as system clock source
-        uint32_t pllm = 2;
-        uint32_t pllsource = 0;
-        uint32_t pllp = 2;
-        uint32_t pllvco = 0;
+        uint32_t pllsource = 0U;
+        uint32_t pllmull = 0U;
+        pllmull = RCC->CFGR & RCC_CFGR_PLLMULL;
+        pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
 
-        // PLL_VCO = (HSE_VALUE or HSI_VALUE / PLL_M) * PLL_N
-        // SYSCLK = PLL_VCO / PLL_P
-        pllsource = (RCC->PLLCFGR & RCC_PLLCFGR_PLLSRC) >> 22;
-        pllm = RCC->PLLCFGR & RCC_PLLCFGR_PLLM;
+        pllmull = (pllmull >> 18U) + 2U;
 
-        if (pllsource != 0)
+        if (pllsource == 0x00U)
         {
-            // HSE used as PLL clock source
-            pllvco = (HSE_VALUE / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);
+            // HSI oscillator clock divided by 2 selected as PLL clock entry
+            ret = (HSI_VALUE >> 1U) * pllmull;
         }
         else
         {
-            // HSI used as PLL clock source
-            pllvco = (HSI_VALUE / pllm) * ((RCC->PLLCFGR & RCC_PLLCFGR_PLLN) >> 6);
+
+            // HSE selected as PLL clock entry
+            if ((RCC->CFGR & RCC_CFGR_PLLXTPRE) != (uint32_t)RESET)
+            {
+                // HSE oscillator clock divided by 2
+                ret = (HSE_VALUE >> 1U) * pllmull;
+            }
+            else
+            {
+                ret = HSE_VALUE * pllmull;
+            }
         }
 
-        pllp = (((RCC->PLLCFGR & RCC_PLLCFGR_PLLP) >> 16) + 1) * 2;
-        ret = pllvco / pllp;
         break;
     }
     default: ret = HSI_VALUE; break;
     }
 
-    tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
+    tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4U)];
     ret >>= tmp;
     return ret;
 }
