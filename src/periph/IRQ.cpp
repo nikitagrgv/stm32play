@@ -82,8 +82,11 @@ FORCE_INLINE IRQn_Type get_irqn_by_type(InterruptType type)
 
 extern "C"
 {
+    void SysTick_Handler()
+    {
+        call_handler(InterruptType::SysTickIRQ);
+    }
 
-    // TODO! REVERT
     void USART1_IRQHandler()
     {
         call_handler(InterruptType::USART1IRQ);

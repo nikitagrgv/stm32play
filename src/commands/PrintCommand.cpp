@@ -15,7 +15,7 @@ bool PrintCommand::execute(const char *args)
     if (str_utils::compareTrimmed(args, "time"))
     {
         io::printSyncFmt("total msec = %u\n", glob::total_msec);
-        io::printSyncFmt("sys freq = %u\n", glob::SYS_FREQUENCY);
+        io::printSyncFmt("sys freq = %u\n", glob::SYSTEM_CORE_CLOCK);
         return true;
     }
     if (str_utils::compareTrimmed(args, "datastat"))

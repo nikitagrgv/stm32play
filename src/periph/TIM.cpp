@@ -33,7 +33,7 @@ void tim::setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value
 {
     stopTimer(tim);
 
-    const uint32_t prescaler = (glob::SYS_FREQUENCY / frequency) - 1;
+    const uint32_t prescaler = (glob::SYSTEM_CORE_CLOCK / frequency) - 1;
 
     MICRO_ASSERT(prescaler <= MAX_PRESCALER);
     MICRO_ASSERT(reload_value <= MAX_RELOAD_VALUE);

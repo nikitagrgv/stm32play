@@ -46,7 +46,7 @@ void usart::setupUsart(USART usart, uint32_t baudrate, int setup_flags, bool ena
     uint32_t cr1 = enable ? USART_CR1_UE : 0;
     cr1 |= get_cr1_flags(setup_flags);
 
-    const uint32_t brr = glob::SYS_FREQUENCY / baudrate;
+    const uint32_t brr = glob::SYSTEM_CORE_CLOCK / baudrate;
     MICRO_ASSERT(brr < (1 << 16) && brr > 0);
 
     usart_reg->SR = 0; // clear flags
