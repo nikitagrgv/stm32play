@@ -35,7 +35,8 @@ int main()
 
     irq::disableInterrupts();
 
-    rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::USART_1 | rcc::TIM_2);
+    rcc::enableClocks(
+        rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::USART_1 | rcc::TIM_2 | rcc::I2C_1);
 
     constexpr Pin led_pin{GPIOPort::C, 13};
 
