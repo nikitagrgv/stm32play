@@ -37,7 +37,6 @@ int main()
 
     rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::USART_1 | rcc::TIM_2);
 
-    // C13 open drain
     constexpr Pin led_pin{GPIOPort::C, 13};
     constexpr Pin usart_tx_pin{GPIOPort::A, 9};
     constexpr Pin usart_rx_pin{GPIOPort::A, 10};
