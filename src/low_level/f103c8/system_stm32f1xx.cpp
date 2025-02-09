@@ -38,6 +38,6 @@ extern "C"
         RCC->CFGR |= RCC_CFGR_PPRE1_DIV2;
         RCC->CFGR &= ~RCC_CFGR_PPRE2; // APB2 prescaler: HCLK / 1
 
-        glob::SYS_FREQUENCY = 72'000'000;
+        glob::SYSTEM_CORE_CLOCK = 72'000'000;
     }
 }
