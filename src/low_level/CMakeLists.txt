@@ -1,5 +1,6 @@
 
 target_sources(${EXECUTABLE_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/clock.h
         ${CMAKE_CURRENT_SOURCE_DIR}/syscalls.c
         ${CMAKE_CURRENT_SOURCE_DIR}/sysmem.c
 )

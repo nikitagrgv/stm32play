@@ -8,6 +8,7 @@
 #include "core/Globals.h"
 #include "debug/Statistic.h"
 #include "drivers/DHT11Driver.h"
+#include "low_level/clock.h"
 #include "periph/EXTI.h"
 #include "periph/GPIO.h"
 #include "periph/IRQ.h"
@@ -29,6 +30,8 @@ CommandExecutor command_executor;
 
 int main()
 {
+    glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
+
     irq::disableInterrupts();
 
     // TODO! MOVE TO periph/RCC !!!

@@ -1,5 +1,6 @@
 
 target_sources(${EXECUTABLE_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/clock.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/startup_stm32f103c8tx.s
         ${CMAKE_CURRENT_SOURCE_DIR}/stm32f1xx_it.c
         ${CMAKE_CURRENT_SOURCE_DIR}/stm32f1xx_it.h
