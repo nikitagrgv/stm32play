@@ -37,19 +37,6 @@ int main()
 
     rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::USART_1 | rcc::TIM_2);
 
-    // TODO! MOVE TO periph/RCC !!!
-
-#ifdef STM32F103
-
-#elifdef STM32F401
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN;
-    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
-    RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-#else
-    #error
-#endif
-
     // C13 open drain
     constexpr Pin led_pin{GPIOPort::C, 13};
     constexpr Pin usart_tx_pin{GPIOPort::A, 9};
