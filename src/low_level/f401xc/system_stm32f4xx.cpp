@@ -1,8 +1,8 @@
 #include "DeviceCMSIS.h"
 #include "core/Globals.h"
 
-#define HSE_VALUE ((uint32_t)25000000) /*!< Default value of the External oscillator in Hz */
-#define HSI_VALUE ((uint32_t)16000000) /*!< Value of the Internal oscillator in Hz*/
+#define HSE_VALUE ((uint32_t)25000000) // Default value of the External oscillator in Hz
+#define HSI_VALUE ((uint32_t)16000000) // Value of the Internal oscillator in Hz
 
 const uint8_t AHBPrescTable[16] = {0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 6, 7, 8, 9};
 const uint8_t APBPrescTable[8] = {0, 0, 0, 0, 1, 2, 3, 4};
