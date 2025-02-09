@@ -38,8 +38,12 @@ int main()
     rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::USART_1 | rcc::TIM_2);
 
     constexpr Pin led_pin{GPIOPort::C, 13};
+
     constexpr Pin usart_tx_pin{GPIOPort::A, 9};
     constexpr Pin usart_rx_pin{GPIOPort::A, 10};
+
+    constexpr Pin i2c_sda_pin{GPIOPort::B, 7};
+    constexpr Pin i2c_scl_pin{GPIOPort::B, 8};
 
     gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
@@ -49,6 +53,13 @@ int main()
 #elifdef STM32F401
     gpio::configureAlternate(usart_tx_pin, 7, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
     gpio::configureAlternate(usart_rx_pin, 7, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
+#endif
+
+#ifdef STM32F103
+    #error
+#elifdef STM32F401
+    gpio::configureAlternate(i2c_sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High, gpio::PullMode::Up);
+    gpio::configureAlternate(i2c_scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High, gpio::PullMode::Up);
 #endif
 
     // SysTick
