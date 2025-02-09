@@ -15,7 +15,9 @@ enum : uint32_t
 
     USART_1 = 1 << 4,
 
-    TIM_2 = 1 << 5,
+    I2C_1 = 1 << 5,
+
+    TIM_2 = 1 << 6,
 };
 
 void enableClocks(uint32_t periphs);
