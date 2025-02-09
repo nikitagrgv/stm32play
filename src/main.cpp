@@ -1,15 +1,19 @@
+#include "DeviceCMSIS.h"
 #include "Print.h"
 #include "Sleep.h"
 #include "commands/CommandBuffer.h"
 #include "commands/CommandExecutor.h"
 #include "commands/DHT11Command.h"
 #include "commands/PrintCommand.h"
+#include "core/Globals.h"
 #include "debug/Statistic.h"
 #include "drivers/DHT11Driver.h"
+#include "low_level/clock.h"
 #include "periph/EXTI.h"
 #include "periph/GPIO.h"
 #include "periph/IRQ.h"
 #include "periph/PeriphBase.h"
+#include "periph/RCC.h"
 #include "periph/SysTick.h"
 #include "periph/TIM.h"
 #include "periph/USART.h"
@@ -17,7 +21,6 @@
 #include "utils/FixedBitset.h"
 
 #include <memory>
-#include <stm32f1xx.h>
 
 FixedDataStream<1024> usart1_stream;
 
@@ -28,22 +31,26 @@ CommandExecutor command_executor;
 
 int main()
 {
+    glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
+
     irq::disableInterrupts();
 
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN | RCC_APB2ENR_AFIOEN
-        | RCC_APB2ENR_USART1EN;
-    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
+    rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::USART_1 | rcc::TIM_2);
 
     // C13 open drain
     constexpr Pin led_pin{GPIOPort::C, 13};
     constexpr Pin usart_tx_pin{GPIOPort::A, 9};
     constexpr Pin usart_rx_pin{GPIOPort::A, 10};
 
-    gpio::setPinMode(led_pin, gpio::PinMode::GeneralOpenDrain50MHz);
+    gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
-    gpio::setPinMode(usart_tx_pin, gpio::PinMode::AlternatePushPull50MHz);
-    gpio::setPinMode(usart_rx_pin, gpio::PinMode::InputPullUpOrDown);
-    gpio::setPinPullUpOrDown(usart_rx_pin, gpio::PullUpOrDownMode::Up);
+#ifdef STM32F103
+    gpio::configureAlternateOutput(usart_tx_pin, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
+    gpio::configureAlternateInput(usart_rx_pin, gpio::PullMode::Up);
+#elifdef STM32F401
+    gpio::configureAlternate(usart_tx_pin, 7, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
+    gpio::configureAlternate(usart_rx_pin, 7, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
+#endif
 
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
@@ -53,7 +60,7 @@ int main()
     // USART1
     constexpr uint32_t baudrate = 56'000;
     constexpr uint32_t flags = usart::ENABLE_RECEIVE | usart::ENABLE_TRANSMIT | usart::ENABLE_RECEIVE_INTERRUPT;
-    usart::setupUsart(USART1, baudrate, flags);
+    usart::setupUsart(USART::USART_1, baudrate, flags);
     irq::enableInterrupt(InterruptType::USART1IRQ);
 
     io::setPrintUsart(USART1);

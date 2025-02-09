@@ -5,6 +5,9 @@ cmake_minimum_required(VERSION 3.27)
 option(ENABLE_DATA_STATISTIC "Enable Data Statistic" ON)
 option(DEBUG_OPTIMIZED "Use -Og instead of -O0" OFF)
 
+set(DEVICE_NAME "STM32F103" CACHE STRING "STM32F103 or STM32F401")
+set_property(CACHE DEVICE_NAME PROPERTY STRINGS "STM32F103" "STM32F401")
+
 # specify cross-compilers and tools
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
 set(CMAKE_CXX_COMPILER arm-none-eabi-g++)
@@ -20,15 +23,6 @@ project(stmplay C CXX ASM)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
-#Uncomment for hardware floating point
-#add_compile_definitions(ARM_MATH_CM4;ARM_MATH_MATRIX_CHECK;ARM_MATH_ROUNDING)
-#add_compile_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
-#add_link_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
-
-#Uncomment for software floating point
-#add_compile_options(-mfloat-abi=soft)
-
-add_compile_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 add_compile_options(-ffunction-sections -fdata-sections -fno-common -fmessage-length=0)
 
 add_compile_options(-fno-exceptions)
@@ -59,31 +53,50 @@ else ()
     add_definitions(-DDEBUG)
 endif ()
 
-add_definitions(-DSTM32F103xB)
+if ("${DEVICE_NAME}" STREQUAL "STM32F103")
+    message(STATUS "Selected Device: F103")
 
-include_directories(src Drivers/CMSIS/Device/ST/STM32F1xx/Include Drivers/CMSIS/Include)
+    add_definitions(-DSTM32F103)
+    add_definitions(-DSTM32F103xB)
+    include_directories(Drivers/CMSIS/Device/ST/STM32F1xx/Include)
+    set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/stm32f103c8tx_flash.ld)
+    add_link_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork -mfloat-abi=soft)
+    add_compile_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork -mfloat-abi=soft)
+elseif ("${DEVICE_NAME}" STREQUAL "STM32F401")
+    message(STATUS "Selected Device: F401")
+
+    add_definitions(-DSTM32F401)
+    add_definitions(-DSTM32F401xC)
+    include_directories(Drivers/CMSIS/Device/ST/STM32F4xx/Include)
+    set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/stm32f401ccux_flash.ld)
+    add_link_options(-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
+    add_compile_options(-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard)
+else ()
+    message(FATAL_ERROR "Invalid Device Name")
+endif ()
+
+include_directories(src Drivers/CMSIS/Include)
 
 if (ENABLE_DATA_STATISTIC)
     add_definitions(-DENABLE_DATA_STATISTIC)
 endif ()
 
-file(GLOB_RECURSE SOURCES "src/*.*")
-
-set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F103C8TX_FLASH.ld)
-
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
-add_link_options(-mcpu=cortex-m3 -mthumb -mthumb-interwork)
 add_link_options(-T ${LINKER_SCRIPT})
 add_link_options(--specs=nano.specs)
 add_link_options(-u _printf_float)
 
-add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})
+set(EXECUTABLE_NAME ${PROJECT_NAME}.elf)
+
+add_executable(${EXECUTABLE_NAME} ${LINKER_SCRIPT})
+
+add_subdirectory(src)
 
 set(HEX_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.hex)
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
-add_custom_command(TARGET ${PROJECT_NAME}.elf POST_BUILD
-        COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${PROJECT_NAME}.elf> ${HEX_FILE}
-        COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${PROJECT_NAME}.elf> ${BIN_FILE}
-        COMMENT "Building ${HEX_FILE}
-Building ${BIN_FILE}")
+add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+        COMMAND ${CMAKE_OBJCOPY} -Oihex $<TARGET_FILE:${EXECUTABLE_NAME}> ${HEX_FILE}
+        COMMAND ${CMAKE_OBJCOPY} -Obinary $<TARGET_FILE:${EXECUTABLE_NAME}> ${BIN_FILE}
+        COMMENT " Building ${HEX_FILE}
+            Building ${BIN_FILE}")

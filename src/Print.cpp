@@ -4,7 +4,7 @@
 
 #include <cstdarg>
 #include <cstdio>
-#include <stm32f1xx.h>
+#include "DeviceCMSIS.h"
 
 namespace
 {
@@ -65,7 +65,6 @@ void io::printSyncFmt(const char *fmt, ...)
 {
     if (!PRINT_USART)
     {
-        // TODO: is it safe to return here (va_list)?
         return;
     }
 

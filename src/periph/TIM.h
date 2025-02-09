@@ -3,7 +3,7 @@
 #include "PeriphBase.h"
 
 #include <cstdint>
-#include <stm32f1xx.h>
+#include "DeviceCMSIS.h"
 
 namespace tim
 {

@@ -6,28 +6,40 @@
 namespace gpio
 {
 
-enum class PinMode
+enum class PullMode
 {
-    InputFloating = 0b0100,
-    InputPullUpOrDown = 0b1000,
-    GeneralPushPull50MHz = 0b0011,
-    GeneralOpenDrain50MHz = 0b0111,
-    AlternatePushPull50MHz = 0b1011,
-    AlternateOpenDrain50MHz = 0b1111,
+    None,
+    Down,
+    Up
 };
 
-enum class PullUpOrDownMode
+enum class OutputMode
 {
-    Down = 0,
-    Up = 1,
+    PushPull,
+    OpenDrain,
 };
 
-void setPinMode(Pin pin, PinMode mode);
+enum class OutputSpeed
+{
+    Low,
+    Medium,
+    High,
+    Max
+};
+
+void configureOutput(Pin pin, OutputMode output_mode, OutputSpeed speed, PullMode pull_mode = PullMode::None);
+void configureInput(Pin pin, PullMode pull_mode = PullMode::None);
+
+#ifdef STM32F103
+void configureAlternateOutput(Pin pin, OutputMode output_mode, OutputSpeed speed, PullMode pull_mode = PullMode::None);
+void configureAlternateInput(Pin pin, PullMode pull_mode = PullMode::None);
+#elifdef STM32F401
+void configureAlternate(Pin pin, int alt_func, OutputMode output_mode, OutputSpeed speed, PullMode pull_mode = PullMode::None);
+#endif
+
 void disablePin(Pin pin);
 
 bool getPinInput(Pin pin);
 void setPinOutput(Pin pin, bool value);
-
-void setPinPullUpOrDown(Pin pin, PullUpOrDownMode mode);
 
 } // namespace gpio

@@ -5,7 +5,7 @@
 namespace glob
 {
 
-constexpr uint32_t SYS_FREQUENCY = 72'000'000;
+extern volatile uint32_t SYSTEM_CORE_CLOCK;
 
 extern volatile uint32_t total_msec;
 

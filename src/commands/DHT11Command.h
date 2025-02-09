@@ -3,7 +3,7 @@
 #include "CommandExecutor.h"
 #include "periph/PeriphBase.h"
 
-#include <stm32f1xx.h>
+#include "DeviceCMSIS.h"
 
 class DHT11Command final : public ICommand
 {

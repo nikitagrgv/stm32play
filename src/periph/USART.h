@@ -1,23 +1,21 @@
 #pragma once
 
-#include "core/Globals.h"
-#include "core/MicroAssert.h"
+#include "PeriphBase.h"
 
 #include <cstdint>
-#include <stm32f1xx.h>
 
 namespace usart
 {
 
 enum SetupFlags : uint32_t
 {
-    ENABLE_TRANSMIT = USART_CR1_TE,
-    ENABLE_RECEIVE = USART_CR1_RE,
-    ENABLE_RECEIVE_INTERRUPT = USART_CR1_RXNEIE,
+    ENABLE_TRANSMIT = 1 << 0,
+    ENABLE_RECEIVE = 1 << 1,
+    ENABLE_RECEIVE_INTERRUPT = 1 << 2,
 };
 
-void setupUsart(USART_TypeDef *usart, uint32_t baudrate, int setup_flags, bool enable = true);
+void setupUsart(USART usart, uint32_t baudrate, int setup_flags, bool enable = true);
 
-void setUsartEnabled(USART_TypeDef *usart, bool enabled);
+void setUsartEnabled(USART usart, bool enabled);
 
 } // namespace usart

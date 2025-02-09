@@ -6,10 +6,20 @@
 enum class GPIOPort
 {
     A = 0,
-    B,
-    C,
-    D,
-    E,
+    B = 1,
+    C = 2,
+    D = 3,
+    E = 4,
+};
+
+enum class USART
+{
+    USART_1,
+    USART_2,
+
+#ifdef STM32F103
+    USART_3,
+#endif
 };
 
 enum class InterruptType

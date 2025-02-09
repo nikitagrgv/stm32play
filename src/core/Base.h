@@ -4,6 +4,8 @@
 
 #define FORCE_INLINE __inline__
 
+#define UNUSED(A) (void)(A)
+
 
 #define CONCATENATE_IMPL(A, B) A##B
 #define CONCATENATE(A, B)      CONCATENATE_IMPL(A, B)

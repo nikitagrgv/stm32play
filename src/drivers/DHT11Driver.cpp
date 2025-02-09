@@ -30,7 +30,7 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 
     gpio::disablePin(pin_);
     gpio::setPinOutput(pin_, false);
-    gpio::setPinMode(pin_, gpio::PinMode::GeneralOpenDrain50MHz);
+    gpio::configureOutput(pin_, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
     utils::sleepMsec(timer_, 20);
 
@@ -45,7 +45,7 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
     irq::enableInterrupt(exti_interrupt_type_);
 
     gpio::setPinOutput(pin_, true);
-    gpio::setPinMode(pin_, gpio::PinMode::InputFloating);
+    gpio::configureInput(pin_);
 
     const uint32_t start_time_ms = glob::total_msec;
     const uint32_t end_time = start_time_ms + TIMEOUT_MS;
