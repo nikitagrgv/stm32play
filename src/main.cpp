@@ -13,6 +13,7 @@
 #include "periph/GPIO.h"
 #include "periph/IRQ.h"
 #include "periph/PeriphBase.h"
+#include "periph/RCC.h"
 #include "periph/SysTick.h"
 #include "periph/TIM.h"
 #include "periph/USART.h"
@@ -34,13 +35,12 @@ int main()
 
     irq::disableInterrupts();
 
+    rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::USART_1 | rcc::TIM_2);
+
     // TODO! MOVE TO periph/RCC !!!
 
 #ifdef STM32F103
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN | RCC_APB2ENR_IOPBEN | RCC_APB2ENR_IOPCEN;
-    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
-    RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+
 #elifdef STM32F401
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN | RCC_AHB1ENR_GPIOCEN;
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;

@@ -11,7 +11,7 @@ enum : uint32_t
     GPIO_B = 1 << 1,
     GPIO_C = 1 << 2,
 
-    SYSCFG_AFIO = 1 << 3,
+    SYSCFG_OR_AFIO = 1 << 3,
 
     USART_1 = 1 << 4,
 

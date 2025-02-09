@@ -21,7 +21,7 @@ void get_masks(uint32_t periph, uint32_t &apb1_mask, uint32_t &apb2_mask)
     {
         apb2_mask |= RCC_APB2ENR_IOPCEN;
     }
-    if (periph & SYSCFG_AFIO)
+    if (periph & SYSCFG_OR_AFIO)
     {
         apb2_mask |= RCC_APB2ENR_AFIOEN;
     }
