@@ -195,11 +195,57 @@ int main()
             {}
 
 
+            // Generate the START condition by setting the START bit in CR1.
+            I2C1->CR1 |= I2C_CR1_START;
+
+            // Wait until the SB (start bit) flag is set in SR1.
+            while (!(I2C1->SR1 & I2C_SR1_SB))
+            {}
+
+            // Send the slave address (7-bit) shifted left by 1, with LSB=0 for read
+            I2C1->DR = (slaveAddr << 1) | 0x01;
+
+            // Wait for the ADDR flag to be set in SR1 (address sent and acknowledged).
+            while (!(I2C1->SR1 & I2C_SR1_ADDR))
+            {}
 
 
+            uint8_t buffers[10];
+            uint8_t *buffer = buffers;
+            len = 6;
 
+            // Multiple-byte reception:
+            // Clear ADDR flag by reading SR1 then SR2.
+            temp = I2C1->SR1 | I2C1->SR2;
 
-
+            // Read bytes until only two remain.
+            while (len > 2)
+            {
+                // Wait until RXNE flag is set.
+                while (!(I2C1->SR1 & I2C_SR1_RXNE))
+                    ;
+                // Read one byte and store it.
+                *buffer++ = I2C1->DR;
+                len--;
+            }
+            // For the last two bytes, special handling is required.
+            // Wait until RXNE flag is set (for the (N-1)th byte).
+            while (!(I2C1->SR1 & I2C_SR1_RXNE))
+                ;
+            // Disable ACK to signal the slave that only one more byte will be read.
+            I2C1->CR1 &= ~I2C_CR1_ACK;
+            // Read the (N-1)th byte.
+            *buffer++ = I2C1->DR;
+            len--;
+            // Generate STOP condition immediately after reading (N-1)th byte.
+            I2C1->CR1 |= I2C_CR1_STOP;
+            // Wait until the RXNE flag is set for the last byte.
+            while (!(I2C1->SR1 & I2C_SR1_RXNE))
+                ;
+            // Read the final byte.
+            *buffer = I2C1->DR;
+            // Optionally, re-enable ACK if further receptions are to follow.
+            I2C1->CR1 |= I2C_CR1_ACK;
 
 
             // Generate the STOP condition.
