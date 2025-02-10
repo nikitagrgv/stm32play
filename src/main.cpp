@@ -130,12 +130,11 @@ int main()
             GPIOB->AFR[1] |= ((4U << ((8 - 8) * 4)) | (4U << ((9 - 8) * 4)));
 
 
-
             // Disable I2C1 (clear PE) to allow configuration of timing registers
             I2C1->CR1 &= ~I2C_CR1_PE;
 
             // --- Set CR2: Lower 6 bits must be the APB1 clock frequency in MHz
-            I2C1->CR2 = 42;  // APB1 = 42 MHz
+            I2C1->CR2 = 42; // APB1 = 42 MHz
 
             // --- Compute and set the CCR value for standard mode:
             // Formula: CCR = F_PCLK / (2 * f_I2C)
@@ -152,56 +151,51 @@ int main()
             I2C1->CR1 |= I2C_CR1_PE;
 
 
-
-
-////////////////////////
+            ////////////////////////
             uint8_t slaveAddr = 0x3f;
-            uint8_t *data = (uint8_t*)"abc";
+            uint8_t *data = (uint8_t *)"abc";
             uint8_t len = 3;
 
             volatile uint32_t temp;
 
             // Wait until I2C bus is free (BUSY flag in SR2)
-            while (I2C1->SR2 & I2C_SR2_BUSY);
+            while (I2C1->SR2 & I2C_SR2_BUSY)
+            {}
 
             // Generate the START condition by setting the START bit in CR1.
             I2C1->CR1 |= I2C_CR1_START;
 
             // Wait until the SB (start bit) flag is set in SR1.
-            while (!(I2C1->SR1 & I2C_SR1_SB));
+            while (!(I2C1->SR1 & I2C_SR1_SB))
+            {}
 
             // Send the slave address (7-bit) shifted left by 1, with LSB=0 for write.
             I2C1->DR = (slaveAddr << 1) & ~0x01;
 
             // Wait for the ADDR flag to be set in SR1 (address sent and acknowledged).
-            while (!(I2C1->SR1 & I2C_SR1_ADDR));
+            while (!(I2C1->SR1 & I2C_SR1_ADDR))
+            {}
             // Clear ADDR flag by reading SR1 and SR2.
             temp = I2C1->SR1 | I2C1->SR2;
             (void)temp; // Prevent compiler warning about unused variable.
 
             // Transmit the data bytes.
-            while (len--) {
+            while (len--)
+            {
                 // Wait until TXE (data register empty) flag is set.
-                while (!(I2C1->SR1 & I2C_SR1_TXE));
+                while (!(I2C1->SR1 & I2C_SR1_TXE))
+                {}
                 // Write data to the DR register.
                 I2C1->DR = *data++;
             }
 
             // Wait until BTF (Byte Transfer Finished) flag is set.
-            while (!(I2C1->SR1 & I2C_SR1_BTF));
+            while (!(I2C1->SR1 & I2C_SR1_BTF))
+            {}
 
             // Generate the STOP condition.
             I2C1->CR1 |= I2C_CR1_STOP;
-////////////////////
-
-
-
-
-
-
-
-
-
+            ////////////////////
 
 
             //
