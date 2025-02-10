@@ -152,9 +152,10 @@ int main()
 
 
             ////////////////////////
-            uint8_t slaveAddr = 0x3f;
-            uint8_t *data = (uint8_t *)"abc";
-            uint8_t len = 3;
+            uint8_t slaveAddr = 0x44;
+            uint8_t datas[2] = {0x22, 0x20};
+            uint8_t *data = datas;
+            uint8_t len = 2;
 
             volatile uint32_t temp;
 
@@ -192,6 +193,14 @@ int main()
             // Wait until BTF (Byte Transfer Finished) flag is set.
             while (!(I2C1->SR1 & I2C_SR1_BTF))
             {}
+
+
+
+
+
+
+
+
 
             // Generate the STOP condition.
             I2C1->CR1 |= I2C_CR1_STOP;
