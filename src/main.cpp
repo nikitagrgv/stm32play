@@ -104,20 +104,121 @@ int main()
         {
             io::printSync("gooo!\n");
 
+            // Enable clock for GPIOB
+            RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
 
-            I2C1->CR1 &= ~I2C_CR1_PE;  // Disable I2C before configuring
-            I2C1->CR2 = 42;           // Set PCLK frequency in MHz
-            I2C1->CCR = 210;          // Set clock control register for 100 kHz
-            I2C1->TRISE = 43;         // Set maximum rise time
-            I2C1->CR1 |= I2C_CR1_PE;   // Re-enable I2C
+            // Configure PB8 and PB9 for Alternate Function mode
+            // Clear the mode bits for PB8 and PB9:
+            GPIOB->MODER &= ~((3U << (8 * 2)) | (3U << (9 * 2)));
+            // Set alternate function mode (binary "10") for PB8 and PB9:
+            GPIOB->MODER |= ((2U << (8 * 2)) | (2U << (9 * 2)));
 
-            // Send START condition
+            // Set output type to open-drain for PB8 and PB9:
+            GPIOB->OTYPER |= (1U << 8) | (1U << 9);
+
+            // Set the output speed to high speed (binary "11") for PB8 and PB9:
+            GPIOB->OSPEEDR &= ~((3U << (8 * 2)) | (3U << (9 * 2)));
+            GPIOB->OSPEEDR |= ((3U << (8 * 2)) | (3U << (9 * 2)));
+
+            // Enable internal pull-up resistors for PB8 and PB9 (binary "01"):
+            GPIOB->PUPDR &= ~((3U << (8 * 2)) | (3U << (9 * 2)));
+            GPIOB->PUPDR |= ((1U << (8 * 2)) | (1U << (9 * 2)));
+
+            // Configure the alternate function for PB8 and PB9 to AF4 (I2C1).
+            // PB8 and PB9 are pins 8 and 9, so use AFR[1] (for pins 8..15):
+            GPIOB->AFR[1] &= ~((0xFU << ((8 - 8) * 4)) | (0xFU << ((9 - 8) * 4)));
+            GPIOB->AFR[1] |= ((4U << ((8 - 8) * 4)) | (4U << ((9 - 8) * 4)));
+
+
+
+            // Disable I2C1 (clear PE) to allow configuration of timing registers
+            I2C1->CR1 &= ~I2C_CR1_PE;
+
+            // --- Set CR2: Lower 6 bits must be the APB1 clock frequency in MHz
+            I2C1->CR2 = 42;  // APB1 = 42 MHz
+
+            // --- Compute and set the CCR value for standard mode:
+            // Formula: CCR = F_PCLK / (2 * f_I2C)
+            // With F_PCLK = 42 MHz and f_I2C = 100 kHz:
+            //    CCR = 42,000,000 / (2 * 100,000) = 210
+            I2C1->CCR = 210;
+
+            // --- Set the TRISE register:
+            // For standard mode: TRISE = (F_PCLK / 1,000,000) + 1
+            // With F_PCLK = 42 MHz: TRISE = 42 + 1 = 43
+            I2C1->TRISE = 43;
+
+            // Re-enable the I2C peripheral
+            I2C1->CR1 |= I2C_CR1_PE;
+
+
+
+
+////////////////////////
+            uint8_t slaveAddr = 0x3f;
+            uint8_t *data = (uint8_t*)"abc";
+            uint8_t len = 3;
+
+            volatile uint32_t temp;
+
+            // Wait until I2C bus is free (BUSY flag in SR2)
+            while (I2C1->SR2 & I2C_SR2_BUSY);
+
+            // Generate the START condition by setting the START bit in CR1.
             I2C1->CR1 |= I2C_CR1_START;
-            // Wait until START is cleared by hardware
-            while (I2C1->SR1 & I2C_SR1_SB)
-            {}
-            // Send slave address (e.g., 0x50 for write)
-            I2C1->DR = (0x50 << 1) | 0; // Slave address + write bit
+
+            // Wait until the SB (start bit) flag is set in SR1.
+            while (!(I2C1->SR1 & I2C_SR1_SB));
+
+            // Send the slave address (7-bit) shifted left by 1, with LSB=0 for write.
+            I2C1->DR = (slaveAddr << 1) & ~0x01;
+
+            // Wait for the ADDR flag to be set in SR1 (address sent and acknowledged).
+            while (!(I2C1->SR1 & I2C_SR1_ADDR));
+            // Clear ADDR flag by reading SR1 and SR2.
+            temp = I2C1->SR1 | I2C1->SR2;
+            (void)temp; // Prevent compiler warning about unused variable.
+
+            // Transmit the data bytes.
+            while (len--) {
+                // Wait until TXE (data register empty) flag is set.
+                while (!(I2C1->SR1 & I2C_SR1_TXE));
+                // Write data to the DR register.
+                I2C1->DR = *data++;
+            }
+
+            // Wait until BTF (Byte Transfer Finished) flag is set.
+            while (!(I2C1->SR1 & I2C_SR1_BTF));
+
+            // Generate the STOP condition.
+            I2C1->CR1 |= I2C_CR1_STOP;
+////////////////////
+
+
+
+
+
+
+
+
+
+
+
+            //
+            //
+            // I2C1->CR1 &= ~I2C_CR1_PE;  // Disable I2C before configuring
+            // I2C1->CR2 = 42;           // Set PCLK frequency in MHz
+            // I2C1->CCR = 210;          // Set clock control register for 100 kHz
+            // I2C1->TRISE = 43;         // Set maximum rise time
+            // I2C1->CR1 |= I2C_CR1_PE;   // Re-enable I2C
+            //
+            // // Send START condition
+            // I2C1->CR1 |= I2C_CR1_START;
+            // // Wait until START is cleared by hardware
+            // while (I2C1->SR1 & I2C_SR1_SB)
+            // {}
+            // // Send slave address (e.g., 0x50 for write)
+            // I2C1->DR = (0x50 << 1) | 0; // Slave address + write bit
 
             return true;
         }
