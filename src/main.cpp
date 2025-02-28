@@ -303,11 +303,11 @@ int main()
                 user_key_state = new_user_key_state;
                 if (user_key_state)
                 {
-                    io::printSyncFmt("User key pressed\n");
+                    io::printSyncFmt("User key released\n");
                 }
                 else
                 {
-                    io::printSyncFmt("User key released\n");
+                    io::printSyncFmt("User key pressed\n");
                 }
             }
         }
