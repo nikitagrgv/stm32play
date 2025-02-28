@@ -46,6 +46,9 @@ int main()
     constexpr Pin i2c_sda_pin{GPIOPort::B, 9};
     constexpr Pin i2c_scl_pin{GPIOPort::B, 8};
 
+    constexpr Pin user_key{GPIOPort::A, 0};
+    gpio::configureInput(user_key, gpio::PullMode::Up);
+
     gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
 #ifdef STM32F103
@@ -285,8 +288,30 @@ int main()
     // I2C1->TRISE = 43;
     // I2C1->CR1 |= I2C_CR1_PE;
 
+    bool user_key_state = gpio::getPinInput(user_key);
+    uint32_t user_key_last_change_time = glob::total_msec;
+
     while (true)
     {
+        const uint32_t cur_time = glob::total_msec;
+        if (cur_time - user_key_last_change_time > 10)
+        {
+            user_key_last_change_time = cur_time;
+            const bool new_user_key_state = gpio::getPinInput(user_key);
+            if (new_user_key_state != user_key_state)
+            {
+                user_key_state = new_user_key_state;
+                if (user_key_state)
+                {
+                    io::printSyncFmt("User key pressed\n");
+                }
+                else
+                {
+                    io::printSyncFmt("User key released\n");
+                }
+            }
+        }
+
         uint8_t byte;
         while (usart1_stream.readByte(byte))
         {
