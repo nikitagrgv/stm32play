@@ -108,7 +108,7 @@ int main()
             if (new_user_key_state != user_key_state)
             {
                 user_key_state = new_user_key_state;
-                if (user_key_state)
+                if (!user_key_state)
                 {
                     io::printSyncFmt("User key pressed\n");
                 }
