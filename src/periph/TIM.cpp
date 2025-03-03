@@ -27,13 +27,33 @@ FORCE_INLINE uint32_t get_dier_flags(uint32_t setup_flags)
     return flags;
 }
 
+#ifdef STM32F103
+    #error
+#elifdef STM32F401
+uint32_t get_tim_base_frequency(TIM_TypeDef *tim)
+{
+    if (tim == TIM1)
+    {
+        return glob::APB2_TIMER_CLOCK;
+    }
+    if (tim == TIM2 || tim == TIM3 || tim == TIM4 || tim == TIM5)
+    {
+        return glob::APB1_TIMER_CLOCK;
+    }
+    MICRO_ASSERT(0);
+    return 0;
+}
+#else
+    #error
+#endif
 } // namespace
 
 void tim::setupTimer(TIM_TypeDef *tim, uint32_t frequency, uint32_t reload_value, uint32_t setup_flags)
 {
     stopTimer(tim);
 
-    const uint32_t prescaler = (glob::SYSTEM_CORE_CLOCK / frequency) - 1;
+    const uint32_t tim_base_frequency = get_tim_base_frequency(tim);
+    const uint32_t prescaler = (tim_base_frequency / frequency) - 1;
 
     MICRO_ASSERT(prescaler <= MAX_PRESCALER);
     MICRO_ASSERT(reload_value <= MAX_RELOAD_VALUE);
