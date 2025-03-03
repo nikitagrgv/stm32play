@@ -32,6 +32,10 @@ CommandExecutor command_executor;
 int main()
 {
     glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
+    glob::APB1_PERIPH_CLOCK = calcAPB1PeriphClock();
+    glob::APB2_PERIPH_CLOCK = calcAPB2PeriphClock();
+    glob::APB1_TIMER_CLOCK = calcAPB1TimerClock();
+    glob::APB2_TIMER_CLOCK = calcAPB2TimerClock();
 
     irq::disableInterrupts();
 

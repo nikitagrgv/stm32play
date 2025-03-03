@@ -60,3 +60,43 @@ uint32_t calcSystemCoreClock()
     ret >>= tmp;
     return ret;
 }
+
+uint32_t calcAPB1PeriphClock()
+{
+    uint32_t hclk = calcSystemCoreClock();
+    uint32_t tmp = (RCC->CFGR >> 10) & 0x7; // bits 10:12 for PPRE1
+    uint32_t presc = APBPrescTable[tmp];
+    return hclk >> presc;
+}
+
+uint32_t calcAPB2PeriphClock()
+{
+    uint32_t hclk = calcSystemCoreClock();
+    uint32_t tmp = (RCC->CFGR >> 13) & 0x7; // bits 13:15 for PPRE2
+    uint32_t presc = APBPrescTable[tmp];
+    return hclk >> presc;
+}
+
+uint32_t calcAPB1TimerClock()
+{
+    uint32_t pclk1 = calcAPB1PeriphClock();
+    uint32_t tmp = (RCC->CFGR >> 10) & 0x7; // bits 10:12 for PPRE1
+    uint32_t presc = APBPrescTable[tmp];
+    if (presc == 0)
+    {
+        return pclk1;
+    }
+    return pclk1 * 2;
+}
+
+uint32_t calcAPB2TimerClock()
+{
+    uint32_t pclk2 = calcAPB2PeriphClock();
+    uint32_t tmp = (RCC->CFGR >> 13) & 0x7; // bits 13:15 for PPRE2
+    uint32_t presc = APBPrescTable[tmp];
+    if (presc == 0)
+    {
+        return pclk2;
+    }
+    return pclk2 * 2;
+}
