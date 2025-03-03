@@ -64,39 +64,39 @@ uint32_t calcSystemCoreClock()
 uint32_t calcAPB1PeriphClock()
 {
     uint32_t hclk = calcSystemCoreClock();
-    uint32_t tmp = (RCC->CFGR >> 10) & 0x7; // bits 10:12 for PPRE1
-    uint32_t presc = APBPrescTable[tmp];
-    return hclk >> presc;
+    uint32_t ppre1 = (RCC->CFGR & RCC_CFGR_PPRE1) >> 10; // Extract PPRE1 bits [10:8]
+    uint8_t shift = APBPrescTable[ppre1];
+    return hclk >> shift;
 }
 
 uint32_t calcAPB1TimerClock()
 {
-    uint32_t pclk1 = calcAPB1PeriphClock();
-    uint32_t tmp = (RCC->CFGR >> 10) & 0x7; // bits 10:12 for PPRE1
-    uint32_t presc = APBPrescTable[tmp];
-    if (presc == 0)
-    {
-        return pclk1;
+    uint32_t hclk = calcSystemCoreClock();
+    uint32_t ppre1 = (RCC->CFGR & RCC_CFGR_PPRE1) >> 10;
+    uint8_t shift = APBPrescTable[ppre1];
+
+    if (shift > 0) {
+        return (hclk >> shift) * 2;
     }
-    return pclk1 * 2;
+    return hclk >> shift;
 }
 
 uint32_t calcAPB2PeriphClock()
 {
     uint32_t hclk = calcSystemCoreClock();
-    uint32_t tmp = (RCC->CFGR >> 13) & 0x7; // bits 13:15 for PPRE2
-    uint32_t presc = APBPrescTable[tmp];
-    return hclk >> presc;
+    uint32_t ppre2 = (RCC->CFGR & RCC_CFGR_PPRE2) >> 13; // Extract PPRE2 bits [13:15]
+    uint8_t shift = APBPrescTable[ppre2];
+    return hclk >> shift;
 }
 
 uint32_t calcAPB2TimerClock()
 {
-    uint32_t pclk2 = calcAPB2PeriphClock();
-    uint32_t tmp = (RCC->CFGR >> 13) & 0x7; // bits 13:15 for PPRE2
-    uint32_t presc = APBPrescTable[tmp];
-    if (presc == 0)
-    {
-        return pclk2;
+    uint32_t hclk = calcSystemCoreClock();
+    uint32_t ppre2 = (RCC->CFGR & RCC_CFGR_PPRE2) >> 13;
+    uint8_t shift = APBPrescTable[ppre2];
+
+    if (shift > 0) {
+        return (hclk >> shift) * 2;
     }
-    return pclk2 * 2;
+    return hclk >> shift;
 }
