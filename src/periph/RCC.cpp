@@ -31,7 +31,6 @@ void get_masks(uint32_t periph, uint32_t &apb1_mask, uint32_t &apb2_mask)
     }
     if (periph & I2C_1)
     {
-    #error
         apb1_mask |= RCC_APB1ENR_I2C1EN;
     }
     if (periph & TIM_2)
