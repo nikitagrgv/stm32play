@@ -69,14 +69,6 @@ uint32_t calcAPB1PeriphClock()
     return hclk >> presc;
 }
 
-uint32_t calcAPB2PeriphClock()
-{
-    uint32_t hclk = calcSystemCoreClock();
-    uint32_t tmp = (RCC->CFGR >> 13) & 0x7; // bits 13:15 for PPRE2
-    uint32_t presc = APBPrescTable[tmp];
-    return hclk >> presc;
-}
-
 uint32_t calcAPB1TimerClock()
 {
     uint32_t pclk1 = calcAPB1PeriphClock();
@@ -87,6 +79,14 @@ uint32_t calcAPB1TimerClock()
         return pclk1;
     }
     return pclk1 * 2;
+}
+
+uint32_t calcAPB2PeriphClock()
+{
+    uint32_t hclk = calcSystemCoreClock();
+    uint32_t tmp = (RCC->CFGR >> 13) & 0x7; // bits 13:15 for PPRE2
+    uint32_t presc = APBPrescTable[tmp];
+    return hclk >> presc;
 }
 
 uint32_t calcAPB2TimerClock()
