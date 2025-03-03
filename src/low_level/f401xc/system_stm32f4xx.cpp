@@ -53,7 +53,7 @@ void setup_clock()
         FLASH_ACR_LATENCY_2WS;      // Flash latency
 
     // Step 7: Select the PLL as the system clock source
-    RCC->CFGR |= RCC_CFGR_SW_PLL;
+    RCC->CFGR |= RCC_CFGR_SW_PLL | RCC_CFGR_PPRE1_DIV2;
     while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL)
     {
         // Wait until the PLL is used as the system clock source
