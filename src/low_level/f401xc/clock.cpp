@@ -75,7 +75,8 @@ uint32_t calcAPB1TimerClock()
     uint32_t ppre1 = (RCC->CFGR & RCC_CFGR_PPRE1) >> 10;
     uint8_t shift = APBPrescTable[ppre1];
 
-    if (shift > 0) {
+    if (shift > 0)
+    {
         return (hclk >> shift) * 2;
     }
     return hclk >> shift;
@@ -95,7 +96,8 @@ uint32_t calcAPB2TimerClock()
     uint32_t ppre2 = (RCC->CFGR & RCC_CFGR_PPRE2) >> 13;
     uint8_t shift = APBPrescTable[ppre2];
 
-    if (shift > 0) {
+    if (shift > 0)
+    {
         return (hclk >> shift) * 2;
     }
     return hclk >> shift;
