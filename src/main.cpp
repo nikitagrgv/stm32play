@@ -56,7 +56,7 @@ int main()
     gpio::configureAlternateInput(usart_rx_pin, gpio::PullMode::Up);
 #elifdef STM32F401
     gpio::configureAlternate(usart_tx_pin, 7, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
-    gpio::configureAlternate(usart_rx_pin, 7, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
+    gpio::configureAlternate(usart_rx_pin, 7, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High, gpio::PullMode::Up);
 #endif
 
     // SysTick
