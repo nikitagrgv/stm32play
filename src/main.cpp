@@ -32,15 +32,22 @@ CommandExecutor command_executor;
 int main()
 {
     glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
+    glob::APB1_PERIPH_CLOCK = calcAPB1PeriphClock();
+    glob::APB1_TIMER_CLOCK = calcAPB1TimerClock();
+    glob::APB2_PERIPH_CLOCK = calcAPB2PeriphClock();
+    glob::APB2_TIMER_CLOCK = calcAPB2TimerClock();
 
     irq::disableInterrupts();
 
     rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::USART_1 | rcc::TIM_2);
 
-    // C13 open drain
     constexpr Pin led_pin{GPIOPort::C, 13};
+
     constexpr Pin usart_tx_pin{GPIOPort::A, 9};
     constexpr Pin usart_rx_pin{GPIOPort::A, 10};
+
+    constexpr Pin user_key{GPIOPort::A, 0};
+    gpio::configureInput(user_key, gpio::PullMode::Up);
 
     gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
@@ -49,7 +56,7 @@ int main()
     gpio::configureAlternateInput(usart_rx_pin, gpio::PullMode::Up);
 #elifdef STM32F401
     gpio::configureAlternate(usart_tx_pin, 7, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
-    gpio::configureAlternate(usart_rx_pin, 7, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
+    gpio::configureAlternate(usart_rx_pin, 7, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High, gpio::PullMode::Up);
 #endif
 
     // SysTick
@@ -92,8 +99,26 @@ int main()
 
     io::printSyncFmt("--- Device is ready ---\n");
 
+    bool user_key_state = gpio::getPinInput(user_key);
+    uint32_t user_key_last_change_time = glob::total_msec;
+
     while (true)
     {
+        const uint32_t cur_time = glob::total_msec;
+        if (cur_time - user_key_last_change_time > 10)
+        {
+            user_key_last_change_time = cur_time;
+            const bool new_user_key_state = gpio::getPinInput(user_key);
+            if (new_user_key_state != user_key_state)
+            {
+                user_key_state = new_user_key_state;
+                if (!user_key_state)
+                {
+                    io::printSyncFmt("User key pressed\n");
+                }
+            }
+        }
+
         uint8_t byte;
         while (usart1_stream.readByte(byte))
         {
