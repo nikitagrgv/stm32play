@@ -45,7 +45,8 @@ void check_temperature()
     I2C1->OAR2 = 0;
     I2C1->SR1 = 0;
     I2C1->CCR = 210;
-
+    I2C1->TRISE = 43;
+    I2C1->FLTR = 0;
     I2C1->CR1 |= I2C_CR1_PE;
 }
 
