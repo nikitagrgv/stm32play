@@ -30,7 +30,7 @@ CommandBuffer command_buffer;
 CommandExecutor command_executor;
 
 
-void check_temperature()
+bool check_temperature()
 {
     rcc::enableClocks(rcc::I2C_1);
 
@@ -143,6 +143,8 @@ void check_temperature()
     bool valid = true;
     valid &= utils::crc8(data, 2, crc8_poly, crc8_init) == data[2];
     valid &= utils::crc8(data + 3, 2, crc8_poly, crc8_init) == data[5];
+
+    return valid;
 }
 
 int main()
