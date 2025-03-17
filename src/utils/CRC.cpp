@@ -1,8 +1,8 @@
 #include "CRC.h"
 
-uint8_t utils::crc8(const uint8_t *data, int len, uint8_t polynomial, uint8_t initValue)
+uint8_t utils::crc8(const uint8_t *data, int len, uint8_t polynomial, uint8_t init)
 {
-    uint8_t crc = initValue;
+    uint8_t crc = init;
 
     for (int b = 0; b < len; ++b)
     {

@@ -17,6 +17,7 @@
 #include "periph/SysTick.h"
 #include "periph/TIM.h"
 #include "periph/USART.h"
+#include "utils/CRC.h"
 #include "utils/DataStream.h"
 #include "utils/FixedBitset.h"
 
@@ -135,6 +136,12 @@ void check_temperature()
 
     data[cur_byte] = I2C1->DR;
     ++cur_byte;
+
+
+    constexpr uint8_t crc8_poly = 0x31;
+    constexpr uint8_t crc8_init = 0xFF;
+    bool valid = true;
+    utils::crc8(data, 2, crc8_poly, crc8_init)
 }
 
 int main()
