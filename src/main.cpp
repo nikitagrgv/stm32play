@@ -55,7 +55,7 @@ void check_temperature()
     while (!(I2C1->SR1 & I2C_SR1_SB))
     {}
 
-    I2C1->DR = 0x44 ;
+    I2C1->DR = 0x44 << 1;
     while (!(I2C1->SR1 & I2C_SR1_ADDR))
     {}
 
