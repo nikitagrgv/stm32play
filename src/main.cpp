@@ -51,11 +51,14 @@ void check_temperature()
 
     utils::sleepMsec(1);
 
+    while (I2C1->SR2 & I2C_SR2_BUSY)
+    {}
+
     I2C1->CR1 |= I2C_CR1_START;
     while (!(I2C1->SR1 & I2C_SR1_SB))
     {}
 
-    I2C1->DR = 0x44 << 1;
+    I2C1->DR = 0x44 << 1 | 0;
     while (!(I2C1->SR1 & I2C_SR1_ADDR))
     {}
 
@@ -78,7 +81,60 @@ void check_temperature()
 
     utils::sleepMsec(1);
 
+    uint8_t data[6] = {0, 0, 0, 0, 0, 0};
+    int cur_byte = 0;
 
+    I2C1->CR1 |= I2C_CR1_START;
+    while (!(I2C1->SR1 & I2C_SR1_SB))
+    {}
+
+    I2C1->CR1 |= I2C_CR1_ACK;
+
+    I2C1->DR = 0x44 << 1 | 1;
+    while (!(I2C1->SR1 & I2C_SR1_ADDR))
+    {}
+
+    sr2 = I2C1->SR2;
+
+    while (!(I2C1->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = I2C1->DR;
+    ++cur_byte;
+
+    while (!(I2C1->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = I2C1->DR;
+    ++cur_byte;
+
+    while (!(I2C1->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = I2C1->DR;
+    ++cur_byte;
+
+    while (!(I2C1->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = I2C1->DR;
+    ++cur_byte;
+
+    while (!(I2C1->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = I2C1->DR;
+    ++cur_byte;
+
+    I2C1->CR1 &= ~I2C_CR1_ACK;
+
+    while (!(I2C1->SR1 & I2C_SR1_RXNE))
+    {}
+
+    I2C1->CR1 |= I2C_CR1_STOP;
+
+    data[cur_byte] = I2C1->DR;
+    ++cur_byte;
 }
 
 int main()
