@@ -29,6 +29,17 @@ CommandBuffer command_buffer;
 CommandExecutor command_executor;
 
 
+void check_temperature()
+{
+    rcc::enableClocks(rcc::I2C_1);
+
+    constexpr Pin scl_pin{GPIOPort::B, 8};
+    constexpr Pin sda_pin{GPIOPort::B, 9};
+
+    gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
+    gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
+}
+
 int main()
 {
     glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
@@ -115,6 +126,7 @@ int main()
                 if (!user_key_state)
                 {
                     io::printSyncFmt("User key pressed\n");
+                    check_temperature();
                 }
             }
         }
