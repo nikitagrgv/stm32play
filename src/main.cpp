@@ -30,7 +30,7 @@ CommandBuffer command_buffer;
 CommandExecutor command_executor;
 
 
-bool check_temperature()
+bool check_sht31(float &temperature, float &humidity)
 {
     rcc::enableClocks(rcc::I2C_1);
 
@@ -144,6 +144,7 @@ bool check_temperature()
     valid &= utils::crc8(data, 2, crc8_poly, crc8_init) == data[2];
     valid &= utils::crc8(data + 3, 2, crc8_poly, crc8_init) == data[5];
 
+
     return valid;
 }
 
@@ -233,7 +234,18 @@ int main()
                 if (!user_key_state)
                 {
                     io::printSyncFmt("User key pressed\n");
-                    check_temperature();
+
+                    float temperature = 0.0f;
+                    float humidity = 0.0f;
+                    const bool valid = check_sht31(temperature, humidity);
+                    if (valid)
+                    {
+                        io::printSyncFmt("T = %f, H = %f\n", temperature, humidity);
+                    }
+                    else
+                    {
+                        io::printSyncFmt("SHT31 error\n");
+                    }
                 }
             }
         }
