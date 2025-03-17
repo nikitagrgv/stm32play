@@ -141,7 +141,8 @@ void check_temperature()
     constexpr uint8_t crc8_poly = 0x31;
     constexpr uint8_t crc8_init = 0xFF;
     bool valid = true;
-    utils::crc8(data, 2, crc8_poly, crc8_init)
+    valid &= utils::crc8(data, 2, crc8_poly, crc8_init) == data[2];
+    valid &= utils::crc8(data + 3, 2, crc8_poly, crc8_init) == data[5];
 }
 
 int main()
