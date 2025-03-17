@@ -50,7 +50,7 @@ void check_temperature()
     I2C1->CR1 |= I2C_CR1_PE;
 
     utils::sleepMsec(1);
-
+    
 }
 
 int main()
