@@ -75,6 +75,34 @@ void check_temperature()
     I2C1->CR1 |= I2C_CR1_STOP;
     while ((I2C1->SR1 & I2C_SR1_TXE))
     {}
+
+    utils::sleepMsec(1);
+
+    I2C1->CR1 |= I2C_CR1_START;
+    while (!(I2C1->SR1 & I2C_SR1_SB))
+    {}
+
+    I2C1->DR = 0x44 << 1;
+    while (!(I2C1->SR1 & I2C_SR1_ADDR))
+    {}
+
+    sr2 = I2C1->SR2;
+
+    while (!(I2C1->SR1 & I2C_SR1_TXE))
+    {}
+
+    I2C1->DR = 0x2C;
+    while (!(I2C1->SR1 & I2C_SR1_TXE))
+    {}
+
+    I2C1->DR = 0x0D;
+    while (!(I2C1->SR1 & I2C_SR1_TXE))
+    {}
+
+    I2C1->CR1 |= I2C_CR1_STOP;
+    while ((I2C1->SR1 & I2C_SR1_TXE))
+    {}
+
 }
 
 int main()
