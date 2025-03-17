@@ -38,6 +38,14 @@ void check_temperature()
 
     gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
     gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
+
+    I2C1->CR1 = 0;
+    I2C1->CR2 = (42 << I2C_CR2_FREQ_Pos);
+    I2C1->OAR1 = 0;
+    I2C1->OAR2 = 0;
+    I2C1->SR1 = 0;
+
+    I2C1->CR1 |= I2C_CR1_PE;
 }
 
 int main()
