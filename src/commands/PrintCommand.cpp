@@ -15,7 +15,11 @@ bool PrintCommand::execute(const char *args)
     if (str_utils::compareTrimmed(args, "time"))
     {
         io::printSyncFmt("total msec = %u\n", glob::total_msec);
-        io::printSyncFmt("sys freq = %u\n", glob::SYSTEM_CORE_CLOCK);
+        io::printSyncFmt("SYS freq = %u\n", glob::SYSTEM_CORE_CLOCK);
+        io::printSyncFmt("APB1 freq = %u\n", glob::APB1_PERIPH_CLOCK);
+        io::printSyncFmt("APB2 freq = %u\n", glob::APB2_PERIPH_CLOCK);
+        io::printSyncFmt("APB1 TIMER freq = %u\n", glob::APB1_TIMER_CLOCK);
+        io::printSyncFmt("APB2 TIMER freq = %u\n", glob::APB2_TIMER_CLOCK);
         return true;
     }
     if (str_utils::compareTrimmed(args, "datastat"))
