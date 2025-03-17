@@ -50,7 +50,18 @@ void check_temperature()
     I2C1->CR1 |= I2C_CR1_PE;
 
     utils::sleepMsec(1);
-    
+
+    I2C1->CR1 |= I2C_CR1_START;
+    while (!(I2C1->SR1 & I2C_SR1_SB))
+    {}
+
+    I2C1->DR = 0x44 ;
+    while (!(I2C1->SR1 & I2C_SR1_ADDR))
+    {}
+
+    uint32_t sr2 = I2C1->SR2;
+
+
 }
 
 int main()
