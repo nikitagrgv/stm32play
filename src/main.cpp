@@ -58,7 +58,7 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
         while (!(i2c->SR1 & I2C_SR1_RXNE))
         {}
 
-        buf[0] = i2c->DR;
+        *buf++ = i2c->DR;
 
         i2c->CR1 |= I2C_CR1_STOP;
 
@@ -75,32 +75,32 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
         while (!(i2c->SR1 & I2C_SR1_BTF))
         {}
 
-        buf[0] = i2c->DR;
-        buf[1] = i2c->DR;
+        *buf++ = i2c->DR;
+        *buf++ = i2c->DR;
 
         i2c->CR1 |= I2C_CR1_STOP;
 
         return true;
     }
-    uint8_t index = 0;
+
+    i2c->CR1 |= I2C_CR1_ACK;
+
     (void)i2c->SR2;
-    while (num_bytes > 3)
+    for (int i = 0; i < num_bytes - 1; ++i)
     {
         while (!(i2c->SR1 & I2C_SR1_RXNE))
         {}
-        buf[index++] = i2c->DR;
-        num_bytes--;
+        *buf++ = i2c->DR;
     }
-    while (!(i2c->SR1 & I2C_SR1_BTF))
-    {}
+
     i2c->CR1 &= ~I2C_CR1_ACK;
-    buf[index++] = i2c->DR;
+
     while (!(i2c->SR1 & I2C_SR1_BTF))
     {}
+
+    *buf++ = i2c->DR;
+
     i2c->CR1 |= I2C_CR1_STOP;
-    buf[index++] = i2c->DR;
-    buf[index++] = i2c->DR;
-    i2c->CR1 |= I2C_CR1_ACK;
 
     return true;
 }
