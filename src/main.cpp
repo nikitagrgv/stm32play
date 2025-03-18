@@ -168,7 +168,7 @@ bool check_sht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
     utils::sleepMsec(1);
 
     uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
-    masterReceive(i2c, 0x44, receive_data, 6);
+    masterReceive(i2c, sht31_address, receive_data, 6);
 
     constexpr uint8_t crc8_poly = 0x31;
     constexpr uint8_t crc8_init = 0xFF;
