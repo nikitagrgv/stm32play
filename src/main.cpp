@@ -36,9 +36,6 @@ bool masterTransmit(I2C_TypeDef *i2c, uint8_t address, const uint8_t *buf, uint3
         return true;
     }
 
-    while (i2c->SR2 & I2C_SR2_BUSY)
-    {}
-
     i2c->CR1 |= I2C_CR1_START;
     while (!(i2c->SR1 & I2C_SR1_SB))
     {}
