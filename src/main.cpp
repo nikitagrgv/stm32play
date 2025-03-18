@@ -37,6 +37,11 @@ bool generateStart(I2C_TypeDef *i2c)
 
 bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num_bytes)
 {
+    if (num_bytes == 0)
+    {
+        return true;
+    }
+
     while (!(i2c->SR1 & I2C_SR1_SB))
     {}
 
@@ -44,7 +49,7 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
     while (!(i2c->SR1 & I2C_SR1_ADDR))
     {}
 
-    if (num_bytes == 0)
+    if (num_bytes == 1)
     {
         i2c->CR1 &= ~I2C_CR1_ACK;
 
