@@ -29,9 +29,23 @@ CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
+bool generateStart(I2C_TypeDef *i2c)
+{
+    i2c->CR1 |= I2C_CR1_START;
+    return true;
+}
 
 bool readData(I2C_TypeDef *i2c, uint8_t *buf, uint32_t num_bytes)
 {
+    while (!(I2C1->SR1 & I2C_SR1_SB))
+    {}
+
+    I2C1->DR = 0x44 << 1 | 1;
+    while (!(I2C1->SR1 & I2C_SR1_ADDR))
+    {}
+
+    uint32_t sr2 = I2C1->SR2;
+
     I2C1->CR1 |= I2C_CR1_ACK;
 
     int cur_byte = 0;
@@ -107,17 +121,8 @@ bool check_sht31(float &temperature, float &humidity)
 
     utils::sleepMsec(1);
 
-    I2C1->CR1 |= I2C_CR1_START;
-    while (!(I2C1->SR1 & I2C_SR1_SB))
-    {}
-
-    I2C1->DR = 0x44 << 1 | 1;
-    while (!(I2C1->SR1 & I2C_SR1_ADDR))
-    {}
-
-    sr2 = I2C1->SR2;
-
     uint8_t data[6] = {0, 0, 0, 0, 0, 0};
+    generateStart(I2C1);
     readData(I2C1, data, 6);
 
     constexpr uint8_t crc8_poly = 0x31;
