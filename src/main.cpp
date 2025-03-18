@@ -90,35 +90,30 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
 
         return true;
     }
-
-    i2c->CR1 |= I2C_CR1_ACK;
-
-    (void)i2c->SR2; // Clear ADDR
-
-    int cur_byte = 0;
-    for (cur_byte = 0; cur_byte < num_bytes - 3; ++cur_byte)
-    {
-        while (!(i2c->SR1 & I2C_SR1_RXNE))
-        {}
-        buf[cur_byte] = i2c->DR;
+    /* ---------- Case 3: Reception of More Than 2 Bytes ---------- */
+    uint8_t index = 0;
+    // Clear ADDR flag by reading SR2
+    (void) i2c->SR2;
+    // Read until 3 bytes remain
+    while(num_bytes > 3) {
+        while (!(i2c->SR1 & I2C_SR1_RXNE));
+        buf[index++] = i2c->DR;
+        num_bytes--;
     }
-
-    while (!(i2c->SR1 & I2C_SR1_BTF))
-    {}
-
+    // Wait for BTF (Byte Transfer Finished) for the next two bytes to be ready
+    while (!(i2c->SR1 & I2C_SR1_BTF));
+    // Disable ACK so that after the next byte the NACK is generated
     i2c->CR1 &= ~I2C_CR1_ACK;
-
-    buf[cur_byte++] = i2c->DR;
-
-    while (!(i2c->SR1 & I2C_SR1_BTF))
-    {}
-
-    i2c->CR1 |= I2C_CR1_POS;
-
-    buf[cur_byte++] = i2c->DR;
-    buf[cur_byte++] = i2c->DR;
-
-    // For subsequent communications
+    // Read the first of the final three bytes
+    buf[index++] = i2c->DR;
+    // Wait for BTF again (last two bytes are in the shift register)
+    while (!(i2c->SR1 & I2C_SR1_BTF));
+    // Generate STOP condition
+    i2c->CR1 |= I2C_CR1_STOP;
+    // Read the remaining two bytes
+    buf[index++] = i2c->DR;
+    buf[index++] = i2c->DR;
+    // Re-enable ACK for subsequent transfers
     i2c->CR1 |= I2C_CR1_ACK;
 
     return true;
@@ -134,7 +129,7 @@ bool check_sht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
     gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
     gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
 
-    i2c->CR1 = 0;
+    i2c->CR1 = I2C_CR1_ACK;
     i2c->CR2 = (42 << I2C_CR2_FREQ_Pos);
     i2c->OAR1 = 0;
     i2c->OAR2 = 0;
