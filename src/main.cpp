@@ -40,11 +40,11 @@ bool masterTransmit(I2C_TypeDef *i2c, uint8_t address, const uint8_t *buf, uint3
     while (!(i2c->SR1 & I2C_SR1_SB))
     {}
 
-    i2c->DR = 0x44 << 1 | 0;
+    i2c->DR = address << 1 | 0;
     while (!(i2c->SR1 & I2C_SR1_ADDR))
     {}
 
-    uint32_t sr2 = i2c->SR2;
+    (void)i2c->SR2; // Clear ADDR
 
     while (!(i2c->SR1 & I2C_SR1_TXE))
     {}
