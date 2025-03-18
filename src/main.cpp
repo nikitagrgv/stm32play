@@ -94,13 +94,12 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
     }
 
     i2c->CR1 &= ~I2C_CR1_ACK;
+    i2c->CR1 |= I2C_CR1_STOP;
 
     while (!(i2c->SR1 & I2C_SR1_BTF))
     {}
 
     *buf++ = i2c->DR;
-
-    i2c->CR1 |= I2C_CR1_STOP;
 
     return true;
 }
