@@ -55,15 +55,12 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
 
         (void)i2c->SR2; // Clear ADDR
 
-        i2c->CR1 |= I2C_CR1_STOP;
-
         while (!(i2c->SR1 & I2C_SR1_RXNE))
         {}
 
         buf[0] = i2c->DR;
 
-        // For subsequent communications
-        i2c->CR1 |= I2C_CR1_ACK;
+        i2c->CR1 |= I2C_CR1_STOP;
 
         return true;
     }
@@ -71,49 +68,38 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
     if (num_bytes == 2)
     {
         i2c->CR1 |= I2C_CR1_POS;
+        i2c->CR1 &= ~I2C_CR1_ACK;
 
         (void)i2c->SR2; // Clear ADDR
-
-        i2c->CR1 &= ~I2C_CR1_ACK;
 
         while (!(i2c->SR1 & I2C_SR1_BTF))
         {}
 
-        i2c->CR1 |= I2C_CR1_STOP;
-
         buf[0] = i2c->DR;
         buf[1] = i2c->DR;
 
-        // For subsequent communications
-        i2c->CR1 &= ~I2C_CR1_POS;
-        i2c->CR1 |= I2C_CR1_ACK;
+        i2c->CR1 |= I2C_CR1_STOP;
 
         return true;
     }
-    /* ---------- Case 3: Reception of More Than 2 Bytes ---------- */
     uint8_t index = 0;
-    // Clear ADDR flag by reading SR2
-    (void) i2c->SR2;
-    // Read until 3 bytes remain
-    while(num_bytes > 3) {
-        while (!(i2c->SR1 & I2C_SR1_RXNE));
+    (void)i2c->SR2;
+    while (num_bytes > 3)
+    {
+        while (!(i2c->SR1 & I2C_SR1_RXNE))
+        {}
         buf[index++] = i2c->DR;
         num_bytes--;
     }
-    // Wait for BTF (Byte Transfer Finished) for the next two bytes to be ready
-    while (!(i2c->SR1 & I2C_SR1_BTF));
-    // Disable ACK so that after the next byte the NACK is generated
+    while (!(i2c->SR1 & I2C_SR1_BTF))
+    {}
     i2c->CR1 &= ~I2C_CR1_ACK;
-    // Read the first of the final three bytes
     buf[index++] = i2c->DR;
-    // Wait for BTF again (last two bytes are in the shift register)
-    while (!(i2c->SR1 & I2C_SR1_BTF));
-    // Generate STOP condition
+    while (!(i2c->SR1 & I2C_SR1_BTF))
+    {}
     i2c->CR1 |= I2C_CR1_STOP;
-    // Read the remaining two bytes
     buf[index++] = i2c->DR;
     buf[index++] = i2c->DR;
-    // Re-enable ACK for subsequent transfers
     i2c->CR1 |= I2C_CR1_ACK;
 
     return true;
