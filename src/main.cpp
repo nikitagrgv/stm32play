@@ -30,38 +30,38 @@ CommandBuffer command_buffer;
 CommandExecutor command_executor;
 
 
-bool readData(I2C_TypeDef *i2c, uint8_t *data, uint32_t count)
+bool readData(I2C_TypeDef *i2c, uint8_t *buf, uint32_t num_bytes)
 {
     int cur_byte = 0;
 
     while (!(i2c->SR1 & I2C_SR1_RXNE))
     {}
 
-    data[cur_byte] = i2c->DR;
+    buf[cur_byte] = i2c->DR;
     ++cur_byte;
 
     while (!(i2c->SR1 & I2C_SR1_RXNE))
     {}
 
-    data[cur_byte] = i2c->DR;
+    buf[cur_byte] = i2c->DR;
     ++cur_byte;
 
     while (!(i2c->SR1 & I2C_SR1_RXNE))
     {}
 
-    data[cur_byte] = i2c->DR;
+    buf[cur_byte] = i2c->DR;
     ++cur_byte;
 
     while (!(i2c->SR1 & I2C_SR1_RXNE))
     {}
 
-    data[cur_byte] = i2c->DR;
+    buf[cur_byte] = i2c->DR;
     ++cur_byte;
 
     while (!(i2c->SR1 & I2C_SR1_RXNE))
     {}
 
-    data[cur_byte] = i2c->DR;
+    buf[cur_byte] = i2c->DR;
     ++cur_byte;
 
     i2c->CR1 &= ~I2C_CR1_ACK;
@@ -71,7 +71,7 @@ bool readData(I2C_TypeDef *i2c, uint8_t *data, uint32_t count)
 
     i2c->CR1 |= I2C_CR1_STOP;
 
-    data[cur_byte] = i2c->DR;
+    buf[cur_byte] = i2c->DR;
     ++cur_byte;
 
     return true;
