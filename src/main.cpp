@@ -55,12 +55,13 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
 
         (void)i2c->SR2; // Clear ADDR
 
+        i2c->CR1 |= I2C_CR1_STOP;
+
         while (!(i2c->SR1 & I2C_SR1_RXNE))
         {}
 
         *buf++ = i2c->DR;
 
-        i2c->CR1 |= I2C_CR1_STOP;
 
         return true;
     }
@@ -159,7 +160,7 @@ bool check_sht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
 
     uint8_t data[6] = {0, 0, 0, 0, 0, 0};
     generateStart(i2c);
-    masterReceive(i2c, 0x44, data, 2);
+    masterReceive(i2c, 0x44, data, 1);
 
     constexpr uint8_t crc8_poly = 0x31;
     constexpr uint8_t crc8_init = 0xFF;
