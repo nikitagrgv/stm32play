@@ -85,7 +85,8 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
 
     i2c->CR1 |= I2C_CR1_ACK;
 
-    (void)i2c->SR2;
+    (void)i2c->SR2; // Clear ADDR
+
     for (int i = 0; i < num_bytes - 1; ++i)
     {
         while (!(i2c->SR1 & I2C_SR1_RXNE))
