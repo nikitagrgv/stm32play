@@ -62,7 +62,6 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
 
         *buf++ = i2c->DR;
 
-
         return true;
     }
 
