@@ -43,11 +43,11 @@ bool readData(I2C_TypeDef *i2c, uint8_t *buf, uint32_t num_bytes)
         buf[cur_byte] = i2c->DR;
     }
 
-    while (!(i2c->SR1 & I2C_SR1_RXNE))
-    {}
-
     i2c->CR1 &= ~I2C_CR1_ACK;
     i2c->CR1 |= I2C_CR1_STOP;
+
+    while (!(i2c->SR1 & I2C_SR1_RXNE))
+    {}
 
     buf[cur_byte] = i2c->DR;
     ++cur_byte;
