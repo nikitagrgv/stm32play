@@ -61,8 +61,37 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
         {}
 
         buf[0] = i2c->DR;
+
+        // For subsequent communications
+        i2c->CR1 |= I2C_CR1_ACK;
+
         return true;
     }
+
+    if (num_bytes == 2)
+    {
+        i2c->CR1 |= I2C_CR1_POS;
+
+        (void)i2c->SR2; // Clear ADDR
+
+        i2c->CR1 &= ~I2C_CR1_ACK;
+
+        while (!(i2c->SR1 & I2C_SR1_BTF))
+        {}
+
+        i2c->CR1 |= I2C_CR1_STOP;
+
+        buf[0] = i2c->DR;
+        buf[1] = i2c->DR;
+
+        // For subsequent communications
+        i2c->CR1 &= ~I2C_CR1_POS;
+        i2c->CR1 |= I2C_CR1_ACK;
+
+        return true;
+    }
+
+
 
     uint32_t sr2 = i2c->SR2;
 
