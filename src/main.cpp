@@ -30,6 +30,53 @@ CommandBuffer command_buffer;
 CommandExecutor command_executor;
 
 
+bool readData(I2C_TypeDef *i2c, uint8_t *data, uint32_t count)
+{
+    int cur_byte = 0;
+
+    while (!(i2c->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = i2c->DR;
+    ++cur_byte;
+
+    while (!(i2c->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = i2c->DR;
+    ++cur_byte;
+
+    while (!(i2c->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = i2c->DR;
+    ++cur_byte;
+
+    while (!(i2c->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = i2c->DR;
+    ++cur_byte;
+
+    while (!(i2c->SR1 & I2C_SR1_RXNE))
+    {}
+
+    data[cur_byte] = i2c->DR;
+    ++cur_byte;
+
+    i2c->CR1 &= ~I2C_CR1_ACK;
+
+    while (!(i2c->SR1 & I2C_SR1_RXNE))
+    {}
+
+    i2c->CR1 |= I2C_CR1_STOP;
+
+    data[cur_byte] = i2c->DR;
+    ++cur_byte;
+
+    return true;
+}
+
 bool check_sht31(float &temperature, float &humidity)
 {
     rcc::enableClocks(rcc::I2C_1);
@@ -82,9 +129,6 @@ bool check_sht31(float &temperature, float &humidity)
 
     utils::sleepMsec(1);
 
-    uint8_t data[6] = {0, 0, 0, 0, 0, 0};
-    int cur_byte = 0;
-
     I2C1->CR1 |= I2C_CR1_START;
     while (!(I2C1->SR1 & I2C_SR1_SB))
     {}
@@ -97,46 +141,8 @@ bool check_sht31(float &temperature, float &humidity)
 
     sr2 = I2C1->SR2;
 
-    while (!(I2C1->SR1 & I2C_SR1_RXNE))
-    {}
-
-    data[cur_byte] = I2C1->DR;
-    ++cur_byte;
-
-    while (!(I2C1->SR1 & I2C_SR1_RXNE))
-    {}
-
-    data[cur_byte] = I2C1->DR;
-    ++cur_byte;
-
-    while (!(I2C1->SR1 & I2C_SR1_RXNE))
-    {}
-
-    data[cur_byte] = I2C1->DR;
-    ++cur_byte;
-
-    while (!(I2C1->SR1 & I2C_SR1_RXNE))
-    {}
-
-    data[cur_byte] = I2C1->DR;
-    ++cur_byte;
-
-    while (!(I2C1->SR1 & I2C_SR1_RXNE))
-    {}
-
-    data[cur_byte] = I2C1->DR;
-    ++cur_byte;
-
-    I2C1->CR1 &= ~I2C_CR1_ACK;
-
-    while (!(I2C1->SR1 & I2C_SR1_RXNE))
-    {}
-
-    I2C1->CR1 |= I2C_CR1_STOP;
-
-    data[cur_byte] = I2C1->DR;
-    ++cur_byte;
-
+    uint8_t data[6] = {0, 0, 0, 0, 0, 0};
+    readData(I2C1, data, 6);
 
     constexpr uint8_t crc8_poly = 0x31;
     constexpr uint8_t crc8_init = 0xFF;
