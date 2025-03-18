@@ -29,6 +29,44 @@ CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
+bool masterTransmit(I2C_TypeDef *i2c, uint8_t address, const uint8_t *buf, uint32_t num_bytes)
+{
+    if (num_bytes == 0)
+    {
+        return true;
+    }
+
+    while (i2c->SR2 & I2C_SR2_BUSY)
+    {}
+
+    i2c->CR1 |= I2C_CR1_START;
+    while (!(i2c->SR1 & I2C_SR1_SB))
+    {}
+
+    i2c->DR = 0x44 << 1 | 0;
+    while (!(i2c->SR1 & I2C_SR1_ADDR))
+    {}
+
+    uint32_t sr2 = i2c->SR2;
+
+    while (!(i2c->SR1 & I2C_SR1_TXE))
+    {}
+
+    i2c->DR = 0x2C;
+    while (!(i2c->SR1 & I2C_SR1_TXE))
+    {}
+
+    i2c->DR = 0x0D;
+    while (!(i2c->SR1 & I2C_SR1_TXE))
+    {}
+
+    i2c->CR1 |= I2C_CR1_STOP;
+    while ((i2c->SR1 & I2C_SR1_TXE))
+    {}
+
+    return true;
+}
+
 bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num_bytes)
 {
     if (num_bytes == 0)
@@ -129,50 +167,26 @@ bool check_sht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
 
     utils::sleepMsec(1);
 
-    while (i2c->SR2 & I2C_SR2_BUSY)
-    {}
-
-    i2c->CR1 |= I2C_CR1_START;
-    while (!(i2c->SR1 & I2C_SR1_SB))
-    {}
-
-    i2c->DR = 0x44 << 1 | 0;
-    while (!(i2c->SR1 & I2C_SR1_ADDR))
-    {}
-
-    uint32_t sr2 = i2c->SR2;
-
-    while (!(i2c->SR1 & I2C_SR1_TXE))
-    {}
-
-    i2c->DR = 0x2C;
-    while (!(i2c->SR1 & I2C_SR1_TXE))
-    {}
-
-    i2c->DR = 0x0D;
-    while (!(i2c->SR1 & I2C_SR1_TXE))
-    {}
-
-    i2c->CR1 |= I2C_CR1_STOP;
-    while ((i2c->SR1 & I2C_SR1_TXE))
-    {}
+    constexpr uint8_t sht31_address = 0x44;
+    const uint8_t transmit_data[2] = {0x2C, 0x0D};
+    masterTransmit(i2c, sht31_address, transmit_data, 2);
 
     utils::sleepMsec(1);
 
-    uint8_t data[6] = {0, 0, 0, 0, 0, 0};
-    masterReceive(i2c, 0x44, data, 6);
+    uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
+    masterReceive(i2c, 0x44, receive_data, 6);
 
     constexpr uint8_t crc8_poly = 0x31;
     constexpr uint8_t crc8_init = 0xFF;
     bool valid = true;
-    valid &= utils::crc8(data, 2, crc8_poly, crc8_init) == data[2];
-    valid &= utils::crc8(data + 3, 2, crc8_poly, crc8_init) == data[5];
+    valid &= utils::crc8(receive_data, 2, crc8_poly, crc8_init) == receive_data[2];
+    valid &= utils::crc8(receive_data + 3, 2, crc8_poly, crc8_init) == receive_data[5];
 
     if (valid)
     {
         constexpr float divisor = 2 << 16 - 1;
-        const uint16_t temp = (uint16_t)data[0] << 8 | data[1];
-        const uint16_t hum = (uint16_t)data[3] << 8 | data[4];
+        const uint16_t temp = (uint16_t)receive_data[0] << 8 | receive_data[1];
+        const uint16_t hum = (uint16_t)receive_data[3] << 8 | receive_data[4];
         humidity = 100.0f * (float)hum / divisor;
         temperature = -45.0f + 175.0f * (float)temp / divisor;
     }
