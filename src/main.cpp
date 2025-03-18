@@ -53,17 +53,7 @@ bool masterTransmit(I2C_TypeDef *i2c, uint8_t address, const uint8_t *buf, uint3
         i2c->DR = *buf++;
     }
 
-    i2c->DR = 0x2C;
-    while (!(i2c->SR1 & I2C_SR1_TXE))
-    {}
-
-    i2c->DR = 0x0D;
-    while (!(i2c->SR1 & I2C_SR1_TXE))
-    {}
-
     i2c->CR1 |= I2C_CR1_STOP;
-    while ((i2c->SR1 & I2C_SR1_TXE))
-    {}
 
     return true;
 }
