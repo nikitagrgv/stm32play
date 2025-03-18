@@ -32,43 +32,21 @@ CommandExecutor command_executor;
 
 bool readData(I2C_TypeDef *i2c, uint8_t *buf, uint32_t num_bytes)
 {
+    I2C1->CR1 |= I2C_CR1_ACK;
+
     int cur_byte = 0;
+    for (cur_byte = 0; cur_byte < num_bytes - 1; ++cur_byte)
+    {
+        while (!(i2c->SR1 & I2C_SR1_RXNE))
+        {}
+
+        buf[cur_byte] = i2c->DR;
+    }
 
     while (!(i2c->SR1 & I2C_SR1_RXNE))
     {}
-
-    buf[cur_byte] = i2c->DR;
-    ++cur_byte;
-
-    while (!(i2c->SR1 & I2C_SR1_RXNE))
-    {}
-
-    buf[cur_byte] = i2c->DR;
-    ++cur_byte;
-
-    while (!(i2c->SR1 & I2C_SR1_RXNE))
-    {}
-
-    buf[cur_byte] = i2c->DR;
-    ++cur_byte;
-
-    while (!(i2c->SR1 & I2C_SR1_RXNE))
-    {}
-
-    buf[cur_byte] = i2c->DR;
-    ++cur_byte;
-
-    while (!(i2c->SR1 & I2C_SR1_RXNE))
-    {}
-
-    buf[cur_byte] = i2c->DR;
-    ++cur_byte;
 
     i2c->CR1 &= ~I2C_CR1_ACK;
-
-    while (!(i2c->SR1 & I2C_SR1_RXNE))
-    {}
-
     i2c->CR1 |= I2C_CR1_STOP;
 
     buf[cur_byte] = i2c->DR;
@@ -132,8 +110,6 @@ bool check_sht31(float &temperature, float &humidity)
     I2C1->CR1 |= I2C_CR1_START;
     while (!(I2C1->SR1 & I2C_SR1_SB))
     {}
-
-    I2C1->CR1 |= I2C_CR1_ACK;
 
     I2C1->DR = 0x44 << 1 | 1;
     while (!(I2C1->SR1 & I2C_SR1_ADDR))
