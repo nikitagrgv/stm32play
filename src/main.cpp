@@ -91,8 +91,6 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
         return true;
     }
 
-    i2c->CR1 |= I2C_CR1_ACK;
-
     int cur_byte = 0;
     for (cur_byte = 0; cur_byte < num_bytes - 3; ++cur_byte)
     {
