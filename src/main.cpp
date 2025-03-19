@@ -255,7 +255,7 @@ bool runLcd(I2C_TypeDef *i2c)
 
     static bool g = true;
     g = !g;
-    runLcdCommand(i2c, address, g << 3, RWMode::Write, RSMode::Data, true);
+    runLcdCommand(i2c, address, 0x00, RWMode::Read, RSMode::Data, g);
 
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
     // masterReceive(i2c, sht31_address, receive_data, 6);
