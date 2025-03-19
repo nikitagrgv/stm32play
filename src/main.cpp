@@ -211,7 +211,7 @@ void triggerLcd(I2C_TypeDef *i2c, uint8_t address, uint8_t data)
 {
     utils::sleepUsec(TIM2, FAST_DELAY_US);
 
-    constexpr uint8_t enable_mask = 1 << 5;
+    constexpr uint8_t enable_mask = 1 << 2;
     constexpr uint8_t enable_clear_mask = ~enable_mask;
 
     uint8_t transmit_data = data & enable_mask;
@@ -226,15 +226,15 @@ void triggerLcd(I2C_TypeDef *i2c, uint8_t address, uint8_t data)
 void runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs, bool backlight = true)
 {
     uint8_t base_mask = 0;
-    base_mask |= (uint8_t)rw << 6;
-    base_mask |= (uint8_t)rs << 7;
-    base_mask |= (uint8_t)backlight << 4;
+    base_mask |= (uint8_t)rw << 1;
+    base_mask |= (uint8_t)rs << 0;
+    base_mask |= (uint8_t)backlight << 3;
 
-    const uint8_t data_high = data >> 4;
-    const uint8_t data_low = data & 0x0F;
+    const uint8_t data_mask_high = data & 0xF0;
+    const uint8_t data_mask_low = (data << 4) & 0xF0;
 
-    triggerLcd(i2c, address, base_mask | data_high);
-    triggerLcd(i2c, address, base_mask | data_low);
+    triggerLcd(i2c, address, base_mask | data_mask_high);
+    triggerLcd(i2c, address, base_mask | data_mask_low);
 }
 
 bool runLcd(I2C_TypeDef *i2c)
@@ -253,7 +253,9 @@ bool runLcd(I2C_TypeDef *i2c)
 
     constexpr uint8_t address = 0x27;
 
-    runLcdCommand(i2c, address, 0x3, RWMode::Write, RSMode::Command);
+    static bool g = true;
+    g = !g;
+    runLcdCommand(i2c, address, g << 3, RWMode::Write, RSMode::Data, true);
 
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
     // masterReceive(i2c, sht31_address, receive_data, 6);
