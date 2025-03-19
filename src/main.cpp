@@ -318,7 +318,7 @@ int main()
                     }
                     else
                     {
-
+                        run_lcd(I2C1);
                     }
                 }
             }
