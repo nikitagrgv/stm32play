@@ -266,7 +266,7 @@ bool runLcd(I2C_TypeDef *i2c)
     triggerLcd(i2c, address, 0b110000 | BACKLIGHT_BIT);
     utils::sleepMsec(20);
 
-    triggerLcd(i2c, address, 0b100000);
+    triggerLcd(i2c, address, 0b100000 | BACKLIGHT_BIT);
 
 
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
