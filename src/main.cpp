@@ -207,6 +207,7 @@ enum class RSMode
 
 bool runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs)
 {
+    uint8_t transmit_data[2] = {0, 0};
 
 
     return true;
