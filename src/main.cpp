@@ -230,18 +230,11 @@ void runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, R
     base_mask |= (uint8_t)rs << 7;
     base_mask |= (uint8_t)backlight << 4;
 
-
     const uint8_t data_high = data >> 4;
     const uint8_t data_low = data & 0x0F;
 
-
-    uint8_t transmit_data = base_mask | data_high | enable_mask;
-    masterTransmit(i2c, address, &transmit_data, 1);
-
-    utils::sleepUsec(TIM2, FAST_DELAY_US);
-
-    transmit_data = base_mask | data_low;
-    masterTransmit(i2c, address, &transmit_data, 1);
+    triggerLcd(i2c, address, base_mask | data_high);
+    triggerLcd(i2c, address, base_mask | data_low);
 }
 
 bool runLcd(I2C_TypeDef *i2c)
