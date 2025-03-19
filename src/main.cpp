@@ -205,13 +205,15 @@ enum class RSMode
     Data = 1
 };
 
-bool runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs)
+bool runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs, bool backlight = true)
 {
-    uint8_t transmit_data[2] = {0, 0};
-
     uint8_t base_mask = 0;
     base_mask |= (uint8_t)rw << 6;
     base_mask |= (uint8_t)rs << 7;
+    base_mask |= (uint8_t)backlight << 4;
+
+
+
 
     return true;
 }
