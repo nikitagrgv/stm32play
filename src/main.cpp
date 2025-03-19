@@ -256,8 +256,6 @@ bool runLcd(I2C_TypeDef *i2c)
     const uint8_t clear_data = 0x00;
     masterTransmit(i2c, address, &clear_data, 1);
 
-    constexpr uint8_t RS_BIT = 1 << 0;
-    constexpr uint8_t RW_BIT = 1 << 1;
     constexpr uint8_t BACKLIGHT_BIT = 1 << 3;
 
     utils::sleepMsec(100);
