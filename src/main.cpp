@@ -154,7 +154,7 @@ bool masterReceive(I2C_TypeDef *i2c, uint8_t address, uint8_t *buf, uint32_t num
     return true;
 }
 
-bool check_sht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
+bool checkSht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
 {
     rcc::enableClocks(rcc::I2C_1);
 
@@ -193,7 +193,24 @@ bool check_sht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
     return valid;
 }
 
-bool run_lcd(I2C_TypeDef *i2c)
+enum class RWMode
+{
+    Write = 0,
+    Read = 1
+};
+
+enum class RSMode
+{
+    Command = 0,
+    Data = 1
+};
+
+bool runLcdCommand(I2C_TypeDef *i2c, uint8_t data, RWMode rw, RSMode rs)
+{
+    return true;
+}
+
+bool runLcd(I2C_TypeDef *i2c)
 {
     rcc::enableClocks(rcc::I2C_1);
 
@@ -308,7 +325,7 @@ int main()
                     {
                         float temperature = 0.0f;
                         float humidity = 0.0f;
-                        const bool valid = check_sht31(I2C1, temperature, humidity);
+                        const bool valid = checkSht31(I2C1, temperature, humidity);
                         if (valid)
                         {
                             io::printSyncFmt("T = %f, H = %f\n", temperature, humidity);
@@ -320,7 +337,7 @@ int main()
                     }
                     else
                     {
-                        run_lcd(I2C1);
+                        runLcd(I2C1);
                     }
                 }
             }
