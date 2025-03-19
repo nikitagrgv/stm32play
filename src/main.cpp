@@ -193,6 +193,28 @@ bool check_sht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
     return valid;
 }
 
+bool run_lcd(I2C_TypeDef *i2c)
+{
+    rcc::enableClocks(rcc::I2C_1);
+
+    constexpr Pin scl_pin{GPIOPort::B, 8};
+    constexpr Pin sda_pin{GPIOPort::B, 9};
+
+    gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
+    gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
+
+    setupI2C(i2c);
+
+    utils::sleepMsec(1);
+
+    constexpr uint8_t sht31_address = 0x44;
+    const uint8_t transmit_data[2] = {0x2C, 0x10};
+    masterTransmit(i2c, sht31_address, transmit_data, 2);
+
+    uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
+    masterReceive(i2c, sht31_address, receive_data, 6);
+}
+
 int main()
 {
     glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
@@ -280,16 +302,23 @@ int main()
                 {
                     io::printSyncFmt("User key pressed\n");
 
-                    float temperature = 0.0f;
-                    float humidity = 0.0f;
-                    const bool valid = check_sht31(I2C1, temperature, humidity);
-                    if (valid)
+                    if (0)
                     {
-                        io::printSyncFmt("T = %f, H = %f\n", temperature, humidity);
+                        float temperature = 0.0f;
+                        float humidity = 0.0f;
+                        const bool valid = check_sht31(I2C1, temperature, humidity);
+                        if (valid)
+                        {
+                            io::printSyncFmt("T = %f, H = %f\n", temperature, humidity);
+                        }
+                        else
+                        {
+                            io::printSyncFmt("SHT31 error\n");
+                        }
                     }
                     else
                     {
-                        io::printSyncFmt("SHT31 error\n");
+
                     }
                 }
             }
