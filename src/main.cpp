@@ -29,6 +29,21 @@ CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
+bool setupI2C(I2C_TypeDef *i2c)
+{
+    i2c->CR1 = 0;
+    i2c->CR1 = I2C_CR1_ACK;
+    i2c->CR2 = (42 << I2C_CR2_FREQ_Pos);
+    i2c->OAR1 = 0;
+    i2c->OAR2 = 0;
+    i2c->SR1 = 0;
+    i2c->CCR = 210;
+    i2c->TRISE = 43;
+    i2c->FLTR = 0;
+    i2c->CR1 |= I2C_CR1_PE;
+    return true;
+}
+
 bool masterTransmit(I2C_TypeDef *i2c, uint8_t address, const uint8_t *buf, uint32_t num_bytes)
 {
     if (num_bytes == 0)
@@ -149,15 +164,7 @@ bool check_sht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
     gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
     gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
 
-    i2c->CR1 = I2C_CR1_ACK;
-    i2c->CR2 = (42 << I2C_CR2_FREQ_Pos);
-    i2c->OAR1 = 0;
-    i2c->OAR2 = 0;
-    i2c->SR1 = 0;
-    i2c->CCR = 210;
-    i2c->TRISE = 43;
-    i2c->FLTR = 0;
-    i2c->CR1 |= I2C_CR1_PE;
+    setupI2C(i2c);
 
     utils::sleepMsec(1);
 
