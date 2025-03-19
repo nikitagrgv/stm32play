@@ -213,6 +213,8 @@ bool run_lcd(I2C_TypeDef *i2c)
 
     uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
     masterReceive(i2c, sht31_address, receive_data, 6);
+
+    return true;
 }
 
 int main()
