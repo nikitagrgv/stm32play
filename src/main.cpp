@@ -207,9 +207,9 @@ bool run_lcd(I2C_TypeDef *i2c)
 
     utils::sleepMsec(1);
 
-    constexpr uint8_t sht31_address = 0x27;
+    constexpr uint8_t address = 0x27;
     const uint8_t transmit_data[2] = {0x2C, 0x10};
-    masterTransmit(i2c, sht31_address, transmit_data, 2);
+    masterTransmit(i2c, address, transmit_data, 2);
 
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
     // masterReceive(i2c, sht31_address, receive_data, 6);
