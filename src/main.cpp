@@ -256,9 +256,20 @@ bool runLcd(I2C_TypeDef *i2c)
     const uint8_t clear_data = 0x00;
     masterTransmit(i2c, address, &clear_data, 1);
 
-    utils::sleepMsec(100);
+    constexpr uint8_t RS_BIT = 1 << 0;
+    constexpr uint8_t RW_BIT = 1 << 1;
+    constexpr uint8_t BACKLIGHT_BIT = 1 << 3;
 
-    runLcdCommand(i2c, address, 0x00, RWMode::Read, RSMode::Data);
+    utils::sleepMsec(100);
+    triggerLcd(i2c, address, 0b110000 | BACKLIGHT_BIT);
+    utils::sleepMsec(20);
+    triggerLcd(i2c, address, 0b110000 | BACKLIGHT_BIT);
+    utils::sleepMsec(20);
+    triggerLcd(i2c, address, 0b110000 | BACKLIGHT_BIT);
+    utils::sleepMsec(20);
+
+    triggerLcd(i2c, address, 0b100000);
+
 
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
     // masterReceive(i2c, sht31_address, receive_data, 6);
