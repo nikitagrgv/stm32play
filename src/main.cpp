@@ -205,8 +205,10 @@ enum class RSMode
     Data = 1
 };
 
-bool runLcdCommand(I2C_TypeDef *i2c, uint8_t data, RWMode rw, RSMode rs)
+bool runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs)
 {
+
+
     return true;
 }
 
