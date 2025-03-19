@@ -205,6 +205,8 @@ enum class RSMode
     Data = 1
 };
 
+constexpr int FAST_DELAY_US = 100;
+
 bool runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs, bool backlight = true)
 {
     uint8_t base_mask = 0;
@@ -212,8 +214,20 @@ bool runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, R
     base_mask |= (uint8_t)rs << 7;
     base_mask |= (uint8_t)backlight << 4;
 
+    constexpr uint8_t enable_mask = 1 << 5;
 
+    const uint8_t data_high = data >> 4;
+    const uint8_t data_low = data & 0x0F;
 
+    utils::sleepUsec(TIM2, FAST_DELAY_US);
+
+    uint8_t transmit_data = base_mask | data_high | enable_mask;
+    masterTransmit(i2c, address, &transmit_data, 1);
+
+    utils::sleepUsec(TIM2, FAST_DELAY_US);
+
+    transmit_data = base_mask | data_low;
+    masterTransmit(i2c, address, &transmit_data, 1);
 
     return true;
 }
