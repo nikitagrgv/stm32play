@@ -253,6 +253,11 @@ bool runLcd(I2C_TypeDef *i2c)
 
     constexpr uint8_t address = 0x27;
 
+    const uint8_t clear_data = 0x00;
+    masterTransmit(i2c, address, &clear_data, 1);
+
+    utils::sleepMsec(100);
+
     static bool g = true;
     g = !g;
     runLcdCommand(i2c, address, 0x00, RWMode::Read, RSMode::Data, g);
