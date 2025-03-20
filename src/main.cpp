@@ -22,6 +22,7 @@
 #include "utils/DataStream.h"
 #include "utils/FixedBitset.h"
 
+#include <cstdlib>
 #include <memory>
 
 FixedDataStream<1024> usart1_stream;
