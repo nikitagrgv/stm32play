@@ -1,6 +1,9 @@
 #include "LCD1602.h"
 
 #include "Sleep.h"
+#include "periph/GPIO.h"
+#include "periph/PeriphBase.h"
+#include "periph/RCC.h"
 
 namespace
 {
@@ -48,6 +51,26 @@ void i2c_write_blocking(I2C_TypeDef *i2c, uint8_t address, const uint8_t *data, 
 void sleep_us(uint64_t us)
 {
     utils::sleepUsec(TIM2, us);
+}
+
+void sleep_ms(uint64_t ms)
+{
+    utils::sleepMsec(TIM2, ms);
+}
+
+bool setupI2C(I2C_TypeDef *i2c)
+{
+    i2c->CR1 = 0;
+    i2c->CR1 = I2C_CR1_ACK;
+    i2c->CR2 = (42 << I2C_CR2_FREQ_Pos);
+    i2c->OAR1 = 0;
+    i2c->OAR2 = 0;
+    i2c->SR1 = 0;
+    i2c->CCR = 210;
+    i2c->TRISE = 43;
+    i2c->FLTR = 0;
+    i2c->CR1 |= I2C_CR1_PE;
+    return true;
 }
 
 } // namespace
@@ -118,12 +141,15 @@ void lcd_send_byte(LCD *lcd_inst, uint8_t val, uint8_t mode, uint64_t delay_us)
 
 void lcd_init(LCD *lcd_inst, int address, uint8_t pin_sda, uint8_t pin_scl, i2c_inst_t *i2c_inst)
 {
-    /* Init the sdk */
-    i2c_init(i2c_inst, STANDARD_RATE);
-    gpio_set_function(pin_sda, GPIO_FUNC_I2C);
-    gpio_set_function(pin_scl, GPIO_FUNC_I2C);
-    gpio_pull_up(pin_sda);
-    gpio_pull_up(pin_scl);
+    rcc::enableClocks(rcc::I2C_1);
+
+    constexpr Pin scl_pin{GPIOPort::B, 8};
+    constexpr Pin sda_pin{GPIOPort::B, 9};
+
+    gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
+    gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
+
+    setupI2C(i2c_inst);
 
     /* Init the struct */
     lcd_inst->addr = (address == -1) ? 0x27 : (uint8_t)address;
