@@ -273,7 +273,10 @@ bool runLcd(I2C_TypeDef *i2c)
     utils::sleepMsec(20);
     runLcdCommand(i2c, address, 0b1000, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
-
+    runLcdCommand(i2c, address, 0b1, RWMode::Write, RSMode::Command);
+    utils::sleepMsec(20);
+    runLcdCommand(i2c, address, 0b110, RWMode::Write, RSMode::Command);
+    utils::sleepMsec(20);
 
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
     // masterReceive(i2c, sht31_address, receive_data, 6);
