@@ -8,8 +8,8 @@
 namespace
 {
 
-I2C_TypeDef *i2c1 = I2C2;
-I2C_TypeDef *i2c0 = I2C2;
+I2C_TypeDef *i2c1 = I2C1;
+I2C_TypeDef *i2c0 = I2C1;
 
 bool masterTransmit(I2C_TypeDef *i2c, uint8_t address, const uint8_t *buf, uint32_t num_bytes)
 {
