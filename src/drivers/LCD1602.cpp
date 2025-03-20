@@ -1,5 +1,7 @@
 #include "LCD1602.h"
 
+#include "Sleep.h"
+
 namespace
 {
 
@@ -41,6 +43,11 @@ bool masterTransmit(I2C_TypeDef *i2c, uint8_t address, const uint8_t *buf, uint3
 void i2c_write_blocking(I2C_TypeDef *i2c, uint8_t address, const uint8_t *data, uint32_t length, bool nostop)
 {
     masterTransmit(i2c, address, data, length);
+}
+
+void sleep_us(uint64_t us)
+{
+    utils::sleepUsec(TIM2, us);
 }
 
 } // namespace
