@@ -3,11 +3,12 @@
 namespace
 {
 
-const I2C_TypeDef *i2c1 = I2C2;
-const I2C_TypeDef *i2c0 = I2C2;
+I2C_TypeDef *i2c1 = I2C2;
+I2C_TypeDef *i2c0 = I2C2;
 
-void i2c_write_blocking()
+void i2c_write_blocking(I2C_TypeDef*i2c, uint8_t address, const uint8_t *data, uint32_t length, bool nostop)
 {
+
 
 }
 
