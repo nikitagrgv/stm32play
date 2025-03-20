@@ -259,14 +259,20 @@ bool runLcd(I2C_TypeDef *i2c)
     constexpr uint8_t BACKLIGHT_BIT = 1 << 3;
 
     utils::sleepMsec(100);
-    triggerLcd(i2c, address, 0b110000 | BACKLIGHT_BIT);
+    triggerLcd(i2c, address, 0b11'0000 | BACKLIGHT_BIT);
     utils::sleepMsec(20);
-    triggerLcd(i2c, address, 0b110000 | BACKLIGHT_BIT);
+    triggerLcd(i2c, address, 0b11'0000 | BACKLIGHT_BIT);
     utils::sleepMsec(20);
-    triggerLcd(i2c, address, 0b110000 | BACKLIGHT_BIT);
+    triggerLcd(i2c, address, 0b11'0000 | BACKLIGHT_BIT);
     utils::sleepMsec(20);
 
-    triggerLcd(i2c, address, 0b100000 | BACKLIGHT_BIT);
+    triggerLcd(i2c, address, 0b10'0000 | BACKLIGHT_BIT);
+    utils::sleepMsec(20);
+
+    runLcdCommand(i2c, address, 0b101000, RWMode::Write, RSMode::Command);
+    utils::sleepMsec(20);
+    runLcdCommand(i2c, address, 0b1000, RWMode::Write, RSMode::Command);
+    utils::sleepMsec(20);
 
 
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
