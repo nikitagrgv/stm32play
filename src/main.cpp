@@ -8,6 +8,7 @@
 #include "core/Globals.h"
 #include "debug/Statistic.h"
 #include "drivers/DHT11Driver.h"
+#include "drivers/LCD1602.h"
 #include "low_level/clock.h"
 #include "periph/EXTI.h"
 #include "periph/GPIO.h"
@@ -392,7 +393,11 @@ int main()
                     }
                     else
                     {
-                        runLcd(I2C1);
+                        LCD my_lcd;
+                        lcd_init(&my_lcd, 0x27, 4, 5, I2C1);
+
+                        char message[] = "Thanks extremq";
+                        lcd_string(&my_lcd, message);
                     }
                 }
             }
