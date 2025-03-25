@@ -50,6 +50,12 @@ public:
     bool isCursorBlinkingEnabled() const { return cursor_blinking_enabled_; }
     bool setCursorBlinkingEnabled(bool enabled);
 
+    MoveDirection getCursorMoveDirection() const { return cursor_move_direction_; }
+    bool setCursorMoveDirection(MoveDirection direction);
+
+    bool isDisplayShiftEnabled() const { return display_shift_enabled_; }
+    bool setDisplayShiftEnabled(bool enabled);
+
     bool returnHome();
     bool clearDisplay();
 

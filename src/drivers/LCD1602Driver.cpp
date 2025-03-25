@@ -132,6 +132,26 @@ bool LCD1602Driver::setCursorBlinkingEnabled(bool enabled)
     return update_display_control();
 }
 
+bool LCD1602Driver::setCursorMoveDirection(MoveDirection direction)
+{
+    if (cursor_move_direction_ == direction)
+    {
+        return false;
+    }
+    cursor_move_direction_ = direction;
+    return update_entry_mode();
+}
+
+bool LCD1602Driver::setDisplayShiftEnabled(bool enabled)
+{
+    if (display_shift_enabled_ == enabled)
+    {
+        return false;
+    }
+    display_shift_enabled_ = enabled;
+    return update_entry_mode();
+}
+
 bool LCD1602Driver::returnHome()
 {
     if (!run_command(0b10, RWMode::Write, RSMode::Command))
