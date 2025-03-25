@@ -47,14 +47,10 @@ bool LCD1602Driver::initialize()
     utils::sleepMsec(1);
 
     update_function_set();
-    run_command(0b1000, RWMode::Write, RSMode::Command);
-    utils::sleepMsec(20);
+    update_display_control();
     run_command(0b1, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
     run_command(0b110, RWMode::Write, RSMode::Command);
-    utils::sleepMsec(20);
-
-    run_command(0b1111, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
 
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
