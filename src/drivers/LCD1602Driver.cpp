@@ -95,6 +95,9 @@ bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs, bool backlig
     const uint8_t high = data_mask_high | base_mask;
     const uint8_t low = data_mask_low | base_mask;
 
-    trigger(high);
-    trigger(low);
+    if (!trigger(high))
+    {
+        return false;
+    }
+    return trigger(low);
 }
