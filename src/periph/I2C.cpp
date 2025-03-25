@@ -17,6 +17,19 @@ I2C_TypeDef *get_i2c_register(I2C i2c)
     }
 }
 
+uint32_t get_max_trise_time_ns(uint32_t i2c_frequency)
+{
+    if (i2c_frequency <= 100'000)
+    {
+        return 1000;
+    }
+    if (i2c_frequency <= 400'000)
+    {
+        return 300;
+    }
+    return 120;
+}
+
 } // namespace
 
 void i2c::setupI2C(I2C i2c, uint32_t speed)
@@ -29,6 +42,7 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
 
     const uint32_t ccr = bus_frequency / speed / 2;
     MICRO_ASSERT(ccr >= 4 && ccr < 1 << 12);
+
 
     i2c_reg->CR1 = 0;
     i2c_reg->CR1 = I2C_CR1_ACK;
