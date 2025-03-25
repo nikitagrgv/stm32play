@@ -261,7 +261,7 @@ int main()
                     {
                         float temperature = 0.0f;
                         float humidity = 0.0f;
-                        const bool valid = checkSht31(I2C1, temperature, humidity);
+                        const bool valid = checkSht31(I2C::I2C_1, temperature, humidity);
                         if (valid)
                         {
                             io::printSyncFmt("T = %f, H = %f\n", temperature, humidity);
