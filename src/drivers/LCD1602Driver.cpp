@@ -72,7 +72,7 @@ bool LCD1602Driver::trigger(uint8_t data)
 
     utils::sleepUsec(timer_, DELAY_US);
 
-    if (i2c::masterTransmitBlocking(i2c_, ADDRESS, data & enable_clear_mask))
+    if (!i2c::masterTransmitBlocking(i2c_, ADDRESS, data & enable_clear_mask))
     {
         return false;
     }

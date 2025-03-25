@@ -145,6 +145,7 @@ int main()
                         io::printSyncFmt("LCD1602 Initialization failed\n");
                     }
 
+                    utils::sleepMsec(45);
                     display.print('1');
                 }
             }
