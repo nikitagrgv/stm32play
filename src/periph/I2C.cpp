@@ -234,6 +234,7 @@ bool i2c::masterTransmitBlocking(I2C i2c, uint8_t address, const uint8_t *buf, u
     }
 
     i2c_reg->CR1 |= I2C_CR1_STOP;
+    return true;
 }
 
 bool i2c::masterTransmitBlocking(I2C i2c, uint8_t address, uint8_t value, int timeout_ms)
