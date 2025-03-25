@@ -78,7 +78,7 @@ void LCD1602Driver::setBacklightEnabled(bool backlight)
         return;
     }
     backlight_ = backlight;
-    update_display_control();
+    update_backlight();
 }
 
 void LCD1602Driver::setLinesMode(LinesMode lines_mode)
@@ -93,7 +93,12 @@ void LCD1602Driver::setLinesMode(LinesMode lines_mode)
 
 void LCD1602Driver::setFont(Font font)
 {
+    if (font_ == font)
+    {
+        return;
+    }
     font_ = font;
+    update_display_control();
 }
 
 bool LCD1602Driver::returnHome()
