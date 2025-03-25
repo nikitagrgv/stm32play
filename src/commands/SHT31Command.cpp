@@ -18,19 +18,19 @@ bool SHT31Command::execute(const char *args)
 
     if (code == SHT31Driver::ErrorCode::Timeout)
     {
-        io::printSyncFmt("DHT11: Timeout\n");
+        io::printSyncFmt("SHT31: Timeout\n");
         return true;
     }
 
     if (code == SHT31Driver::ErrorCode::InvalidChecksum)
     {
-        io::printSyncFmt("DHT11: Invalid checksum\n");
+        io::printSyncFmt("SHT31: Invalid checksum\n");
         return true;
     }
 
     if (code != SHT31Driver::ErrorCode::Success)
     {
-        io::printSyncFmt("DHT11: Unexpected error\n");
+        io::printSyncFmt("SHT31: Unexpected error\n");
         return true;
     }
 
