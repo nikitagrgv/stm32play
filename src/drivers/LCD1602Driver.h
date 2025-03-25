@@ -29,10 +29,11 @@ public:
     bool isBacklightEnabled() const { return backlight_; }
     void setBacklightEnabled(bool backlight) { backlight_ = backlight; }
 
-    LinesMode getNumLines() const { return lines_mode_; }
-    void setNumLines(LinesMode num_lines) { lines_mode_ = num_lines; }
-    Font get_font() const { return font_; }
-    void set_font(Font font) { font_ = font; }
+    LinesMode getLinesMode() const { return lines_mode_; }
+    void setLinesMode(LinesMode lines_mode) { lines_mode_ = lines_mode; }
+
+    Font getFont() const { return font_; }
+    void setFont(Font font) { font_ = font; }
 
     bool returnHome();
 
