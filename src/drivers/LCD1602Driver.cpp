@@ -6,10 +6,10 @@
 namespace
 {
 
-uint32_t REGISTER_SELECT_BIT_POS = 0;
-uint32_t READ_WRITE_BIT_POS = 1;
-uint32_t ENABLE_BIT_POS = 2;
-uint32_t BACKLIGHT_BIT_POS = 3;
+constexpr uint32_t REGISTER_SELECT_BIT_POS = 0;
+constexpr uint32_t READ_WRITE_BIT_POS = 1;
+constexpr uint32_t ENABLE_BIT_POS = 2;
+constexpr uint32_t BACKLIGHT_BIT_POS = 3;
 
 } // namespace
 
@@ -71,7 +71,7 @@ bool LCD1602Driver::trigger(uint8_t data)
 {
     utils::sleepUsec(timer_, DELAY_US);
 
-    constexpr uint8_t enable_mask = 1 << 2;
+    constexpr uint8_t enable_mask = 1 << ENABLE_BIT_POS;
     constexpr uint8_t enable_clear_mask = ~enable_mask;
 
     if (!i2c::masterTransmitBlocking(i2c_, ADDRESS, data | enable_mask))
