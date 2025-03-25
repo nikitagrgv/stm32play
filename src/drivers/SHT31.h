@@ -1,6 +1,6 @@
 #pragma once
 
-#includ3
+#include "periph/PeriphBase.h"
 
 class SHT31
 {
@@ -12,8 +12,8 @@ public:
         InvalidChecksum,
     };
 
-    SHT31(Pin input_pin, TIM_TypeDef *timer);
+    explicit SHT31(I2C i2c);
     ~SHT31();
 
     ErrorCode run(float &temperature, float &humidity);
-}
+};
