@@ -5,6 +5,7 @@
 #include "commands/CommandExecutor.h"
 #include "commands/DHT11Command.h"
 #include "commands/PrintCommand.h"
+#include "commands/SHT31Command.h"
 #include "core/Globals.h"
 #include "debug/Statistic.h"
 #include "drivers/DHT11Driver.h"
@@ -185,6 +186,9 @@ int main()
     constexpr Pin dht_pin{GPIOPort::B, 5};
     TIM_TypeDef *dht_timer = TIM2;
     command_executor.addCommand(std::make_unique<DHT11Command>(dht_pin, dht_timer));
+
+    constexpr I2C sht31_i2c = I2C::I2C_1;
+    command_executor.addCommand(std::make_unique<SHT31Command>(sht31_i2c));
 
     gpio::setPinOutput(led_pin, false);
 
