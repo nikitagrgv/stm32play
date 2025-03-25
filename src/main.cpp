@@ -236,7 +236,6 @@ void runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, R
     const uint8_t data_mask_low = (data << 4) & 0xF0;
 
     triggerLcd(i2c, address, base_mask | data_mask_high);
-    utils::sleepUsec(TIM2, FAST_DELAY_US);
     triggerLcd(i2c, address, base_mask | data_mask_low);
 }
 
