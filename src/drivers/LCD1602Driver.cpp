@@ -105,7 +105,10 @@ void LCD1602Driver::setFont(Font font)
 
 bool LCD1602Driver::returnHome()
 {
-    run_command(0b10, RWMode::Write, RSMode::Command);
+    if (!run_command(0b10, RWMode::Write, RSMode::Command))
+    {
+        return false;
+    }
     short_delay();
     return true;
 }
