@@ -37,14 +37,15 @@ bool LCD1602Driver::initialize()
     runLcdCommand(i2c, address, 0b1111, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
 
-    runLcdCommand(i2c, address, 'f', RWMode::Write, RSMode::Data);
-
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
     // masterReceive(i2c, sht31_address, receive_data, 6);
     return true;
 }
 
-bool LCD1602Driver::print(char ch) {}
+bool LCD1602Driver::print(char ch)
+{
+    run_command(address, 'f', RWMode::Write, RSMode::Data);
+}
 
 bool LCD1602Driver::print(const char *str)
 {

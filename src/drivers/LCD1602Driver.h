@@ -27,6 +27,7 @@ private:
     };
 
     constexpr int DELAY_US = 80;
+    constexpr uint8_t ADDRESS = 0x27;
 
 private:
     bool trigger(I2C i2c, uint8_t address, uint8_t data);
