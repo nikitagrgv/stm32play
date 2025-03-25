@@ -235,8 +235,11 @@ void runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, R
     const uint8_t data_mask_high = data & 0xF0;
     const uint8_t data_mask_low = (data << 4) & 0xF0;
 
-    triggerLcd(i2c, address, base_mask | data_mask_high);
-    triggerLcd(i2c, address, base_mask | data_mask_low);
+    const uint8_t high = data_mask_high | base_mask;
+    const uint8_t low = data_mask_low | base_mask;
+
+    triggerLcd(i2c, address, high);
+    triggerLcd(i2c, address, low);
 }
 
 bool runLcd(I2C_TypeDef *i2c)
