@@ -52,11 +52,8 @@ bool LCD1602Driver::initialize()
     update_function_set();
     update_display_control();
     clearDisplay();
-    run_command(0b110, RWMode::Write, RSMode::Command);
-    utils::sleepMsec(20);
+    update_entry_mode();
 
-    // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
-    // masterReceive(i2c, sht31_address, receive_data, 6);
     return true;
 }
 
