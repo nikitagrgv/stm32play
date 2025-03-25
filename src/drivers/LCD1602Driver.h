@@ -66,8 +66,13 @@ private:
 
 private:
     bool backlight_ = true;
+
     LinesMode lines_mode_ = LinesMode::Two;
     Font font_ = Font::Font5x8;
+
+    bool display_on_{true};
+    bool cursor_on_{true};
+    bool cursor_blink_on_{true};
 
     I2C i2c_;
     TIM_TypeDef *timer_;
