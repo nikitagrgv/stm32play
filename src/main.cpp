@@ -163,7 +163,6 @@ int main()
     constexpr Pin user_key{GPIOPort::A, 0};
     gpio::configureInput(user_key, gpio::PullMode::Up);
 
-
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
     systick::setupTimer(systick_frequency, systick::ENABLE_INTERRUPT);
