@@ -43,6 +43,8 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
     const uint32_t ccr = bus_frequency / speed / 2;
     MICRO_ASSERT(ccr >= 4 && ccr < 1 << 12);
 
+    const uint32_t max_trise_time_ns = get_max_trise_time_ns(speed);
+    const uint32_t trise = max_trise_time_ns * bus_frequency_mhz / 1'000 + 1;
 
     i2c_reg->CR1 = 0;
     i2c_reg->CR1 = I2C_CR1_ACK;
@@ -51,7 +53,7 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
     i2c_reg->OAR2 = 0;
     i2c_reg->SR1 = 0;
     i2c_reg->CCR = ccr;
-    i2c_reg->TRISE = 43;
+    i2c_reg->TRISE = trise;
     i2c_reg->FLTR = 0;
     i2c_reg->CR1 |= I2C_CR1_PE;
 }
