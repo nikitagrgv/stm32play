@@ -243,4 +243,16 @@ bool LCD1602Driver::update_display_control()
     return true;
 }
 
-bool LCD1602Driver::update_entry_mode() {}
+bool LCD1602Driver::update_entry_mode()
+{
+    uint8_t data = 1 << 2;
+    data |= (uint8_t)display_enabled_ << DISPLAY_ON_BIT_POS;
+    data |= (uint8_t)cursor_enabled_ << CURSOR_ON_BIT_POS;
+    data |= (uint8_t)cursor_blinking_enabled_ << CURSOR_BLINKING_ON_BIT_POS;
+    if (!run_command(data, RWMode::Write, RSMode::Command))
+    {
+        return false;
+    }
+    short_delay();
+    return true;
+}
