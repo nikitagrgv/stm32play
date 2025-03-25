@@ -15,7 +15,6 @@ enum SetupFlags : uint32_t
 };
 
 void setupUsart(USART usart, uint32_t baudrate, int setup_flags, bool enable = true);
-
 void setUsartEnabled(USART usart, bool enabled);
 
 } // namespace usart
