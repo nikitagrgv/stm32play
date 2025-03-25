@@ -29,6 +29,14 @@ enum class I2C
     I2C_3,
 };
 
+enum class Tim
+{
+    TIM_2,
+    TIM_3,
+    TIM_4,
+    TIM_5,
+};
+
 enum class InterruptType
 {
     SysTickIRQ = 0,
