@@ -26,6 +26,7 @@ private:
         Data = 1
     };
 
+    static constexpr int TIMEOUT_MS = 100;
     static constexpr int DELAY_US = 80;
     static constexpr uint8_t ADDRESS = 0x27;
 

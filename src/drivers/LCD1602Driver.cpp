@@ -20,7 +20,7 @@ LCD1602Driver::LCD1602Driver(I2C i2c, TIM_TypeDef *timer)
 
 bool LCD1602Driver::initialize()
 {
-    i2c::masterTransmitBlocking(i2c_, ADDRESS, 0x00);
+    i2c::masterTransmitBlocking(i2c_, ADDRESS, 0x00, TIMEOUT_MS);
 
     constexpr uint8_t BACKLIGHT_BIT = 1 << 3;
 
@@ -74,14 +74,14 @@ bool LCD1602Driver::trigger(uint8_t data)
     constexpr uint8_t enable_mask = 1 << ENABLE_BIT_POS;
     constexpr uint8_t enable_clear_mask = ~enable_mask;
 
-    if (!i2c::masterTransmitBlocking(i2c_, ADDRESS, data | enable_mask))
+    if (!i2c::masterTransmitBlocking(i2c_, ADDRESS, data | enable_mask, TIMEOUT_MS))
     {
         return false;
     }
 
     utils::sleepUsec(timer_, DELAY_US);
 
-    if (!i2c::masterTransmitBlocking(i2c_, ADDRESS, data & enable_clear_mask))
+    if (!i2c::masterTransmitBlocking(i2c_, ADDRESS, data & enable_clear_mask, TIMEOUT_MS))
     {
         return false;
     }
