@@ -109,16 +109,15 @@ int main()
     constexpr I2C sht31_i2c = I2C::I2C_1;
     command_executor.addCommand(std::make_unique<SHT31Command>(sht31_i2c));
 
+    irq::enableInterrupts();
+
     // Display
-    utils::sleepMsec(3000);
     LCD1602Driver display{I2C::I2C_1, TIM2};
     const bool display_initialized = display.initialize();
     if (!display_initialized)
     {
         io::printSyncFmt("LCD1602 Initialization failed\n");
     }
-
-    irq::enableInterrupts();
 
     io::printSyncFmt("--- Device is ready ---\n");
 
