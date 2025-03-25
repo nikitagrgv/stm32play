@@ -27,6 +27,7 @@ bool LCD1602Driver::initialize()
 
     constexpr uint8_t BACKLIGHT_MASK = backlight_ << BACKLIGHT_BIT_POS;
 
+    // Setup 4-bit mode
     utils::sleepMsec(15);
     trigger(0b11'0000 | BACKLIGHT_MASK);
     utils::sleepMsec(5);
