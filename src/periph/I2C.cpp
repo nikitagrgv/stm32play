@@ -1,6 +1,7 @@
 #include "I2C.h"
 
 #include "DeviceCMSIS.h"
+#include "core/Globals.h"
 
 namespace
 {
@@ -22,7 +23,8 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
 {
     I2C_TypeDef *i2c_reg = get_i2c_register(i2c);
 
-    glob::
+    const uint32_t bus_frequency = glob::APB1_PERIPH_CLOCK;
+    const uint32_t bus_frequency_mhz = bus_frequency / 1'000'000;
 
     i2c_reg->CR1 = 0;
     i2c_reg->CR1 = I2C_CR1_ACK;
@@ -35,5 +37,3 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
     i2c_reg->FLTR = 0;
     i2c_reg->CR1 |= I2C_CR1_PE;
 }
-
-
