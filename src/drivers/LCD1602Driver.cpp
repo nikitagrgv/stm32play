@@ -34,8 +34,7 @@ bool LCD1602Driver::initialize()
     trigger(0b11'0000);
     utils::sleepMsec(1);
 
-    trigger(0b10'0000);
-    utils::sleepMsec(20);
+    returnHome();
 
     run_command(0b101000, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
@@ -69,7 +68,15 @@ bool LCD1602Driver::print(const char *str)
     return true;
 }
 
-bool LCD1602Driver::returnHome() {}
+bool LCD1602Driver::returnHome()
+{
+    if (!trigger(0b10'0000))
+    {
+        return false;
+    }
+    utils::sleepMsec(2);
+    return true;
+}
 
 bool LCD1602Driver::put_data(uint8_t data)
 {
