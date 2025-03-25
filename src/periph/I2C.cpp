@@ -45,6 +45,7 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
 
     const uint32_t max_trise_time_ns = get_max_trise_time_ns(speed);
     const uint32_t trise = max_trise_time_ns * bus_frequency_mhz / 1'000 + 1;
+    MICRO_ASSERT(trise < 1 << 6);
 
     i2c_reg->CR1 = 0;
     i2c_reg->CR1 = I2C_CR1_ACK;
