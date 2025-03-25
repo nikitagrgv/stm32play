@@ -118,6 +118,10 @@ int main()
     {
         io::printSyncFmt("LCD1602 Initialization failed\n");
     }
+    else
+    {
+        display.print("Initialized");
+    }
 
     io::printSyncFmt("--- Device is ready ---\n");
 
