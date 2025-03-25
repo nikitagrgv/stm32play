@@ -92,7 +92,7 @@ private:
     bool cursor_blinking_enabled_{true};
 
     MoveDirection cursor_direction_{MoveDirection::Increment};
-    bool display_shifting_enabled_{false};
+    bool display_shift_enabled_{false};
 
     I2C i2c_;
     TIM_TypeDef *timer_;
