@@ -30,7 +30,7 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
 
     i2c_reg->CR1 = 0;
     i2c_reg->CR1 = I2C_CR1_ACK;
-    i2c_reg->CR2 = (42 << I2C_CR2_FREQ_Pos);
+    i2c_reg->CR2 = (bus_frequency_mhz << I2C_CR2_FREQ_Pos);
     i2c_reg->OAR1 = 0;
     i2c_reg->OAR2 = 0;
     i2c_reg->SR1 = 0;
