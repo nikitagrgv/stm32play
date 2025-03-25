@@ -36,13 +36,13 @@ public:
     void setFont(Font font);
 
     bool isDisplayEnabled() const { return display_enabled_; }
-    void setDisplayEnabled();
+    void setDisplayEnabled(bool enabled);
 
     bool isCursorEnabled() const { return cursor_enabled_; }
-    void setCursorEnabled();
+    void setCursorEnabled(bool enabled);
 
     bool isCursorBlinkingEnabled() const { return cursor_blinking_enabled_; }
-    void setCursorBlinkingEnabled();
+    void setCursorBlinkingEnabled(bool enabled);
 
     bool returnHome();
 

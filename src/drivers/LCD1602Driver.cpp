@@ -103,11 +103,35 @@ void LCD1602Driver::setFont(Font font)
     update_function_set();
 }
 
-void LCD1602Driver::setDisplayEnabled() {}
+void LCD1602Driver::setDisplayEnabled(bool enabled)
+{
+    if (display_enabled_ == enabled)
+    {
+        return;
+    }
+    display_enabled_ = enabled;
+    update_display_control();
+}
 
-void LCD1602Driver::setCursorEnabled() {}
+void LCD1602Driver::setCursorEnabled(bool enabled)
+{
+    if (cursor_enabled_ == enabled)
+    {
+        return;
+    }
+    cursor_enabled_ = enabled;
+    update_display_control();
+}
 
-void LCD1602Driver::setCursorBlinkingEnabled() {}
+void LCD1602Driver::setCursorBlinkingEnabled(bool enabled)
+{
+    if (cursor_blinking_enabled_ == enabled)
+    {
+        return;
+    }
+    cursor_blinking_enabled_ = enabled;
+    update_display_control();
+}
 
 bool LCD1602Driver::returnHome()
 {
