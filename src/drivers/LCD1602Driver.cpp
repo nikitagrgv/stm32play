@@ -157,6 +157,6 @@ void LCD1602Driver::update_display_control()
     uint8_t data = 1 << 5;
     data |= (uint8_t)font_ << FONT_BIT_POS;
     data |= (uint8_t)lines_mode_ << NUM_LINES_BIT_POS;
-    run_command(0b10'1000, RWMode::Write, RSMode::Command);
+    run_command(data, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
 }
