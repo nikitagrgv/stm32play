@@ -35,6 +35,15 @@ public:
     Font getFont() const { return font_; }
     void setFont(Font font);
 
+    bool isDisplayEnabled() const { return display_enabled_; }
+    void setDisplayEnabled();
+
+    bool isCursorEnabled() const { return cursor_enabled_; }
+    void setCursorEnabled();
+
+    bool isCursorBlinkingEnabled() const { return cursor_blinking_enabled_; }
+    void setCursorBlinkingEnabled();
+
     bool returnHome();
 
 private:
@@ -62,6 +71,7 @@ private:
     void short_delay();
 
     void update_backlight();
+    void update_function_set();
     void update_display_control();
 
 private:
@@ -72,7 +82,7 @@ private:
 
     bool display_enabled_{true};
     bool cursor_enabled_{true};
-    bool cursor_blink_enabled_{true};
+    bool cursor_blinking_enabled_{true};
 
     I2C i2c_;
     TIM_TypeDef *timer_;

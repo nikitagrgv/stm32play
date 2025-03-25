@@ -16,6 +16,10 @@ constexpr uint8_t BACKLIGHT_BIT_POS = 3;
 constexpr uint8_t NUM_LINES_BIT_POS = 3;
 constexpr uint8_t FONT_BIT_POS = 2;
 
+constexpr uint8_t DISPLAY_ON_BIT_POS = 2;
+constexpr uint8_t CURSOR_ON_BIT_POS = 1;
+constexpr uint8_t CURSOR_BLINKING_ON_BIT_POS = 0;
+
 } // namespace
 
 LCD1602Driver::LCD1602Driver(I2C i2c, TIM_TypeDef *timer)
@@ -42,7 +46,7 @@ bool LCD1602Driver::initialize()
     trigger(0b10'0000);
     utils::sleepMsec(1);
 
-    update_display_control();
+    update_function_set();
     run_command(0b1000, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
     run_command(0b1, RWMode::Write, RSMode::Command);
@@ -90,7 +94,7 @@ void LCD1602Driver::setLinesMode(LinesMode lines_mode)
         return;
     }
     lines_mode_ = lines_mode;
-    update_display_control();
+    update_function_set();
 }
 
 void LCD1602Driver::setFont(Font font)
@@ -100,8 +104,14 @@ void LCD1602Driver::setFont(Font font)
         return;
     }
     font_ = font;
-    update_display_control();
+    update_function_set();
 }
+
+void LCD1602Driver::setDisplayEnabled() {}
+
+void LCD1602Driver::setCursorEnabled() {}
+
+void LCD1602Driver::setCursorBlinkingEnabled() {}
 
 bool LCD1602Driver::returnHome()
 {
@@ -172,6 +182,15 @@ void LCD1602Driver::short_delay()
 void LCD1602Driver::update_backlight()
 {
     put_data(0xFF);
+}
+
+void LCD1602Driver::update_function_set()
+{
+    uint8_t data = 1 << 5;
+    data |= (uint8_t)font_ << FONT_BIT_POS;
+    data |= (uint8_t)lines_mode_ << NUM_LINES_BIT_POS;
+    run_command(data, RWMode::Write, RSMode::Command);
+    short_delay();
 }
 
 void LCD1602Driver::update_display_control()
