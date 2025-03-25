@@ -13,7 +13,6 @@ public:
     };
 
     explicit SHT31Driver(I2C i2c);
-    ~SHT31Driver();
 
     ErrorCode run(float &temperature, float &humidity);
 
