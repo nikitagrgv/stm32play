@@ -25,6 +25,7 @@
 #include "utils/DataStream.h"
 #include "utils/FixedBitset.h"
 
+#include <cstdio>
 #include <cstdlib>
 #include <memory>
 
@@ -158,6 +159,11 @@ int main()
             if (sht31.run(temp, hum) == SHT31Driver::ErrorCode::Success)
             {
                 display.clear();
+
+                constexpr int BUFFER_SIZE = 64;
+                char buffer[BUFFER_SIZE];
+                snprintf(buffer, BUFFER_SIZE, "T=%f\nH=%f", temp, hum);
+                display.print(buffer);
             }
         }
 
