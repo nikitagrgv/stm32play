@@ -109,7 +109,7 @@ bool LCD1602Driver::returnHome()
     {
         return false;
     }
-    utils::sleepMsec(2);
+    short_delay();
     return true;
 }
 
@@ -119,7 +119,7 @@ bool LCD1602Driver::put_data(uint8_t data)
     {
         data |= 1 << BACKLIGHT_BIT_POS;
     }
-    utils::sleepUsec(timer_, DELAY_US);
+    short_delay();
     return i2c::masterTransmitBlocking(i2c_, ADDRESS, data, TIMEOUT_MS);
 }
 
@@ -164,6 +164,11 @@ bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs)
     return true;
 }
 
+void LCD1602Driver::short_delay()
+{
+    utils::sleepUsec(timer_, DELAY_US);
+}
+
 void LCD1602Driver::update_backlight()
 {
     put_data(0xFF);
@@ -175,5 +180,5 @@ void LCD1602Driver::update_display_control()
     data |= (uint8_t)font_ << FONT_BIT_POS;
     data |= (uint8_t)lines_mode_ << NUM_LINES_BIT_POS;
     run_command(data, RWMode::Write, RSMode::Command);
-    utils::sleepUsec(timer_, DELAY_US);
+    short_delay();
 }

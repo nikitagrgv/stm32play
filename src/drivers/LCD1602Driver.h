@@ -59,6 +59,8 @@ private:
     bool trigger(uint8_t data);
     bool run_command(uint8_t data, RWMode rw, RSMode rs);
 
+    void short_delay();
+
     void update_backlight();
     void update_display_control();
 
