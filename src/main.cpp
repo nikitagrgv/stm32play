@@ -155,12 +155,14 @@ int main()
 
     rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::TIM_2);
 
+    // Led
     constexpr Pin led_pin{GPIOPort::C, 13};
+    gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
+    // User key
     constexpr Pin user_key{GPIOPort::A, 0};
     gpio::configureInput(user_key, gpio::PullMode::Up);
 
-    gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
 
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
