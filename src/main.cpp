@@ -401,7 +401,7 @@ int main()
                         lcd_init(&my_lcd, address, 4, 5, i2c);
 
                         utils::sleepMsec(1);
-                        runLcdCommand(i2c, address, 't', RWMode::Write, RSMode::Data);
+                        runLcdCommand(i2c, address, 'T', RWMode::Write, RSMode::Data);
                         utils::sleepMsec(1);
                         runLcdCommand(i2c, address, 'h', RWMode::Write, RSMode::Data);
                         utils::sleepMsec(1);
