@@ -72,13 +72,12 @@ bool LCD1602Driver::print(const char *str)
 
 bool LCD1602Driver::put_data(uint8_t data)
 {
+    utils::sleepUsec(timer_, DELAY_US);
     return i2c::masterTransmitBlocking(i2c_, ADDRESS, data, TIMEOUT_MS);
 }
 
 bool LCD1602Driver::trigger(uint8_t data)
 {
-    utils::sleepUsec(timer_, DELAY_US);
-
     constexpr uint8_t enable_mask = 1 << ENABLE_BIT_POS;
     constexpr uint8_t enable_clear_mask = ~enable_mask;
 
@@ -86,8 +85,6 @@ bool LCD1602Driver::trigger(uint8_t data)
     {
         return false;
     }
-
-    utils::sleepUsec(timer_, DELAY_US);
 
     if (!put_data(data & enable_clear_mask))
     {
