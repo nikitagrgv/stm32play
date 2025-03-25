@@ -18,6 +18,12 @@ public:
         Font5x10 = 1,
     };
 
+    enum class ShiftDirection
+    {
+        Decrement = 0,
+        Increment = 1,
+    };
+
 public:
     LCD1602Driver(I2C i2c, TIM_TypeDef *timer);
 
