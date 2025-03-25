@@ -45,7 +45,7 @@ public:
     bool setCursorBlinkingEnabled(bool enabled);
 
     bool returnHome();
-
+    bool clearDisplay();
 
 private:
     enum class RWMode : uint8_t

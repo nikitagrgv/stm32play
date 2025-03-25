@@ -143,6 +143,16 @@ bool LCD1602Driver::returnHome()
     return true;
 }
 
+bool LCD1602Driver::clearDisplay()
+{
+    if (!run_command(0b1, RWMode::Write, RSMode::Command))
+    {
+        return false;
+    }
+    short_delay();
+    return true;
+}
+
 bool LCD1602Driver::put_data(uint8_t data)
 {
     if (backlight_)
