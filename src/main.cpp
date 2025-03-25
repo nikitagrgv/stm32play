@@ -118,7 +118,7 @@ void runLcdCommand(I2C i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs,
     triggerLcd(i2c, address, low);
 }
 
-bool runLcd(I2C i2c, I2C_TypeDef *i2c_reg)
+bool runLcd(I2C i2c)
 {
     rcc::enableClocks(rcc::I2C_1);
 
@@ -273,10 +273,8 @@ int main()
                     }
                     else
                     {
-                        I2C_TypeDef *i2c = I2C1;
                         const uint8_t address = 0x27;
-
-                        runLcd(I2C::I2C_1, i2c);
+                        runLcd(I2C::I2C_1);
                         //
                         // LCD my_lcd;
                         // lcd_init(&my_lcd, address, 4, 5, i2c);
