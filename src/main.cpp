@@ -48,7 +48,7 @@ bool checkSht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
 
     constexpr uint8_t sht31_address = 0x44;
     const uint8_t transmit_data[2] = {0x2C, 0x10};
-    masterTransmit(i2c, sht31_address, transmit_data, 2);
+    i2c::masterTransmitBlocking(i2c, sht31_address, transmit_data, 2);
 
     uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
     masterReceive(i2c, sht31_address, receive_data, 6);
@@ -85,7 +85,7 @@ enum class RSMode : uint8_t
 
 constexpr int FAST_DELAY_US = 80;
 
-void triggerLcd(I2C_TypeDef *i2c, uint8_t address, uint8_t data)
+void triggerLcd(I2C i2c, uint8_t address, uint8_t data)
 {
     utils::sleepUsec(TIM2, FAST_DELAY_US);
 
@@ -93,15 +93,15 @@ void triggerLcd(I2C_TypeDef *i2c, uint8_t address, uint8_t data)
     constexpr uint8_t enable_clear_mask = ~enable_mask;
 
     uint8_t transmit_data = data | enable_mask;
-    masterTransmit(i2c, address, &transmit_data, 1);
+    i2c::masterTransmitBlocking(i2c, address, &transmit_data, 1);
 
     utils::sleepUsec(TIM2, FAST_DELAY_US);
 
     transmit_data = data & enable_clear_mask;
-    masterTransmit(i2c, address, &transmit_data, 1);
+    i2c::masterTransmitBlocking(i2c, address, &transmit_data, 1);
 }
 
-void runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs, bool backlight = true)
+void runLcdCommand(I2C i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs, bool backlight = true)
 {
     uint8_t base_mask = 0;
     base_mask |= (uint8_t)rw << 1;
@@ -118,7 +118,7 @@ void runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, R
     triggerLcd(i2c, address, low);
 }
 
-bool runLcd(I2C i2cc, I2C_TypeDef *i2c)
+bool runLcd(I2C i2c, I2C_TypeDef *i2c_reg)
 {
     rcc::enableClocks(rcc::I2C_1);
 
@@ -128,14 +128,14 @@ bool runLcd(I2C i2cc, I2C_TypeDef *i2c)
     gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
     gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
 
-    i2c::setupI2C(i2cc);
+    i2c::setupI2C(i2c);
 
     utils::sleepMsec(1);
 
     constexpr uint8_t address = 0x27;
 
     const uint8_t clear_data = 0x00;
-    masterTransmit(i2c, address, &clear_data, 1);
+    i2c::masterTransmitBlocking(i2c, address, &clear_data, 1);
 
     constexpr uint8_t BACKLIGHT_BIT = 1 << 3;
 
