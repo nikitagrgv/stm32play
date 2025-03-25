@@ -9,7 +9,7 @@
 #include "core/Globals.h"
 #include "debug/Statistic.h"
 #include "drivers/DHT11Driver.h"
-#include "drivers/LCD1602.h"
+#include "drivers/LCD1602Driver.h"
 #include "low_level/clock.h"
 #include "periph/EXTI.h"
 #include "periph/GPIO.h"

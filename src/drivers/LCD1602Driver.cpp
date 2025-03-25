@@ -1,5 +1,4 @@
-#include "LCD1602.h"
-
+#include "LCD1602Driver.h"
 #include "Sleep.h"
 #include "periph/GPIO.h"
 #include "periph/PeriphBase.h"
