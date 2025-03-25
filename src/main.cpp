@@ -10,6 +10,7 @@
 #include "debug/Statistic.h"
 #include "drivers/DHT11Driver.h"
 #include "drivers/LCD1602Driver.h"
+#include "drivers/SHT31Driver.h"
 #include "low_level/clock.h"
 #include "periph/EXTI.h"
 #include "periph/GPIO.h"
@@ -75,6 +76,7 @@ int main()
     io::setPrintUsart(USART1);
 
     // I2C1
+    I2C main_i2c = I2C::I2C_1;
     rcc::enableClocks(rcc::I2C_1);
 
     constexpr Pin scl_pin{GPIOPort::B, 8};
@@ -82,7 +84,7 @@ int main()
     gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
     gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
 
-    i2c::setupI2C(I2C::I2C_1);
+    i2c::setupI2C(main_i2c);
 
     // Handlers
     irq::setHandler(InterruptType::SysTickIRQ, [](void *) {
@@ -106,13 +108,12 @@ int main()
     TIM_TypeDef *dht_timer = TIM2;
     command_executor.addCommand(std::make_unique<DHT11Command>(dht_pin, dht_timer));
 
-    constexpr I2C sht31_i2c = I2C::I2C_1;
-    command_executor.addCommand(std::make_unique<SHT31Command>(sht31_i2c));
+    command_executor.addCommand(std::make_unique<SHT31Command>(main_i2c));
 
     irq::enableInterrupts();
 
     // Display
-    LCD1602Driver display{I2C::I2C_1, TIM2};
+    LCD1602Driver display{main_i2c, TIM2};
     const bool display_initialized = display.initialize();
     if (display_initialized)
     {
@@ -152,6 +153,12 @@ int main()
         if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
         {
             last_temperature_update_time = cur_time;
+            SHT31Driver sht31{main_i2c};
+            float temp, hum;
+            if (sht31.run(temp, hum) == SHT31Driver::ErrorCode::Success)
+            {
+                display.clear();
+            }
         }
 
         uint8_t byte;

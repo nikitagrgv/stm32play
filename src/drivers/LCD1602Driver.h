@@ -30,7 +30,7 @@ public:
     bool initialize();
 
     bool returnHome();
-    bool clearDisplay();
+    bool clear();
 
     bool shiftCursorLeft(int distance = 1);
     bool shiftCursorRight(int distance = 1);

@@ -54,7 +54,7 @@ bool LCD1602Driver::initialize()
 
     update_function_set();
     update_display_control();
-    clearDisplay();
+    clear();
     update_entry_mode();
 
     return true;
@@ -70,7 +70,7 @@ bool LCD1602Driver::returnHome()
     return true;
 }
 
-bool LCD1602Driver::clearDisplay()
+bool LCD1602Driver::clear()
 {
     if (!run_command(0b1, RWMode::Write, RSMode::Command))
     {
