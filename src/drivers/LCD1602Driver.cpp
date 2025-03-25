@@ -57,6 +57,26 @@ bool LCD1602Driver::initialize()
     return true;
 }
 
+bool LCD1602Driver::returnHome()
+{
+    if (!run_command(0b10, RWMode::Write, RSMode::Command))
+    {
+        return false;
+    }
+    utils::sleepMsec(timer_, 2);
+    return true;
+}
+
+bool LCD1602Driver::clearDisplay()
+{
+    if (!run_command(0b1, RWMode::Write, RSMode::Command))
+    {
+        return false;
+    }
+    utils::sleepMsec(timer_, 5);
+    return true;
+}
+
 bool LCD1602Driver::print(char ch)
 {
     return run_command(ch, RWMode::Write, RSMode::Data);
@@ -150,26 +170,6 @@ bool LCD1602Driver::setDisplayShiftEnabled(bool enabled)
     }
     display_shift_enabled_ = enabled;
     return update_entry_mode();
-}
-
-bool LCD1602Driver::returnHome()
-{
-    if (!run_command(0b10, RWMode::Write, RSMode::Command))
-    {
-        return false;
-    }
-    utils::sleepMsec(timer_, 2);
-    return true;
-}
-
-bool LCD1602Driver::clearDisplay()
-{
-    if (!run_command(0b1, RWMode::Write, RSMode::Command))
-    {
-        return false;
-    }
-    utils::sleepMsec(timer_, 5);
-    return true;
 }
 
 bool LCD1602Driver::put_data(uint8_t data)

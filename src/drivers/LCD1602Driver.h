@@ -29,6 +29,9 @@ public:
 
     bool initialize();
 
+    bool returnHome();
+    bool clearDisplay();
+
     bool print(char ch);
     bool print(const char *str);
 
@@ -55,9 +58,6 @@ public:
 
     bool isDisplayShiftEnabled() const { return display_shift_enabled_; }
     bool setDisplayShiftEnabled(bool enabled);
-
-    bool returnHome();
-    bool clearDisplay();
 
 private:
     enum class RWMode : uint8_t
