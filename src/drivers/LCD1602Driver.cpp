@@ -73,64 +73,64 @@ bool LCD1602Driver::print(const char *str)
     return true;
 }
 
-void LCD1602Driver::setBacklightEnabled(bool backlight)
+bool LCD1602Driver::setBacklightEnabled(bool backlight)
 {
     if (backlight_ == backlight)
     {
-        return;
+        return true;
     }
     backlight_ = backlight;
-    update_backlight();
+    return update_backlight();
 }
 
-void LCD1602Driver::setLinesMode(LinesMode lines_mode)
+bool LCD1602Driver::setLinesMode(LinesMode lines_mode)
 {
     if (lines_mode_ == lines_mode)
     {
-        return;
+        return true;
     }
     lines_mode_ = lines_mode;
-    update_function_set();
+    return update_function_set();
 }
 
-void LCD1602Driver::setFont(Font font)
+bool LCD1602Driver::setFont(Font font)
 {
     if (font_ == font)
     {
-        return;
+        return true;
     }
     font_ = font;
     update_function_set();
 }
 
-void LCD1602Driver::setDisplayEnabled(bool enabled)
+bool LCD1602Driver::setDisplayEnabled(bool enabled)
 {
     if (display_enabled_ == enabled)
     {
-        return;
+        return true;
     }
     display_enabled_ = enabled;
-    update_display_control();
+    return update_display_control();
 }
 
-void LCD1602Driver::setCursorEnabled(bool enabled)
+bool LCD1602Driver::setCursorEnabled(bool enabled)
 {
     if (cursor_enabled_ == enabled)
     {
-        return;
+        return true;
     }
     cursor_enabled_ = enabled;
-    update_display_control();
+    return update_display_control();
 }
 
-void LCD1602Driver::setCursorBlinkingEnabled(bool enabled)
+bool LCD1602Driver::setCursorBlinkingEnabled(bool enabled)
 {
     if (cursor_blinking_enabled_ == enabled)
     {
-        return;
+        return true;
     }
     cursor_blinking_enabled_ = enabled;
-    update_display_control();
+    return update_display_control();
 }
 
 bool LCD1602Driver::returnHome()
@@ -199,26 +199,34 @@ void LCD1602Driver::short_delay()
     utils::sleepUsec(timer_, DELAY_US);
 }
 
-void LCD1602Driver::update_backlight()
+bool LCD1602Driver::update_backlight()
 {
-    put_data(0xFF);
+    return put_data(0xFF);
 }
 
-void LCD1602Driver::update_function_set()
+bool LCD1602Driver::update_function_set()
 {
     uint8_t data = 1 << 5;
     data |= (uint8_t)font_ << FONT_BIT_POS;
     data |= (uint8_t)lines_mode_ << NUM_LINES_BIT_POS;
-    run_command(data, RWMode::Write, RSMode::Command);
+    if (!run_command(data, RWMode::Write, RSMode::Command))
+    {
+        return false;
+    }
     short_delay();
+    return true;
 }
 
-void LCD1602Driver::update_display_control()
+bool LCD1602Driver::update_display_control()
 {
     uint8_t data = 1 << 3;
     data |= (uint8_t)display_enabled_ << DISPLAY_ON_BIT_POS;
     data |= (uint8_t)cursor_enabled_ << CURSOR_ON_BIT_POS;
     data |= (uint8_t)cursor_blinking_enabled_ << CURSOR_BLINKING_ON_BIT_POS;
-    run_command(data, RWMode::Write, RSMode::Command);
+    if (!run_command(data, RWMode::Write, RSMode::Command))
+    {
+        return false;
+    }
     short_delay();
+    return true;
 }

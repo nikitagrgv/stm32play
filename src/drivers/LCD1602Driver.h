@@ -27,24 +27,25 @@ public:
     bool print(const char *str);
 
     bool isBacklightEnabled() const { return backlight_; }
-    void setBacklightEnabled(bool backlight);
+    bool setBacklightEnabled(bool backlight);
 
     LinesMode getLinesMode() const { return lines_mode_; }
-    void setLinesMode(LinesMode lines_mode);
+    bool setLinesMode(LinesMode lines_mode);
 
     Font getFont() const { return font_; }
-    void setFont(Font font);
+    bool setFont(Font font);
 
     bool isDisplayEnabled() const { return display_enabled_; }
-    void setDisplayEnabled(bool enabled);
+    bool setDisplayEnabled(bool enabled);
 
     bool isCursorEnabled() const { return cursor_enabled_; }
-    void setCursorEnabled(bool enabled);
+    bool setCursorEnabled(bool enabled);
 
     bool isCursorBlinkingEnabled() const { return cursor_blinking_enabled_; }
-    void setCursorBlinkingEnabled(bool enabled);
+    bool setCursorBlinkingEnabled(bool enabled);
 
     bool returnHome();
+
 
 private:
     enum class RWMode : uint8_t
@@ -70,9 +71,9 @@ private:
 
     void short_delay();
 
-    void update_backlight();
-    void update_function_set();
-    void update_display_control();
+    bool update_backlight();
+    bool update_function_set();
+    bool update_display_control();
 
 private:
     bool backlight_ = true;
