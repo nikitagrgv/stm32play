@@ -160,7 +160,7 @@ int main()
             {
                 display.clear();
 
-                constexpr int BUFFER_SIZE = 64;
+                constexpr int BUFFER_SIZE = 16;
                 char buffer[BUFFER_SIZE];
 
                 display.goHome();
