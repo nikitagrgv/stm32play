@@ -213,7 +213,6 @@ int main()
                 {
                     io::printSyncFmt("User key pressed\n");
 
-                    const uint8_t address = 0x27;
                     runLcd(I2C::I2C_1);
                     //
                     // LCD my_lcd;
