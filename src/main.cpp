@@ -135,7 +135,7 @@ bool runLcd(I2C i2c)
     constexpr uint8_t address = 0x27;
 
     const uint8_t clear_data = 0x00;
-    i2c::masterTransmitBlocking(i2c, address, &clear_data, 1);
+    i2c::masterTransmitBlocking(i2c, address, clear_data);
 
     constexpr uint8_t BACKLIGHT_BIT = 1 << 3;
 
