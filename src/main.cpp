@@ -93,12 +93,12 @@ void triggerLcd(I2C i2c, uint8_t address, uint8_t data)
     constexpr uint8_t enable_clear_mask = ~enable_mask;
 
     uint8_t transmit_data = data | enable_mask;
-    i2c::masterTransmitBlocking(i2c, address, &transmit_data, 1);
+    i2c::masterTransmitBlocking(i2c, address, transmit_data);
 
     utils::sleepUsec(TIM2, FAST_DELAY_US);
 
     transmit_data = data & enable_clear_mask;
-    i2c::masterTransmitBlocking(i2c, address, &transmit_data, 1);
+    i2c::masterTransmitBlocking(i2c, address, transmit_data);
 }
 
 void runLcdCommand(I2C i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs, bool backlight = true)
