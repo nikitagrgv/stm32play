@@ -151,7 +151,7 @@ bool LCD1602Driver::clearDisplay()
     {
         return false;
     }
-    short_delay();
+    utils::sleepMsec(timer_, 5);
     return true;
 }
 
