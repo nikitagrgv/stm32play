@@ -80,22 +80,22 @@ bool LCD1602Driver::clearDisplay()
     return true;
 }
 
-bool LCD1602Driver::shiftCursorLeft()
+bool LCD1602Driver::shiftCursorLeft(int distance)
 {
     return cursor_or_display_shift(MoveDirection::Left, false);
 }
 
-bool LCD1602Driver::shiftCursorRight()
+bool LCD1602Driver::shiftCursorRight(int distance)
 {
     return cursor_or_display_shift(MoveDirection::Right, false);
 }
 
-bool LCD1602Driver::shiftDisplayLeft()
+bool LCD1602Driver::shiftDisplayLeft(int distance)
 {
     return cursor_or_display_shift(MoveDirection::Left, true);
 }
 
-bool LCD1602Driver::shiftDisplayRight()
+bool LCD1602Driver::shiftDisplayRight(int distance)
 {
     return cursor_or_display_shift(MoveDirection::Right, true);
 }
@@ -291,10 +291,17 @@ bool LCD1602Driver::update_entry_mode()
     return run_command_extra_delay(data, RWMode::Write, RSMode::Command);
 }
 
-bool LCD1602Driver::cursor_or_display_shift(MoveDirection direction, bool is_display)
+bool LCD1602Driver::cursor_or_display_shift(MoveDirection direction, bool is_display, int distance)
 {
     uint8_t data = 1 << 4;
     data |= (uint8_t)direction << SHIFT_RIGHT_OR_LEFT_BIT_POS;
     data |= (uint8_t)is_display << DISPLAY_OR_CURSOR_BIT_POS;
-    return run_command_extra_delay(data, RWMode::Write, RSMode::Command);
+    for (int i = 0; i < distance; ++i)
+    {
+        if (!run_command_extra_delay(data, RWMode::Write, RSMode::Command))
+        {
+            return false;
+        }
+    }
+    return true;
 }

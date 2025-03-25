@@ -32,11 +32,11 @@ public:
     bool returnHome();
     bool clearDisplay();
 
-    bool shiftCursorLeft();
-    bool shiftCursorRight();
+    bool shiftCursorLeft(int distance = 1);
+    bool shiftCursorRight(int distance = 1);
 
-    bool shiftDisplayLeft();
-    bool shiftDisplayRight();
+    bool shiftDisplayLeft(int distance = 1);
+    bool shiftDisplayRight(int distance = 1);
 
     bool print(char ch);
     bool print(const char *str);
@@ -95,7 +95,7 @@ private:
     bool update_display_control();
     bool update_entry_mode();
 
-    bool cursor_or_display_shift(MoveDirection direction, bool is_display);
+    bool cursor_or_display_shift(MoveDirection direction, bool is_display, int distance);
 
 private:
     bool backlight_ = true;
