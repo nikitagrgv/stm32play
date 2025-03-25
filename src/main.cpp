@@ -207,7 +207,7 @@ enum class RSMode : uint8_t
     Data = 1
 };
 
-constexpr int FAST_DELAY_US = 100;
+constexpr int FAST_DELAY_US = 80;
 
 void triggerLcd(I2C_TypeDef *i2c, uint8_t address, uint8_t data)
 {
@@ -236,6 +236,7 @@ void runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, R
     const uint8_t data_mask_low = (data << 4) & 0xF0;
 
     triggerLcd(i2c, address, base_mask | data_mask_high);
+    utils::sleepUsec(TIM2, FAST_DELAY_US);
     triggerLcd(i2c, address, base_mask | data_mask_low);
 }
 
