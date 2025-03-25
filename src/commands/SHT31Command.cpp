@@ -34,7 +34,7 @@ bool SHT31Command::execute(const char *args)
         return true;
     }
 
-    io::printSyncFmt("T = %f, H = %f\n", temperature, humidity);
+    io::printSyncFmt("SHT31: T = %f, H = %f\n", temperature, humidity);
 
     return true;
 }
