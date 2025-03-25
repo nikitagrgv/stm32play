@@ -3,7 +3,7 @@
 #include "core/Base.h"
 #include "core/MicroAssert.h"
 
-enum class GPIOPort
+enum class GPIOPort : uint8_t
 {
     A = 0,
     B = 1,
@@ -12,7 +12,7 @@ enum class GPIOPort
     E = 4,
 };
 
-enum class USART
+enum class USART : uint8_t
 {
     USART_1,
     USART_2,
@@ -22,14 +22,14 @@ enum class USART
 #endif
 };
 
-enum class I2C
+enum class I2C : uint8_t
 {
     I2C_1,
     I2C_2,
     I2C_3,
 };
 
-enum class InterruptType
+enum class InterruptType : uint8_t
 {
     SysTickIRQ = 0,
 
@@ -65,5 +65,5 @@ struct Pin
     FORCE_INLINE constexpr bool isValid() const { return num >= 0 && num < 16; }
 
     GPIOPort port{GPIOPort::A};
-    int num{0};
+    uint8_t num{0};
 };
