@@ -216,7 +216,7 @@ void triggerLcd(I2C_TypeDef *i2c, uint8_t address, uint8_t data)
     constexpr uint8_t enable_mask = 1 << 2;
     constexpr uint8_t enable_clear_mask = ~enable_mask;
 
-    uint8_t transmit_data = data & enable_mask;
+    uint8_t transmit_data = data | enable_mask;
     masterTransmit(i2c, address, &transmit_data, 1);
 
     utils::sleepUsec(TIM2, FAST_DELAY_US);
