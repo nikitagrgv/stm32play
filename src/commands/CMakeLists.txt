@@ -8,4 +8,6 @@ target_sources(${EXECUTABLE_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/DHT11Command.h
         ${CMAKE_CURRENT_SOURCE_DIR}/PrintCommand.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/PrintCommand.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/SHT31Command.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/SHT31Command.h
 )
