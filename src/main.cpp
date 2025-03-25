@@ -141,7 +141,9 @@ int main()
                 if (!user_key_state)
                 {
                     io::printSyncFmt("User key pressed\n");
-                    display.print("Hello!");
+                    display.shiftCursorRight(3);
+
+                    // display.print("Hello!");
                 }
             }
         }

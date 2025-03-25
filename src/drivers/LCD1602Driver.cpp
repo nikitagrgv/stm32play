@@ -82,22 +82,22 @@ bool LCD1602Driver::clearDisplay()
 
 bool LCD1602Driver::shiftCursorLeft(int distance)
 {
-    return cursor_or_display_shift(MoveDirection::Left, false);
+    return cursor_or_display_shift(MoveDirection::Left, false, distance);
 }
 
 bool LCD1602Driver::shiftCursorRight(int distance)
 {
-    return cursor_or_display_shift(MoveDirection::Right, false);
+    return cursor_or_display_shift(MoveDirection::Right, false, distance);
 }
 
 bool LCD1602Driver::shiftDisplayLeft(int distance)
 {
-    return cursor_or_display_shift(MoveDirection::Left, true);
+    return cursor_or_display_shift(MoveDirection::Left, true, distance);
 }
 
 bool LCD1602Driver::shiftDisplayRight(int distance)
 {
-    return cursor_or_display_shift(MoveDirection::Right, true);
+    return cursor_or_display_shift(MoveDirection::Right, true, distance);
 }
 
 bool LCD1602Driver::print(char ch)
