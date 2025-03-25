@@ -6,7 +6,7 @@
 class LCD1602Driver
 {
 public:
-    enum class NumLines : uint8_t
+    enum class LinesMode : uint8_t
     {
         One = 0,
         Two = 1,
@@ -25,6 +25,14 @@ public:
 
     bool print(char ch);
     bool print(const char *str);
+
+    bool isBacklightEnabled() const { return backlight_; }
+    void setBacklightEnabled(bool backlight) { backlight_ = backlight; }
+
+    LinesMode getNumLines() const { return lines_mode_; }
+    void setNumLines(LinesMode num_lines) { lines_mode_ = num_lines; }
+    Font get_font() const { return font_; }
+    void set_font(Font font) { font_ = font; }
 
     bool returnHome();
 
@@ -52,7 +60,7 @@ private:
 
 private:
     bool backlight_ = true;
-    NumLines num_lines_ = NumLines::Two;
+    LinesMode lines_mode_ = LinesMode::Two;
     Font font_ = Font::Font5x8;
 
     I2C i2c_;
