@@ -25,7 +25,7 @@ bool LCD1602Driver::initialize()
         return false;
     }
 
-    constexpr uint8_t BACKLIGHT_BIT = 1 << 3;
+    constexpr uint8_t BACKLIGHT_BIT = 1 << BACKLIGHT_BIT_POS;
 
     utils::sleepMsec(100);
     trigger(0b11'0000 | BACKLIGHT_BIT);
