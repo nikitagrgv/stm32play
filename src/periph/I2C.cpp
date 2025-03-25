@@ -26,6 +26,8 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
     const uint32_t bus_frequency = glob::APB1_PERIPH_CLOCK;
     const uint32_t bus_frequency_mhz = bus_frequency / 1'000'000;
 
+    MICRO_ASSERT(bus_frequency_mhz >= 2 && bus_frequency_mhz <= 50);
+
     i2c_reg->CR1 = 0;
     i2c_reg->CR1 = I2C_CR1_ACK;
     i2c_reg->CR2 = (42 << I2C_CR2_FREQ_Pos);
