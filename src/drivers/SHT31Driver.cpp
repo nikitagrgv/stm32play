@@ -11,10 +11,10 @@ SHT31Driver::ErrorCode SHT31Driver::run(float &temperature, float &humidity)
 {
     constexpr uint8_t sht31_address = 0x44;
     const uint8_t transmit_data[2] = {0x2C, 0x10};
-    i2c::masterTransmitBlocking(i2c_, sht31_address, transmit_data, 2);
+    i2c::masterTransmitBlocking(i2c_, sht31_address, transmit_data, 2, TIMEOUT_MS);
 
     uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
-    i2c::masterReceiveBlocking(i2c_, sht31_address, receive_data, 6);
+    i2c::masterReceiveBlocking(i2c_, sht31_address, receive_data, 6, TIMEOUT_MS);
 
     constexpr uint8_t crc8_poly = 0x31;
     constexpr uint8_t crc8_init = 0xFF;
