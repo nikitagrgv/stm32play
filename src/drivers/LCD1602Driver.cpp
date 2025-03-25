@@ -72,6 +72,21 @@ bool LCD1602Driver::print(const char *str)
     return true;
 }
 
+void LCD1602Driver::setBacklightEnabled(bool backlight)
+{
+    backlight_ = backlight;
+}
+
+void LCD1602Driver::setLinesMode(LinesMode lines_mode)
+{
+    lines_mode_ = lines_mode;
+}
+
+void LCD1602Driver::setFont(Font font)
+{
+    font_ = font;
+}
+
 bool LCD1602Driver::returnHome()
 {
     if (!trigger(0b10'0000))
@@ -133,3 +148,14 @@ bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs)
     }
     return true;
 }
+
+void LCD1602Driver::update_backlight()
+{
+
+}
+
+void LCD1602Driver::update_display_control()
+{
+
+}
+

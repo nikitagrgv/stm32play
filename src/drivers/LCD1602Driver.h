@@ -27,13 +27,13 @@ public:
     bool print(const char *str);
 
     bool isBacklightEnabled() const { return backlight_; }
-    void setBacklightEnabled(bool backlight) { backlight_ = backlight; }
+    void setBacklightEnabled(bool backlight);
 
     LinesMode getLinesMode() const { return lines_mode_; }
-    void setLinesMode(LinesMode lines_mode) { lines_mode_ = lines_mode; }
+    void setLinesMode(LinesMode lines_mode);
 
     Font getFont() const { return font_; }
-    void setFont(Font font) { font_ = font; }
+    void setFont(Font font);
 
     bool returnHome();
 
@@ -58,6 +58,9 @@ private:
     bool put_data(uint8_t data);
     bool trigger(uint8_t data);
     bool run_command(uint8_t data, RWMode rw, RSMode rs);
+
+    void update_backlight();
+    void update_display_control();
 
 private:
     bool backlight_ = true;
