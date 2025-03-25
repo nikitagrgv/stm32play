@@ -31,6 +31,7 @@ private:
     static constexpr uint8_t ADDRESS = 0x27;
 
 private:
+    bool put_data(uint8_t data);
     bool trigger(uint8_t data);
     bool run_command(uint8_t data, RWMode rw, RSMode rs);
 
