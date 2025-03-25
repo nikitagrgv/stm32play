@@ -25,17 +25,17 @@ bool LCD1602Driver::initialize()
         return false;
     }
 
-    constexpr uint8_t BACKLIGHT_BIT = 1 << BACKLIGHT_BIT_POS;
+    constexpr uint8_t BACKLIGHT_MASK = backlight_ << BACKLIGHT_BIT_POS;
 
     utils::sleepMsec(100);
-    trigger(0b11'0000 | BACKLIGHT_BIT);
+    trigger(0b11'0000 | BACKLIGHT_MASK);
     utils::sleepMsec(20);
-    trigger(0b11'0000 | BACKLIGHT_BIT);
+    trigger(0b11'0000 | BACKLIGHT_MASK);
     utils::sleepMsec(20);
-    trigger(0b11'0000 | BACKLIGHT_BIT);
+    trigger(0b11'0000 | BACKLIGHT_MASK);
     utils::sleepMsec(20);
 
-    trigger(0b10'0000 | BACKLIGHT_BIT);
+    trigger(0b10'0000 | BACKLIGHT_MASK);
     utils::sleepMsec(20);
 
     run_command(0b101000, RWMode::Write, RSMode::Command);
