@@ -31,9 +31,11 @@ private:
 
 private:
     bool trigger(uint8_t data);
-    bool run_command(uint8_t data, RWMode rw, RSMode rs, bool backlight = true);
+    bool run_command(uint8_t data, RWMode rw, RSMode rs);
 
 private:
+    bool backlight_ = true;
+
     I2C i2c_;
     TIM_TypeDef *timer_;
 };

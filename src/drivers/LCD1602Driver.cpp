@@ -72,7 +72,7 @@ bool LCD1602Driver::trigger(uint8_t data)
 
     utils::sleepUsec(timer_, DELAY_US);
 
-    if (!i2c::masterTransmitBlocking(i2c_, ADDRESS, data & enable_clear_mask))
+    if (i2c::masterTransmitBlocking(i2c_, ADDRESS, data & enable_clear_mask))
     {
         return false;
     }
@@ -80,12 +80,12 @@ bool LCD1602Driver::trigger(uint8_t data)
     return true;
 }
 
-bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs, bool backlight)
+bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs)
 {
     uint8_t base_mask = 0;
     base_mask |= (uint8_t)rw << 1;
     base_mask |= (uint8_t)rs << 0;
-    base_mask |= (uint8_t)backlight << 3;
+    base_mask |= (uint8_t)backlight_ << 3;
 
     const uint8_t data_mask_high = data & 0xF0;
     const uint8_t data_mask_low = (data << 4) & 0xF0;
