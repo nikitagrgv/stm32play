@@ -276,4 +276,15 @@ bool LCD1602Driver::update_entry_mode()
     return true;
 }
 
-bool LCD1602Driver::cursor_or_display_shift(MoveDirection direction, bool is_display) {}
+bool LCD1602Driver::cursor_or_display_shift(MoveDirection direction, bool is_display)
+{
+    uint8_t data = 1 << 4;
+    data |= (uint8_t)direction << SHIFT_RIGHT_OR_LEFT_BIT_POS;
+    data |= (uint8_t)is_display << DISPLAY_OR_CURSOR_BIT_POS;
+    if (!run_command(data, RWMode::Write, RSMode::Command))
+    {
+        return false;
+    }
+    short_delay();
+    return true;
+}
