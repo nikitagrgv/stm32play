@@ -33,8 +33,8 @@ bool LCD1602Driver::initialize()
     utils::sleepMsec(1);
     trigger(0b11'0000);
     utils::sleepMsec(1);
-
-    returnHome();
+    trigger(0b10'0000);
+    utils::sleepMsec(1);
 
     run_command(0b101000, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
