@@ -22,6 +22,13 @@ enum class USART
 #endif
 };
 
+enum class I2C
+{
+    I2C_1,
+    I2C_2,
+    I2C_3,
+};
+
 enum class InterruptType
 {
     SysTickIRQ = 0,
