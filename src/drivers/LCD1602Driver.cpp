@@ -6,9 +6,11 @@
 namespace
 {
 
+uint32_t READ_WRITE_BIT_POS = 1;
+uint32_t REGISTER_SELECT_BIT_POS = 0;
+uint32_t BACKLIGHT_BIT_POS = 3;
 
-
-}
+} // namespace
 
 LCD1602Driver::LCD1602Driver(I2C i2c, TIM_TypeDef *timer)
     : i2c_(i2c)
@@ -89,9 +91,9 @@ bool LCD1602Driver::trigger(uint8_t data)
 bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs)
 {
     uint8_t base_mask = 0;
-    base_mask |= (uint8_t)rw << 1;
-    base_mask |= (uint8_t)rs << 0;
-    base_mask |= (uint8_t)backlight_ << 3;
+    base_mask |= (uint8_t)rw << READ_WRITE_BIT_POS;
+    base_mask |= (uint8_t)rs << REGISTER_SELECT_BIT_POS;
+    base_mask |= (uint8_t)backlight_ << BACKLIGHT_BIT_POS;
 
     const uint8_t data_mask_high = data & 0xF0;
     const uint8_t data_mask_low = (data << 4) & 0xF0;
