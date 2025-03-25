@@ -13,6 +13,8 @@ public:
     bool print(char ch);
     bool print(const char *str);
 
+    bool returnHome();
+
 private:
     enum class RWMode : uint8_t
     {

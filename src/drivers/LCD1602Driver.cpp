@@ -25,18 +25,16 @@ bool LCD1602Driver::initialize()
         return false;
     }
 
-    const uint8_t BACKLIGHT_MASK = backlight_ << BACKLIGHT_BIT_POS;
-
     // Setup 4-bit mode
     utils::sleepMsec(15);
-    trigger(0b11'0000 | BACKLIGHT_MASK);
+    trigger(0b11'0000);
     utils::sleepMsec(5);
-    trigger(0b11'0000 | BACKLIGHT_MASK);
+    trigger(0b11'0000);
     utils::sleepMsec(1);
-    trigger(0b11'0000 | BACKLIGHT_MASK);
+    trigger(0b11'0000);
     utils::sleepMsec(1);
 
-    trigger(0b10'0000 | BACKLIGHT_MASK);
+    trigger(0b10'0000);
     utils::sleepMsec(20);
 
     run_command(0b101000, RWMode::Write, RSMode::Command);
@@ -71,6 +69,8 @@ bool LCD1602Driver::print(const char *str)
     return true;
 }
 
+bool LCD1602Driver::returnHome() {}
+
 bool LCD1602Driver::put_data(uint8_t data)
 {
     utils::sleepUsec(timer_, DELAY_US);
@@ -81,6 +81,11 @@ bool LCD1602Driver::trigger(uint8_t data)
 {
     constexpr uint8_t enable_mask = 1 << ENABLE_BIT_POS;
     constexpr uint8_t enable_clear_mask = ~enable_mask;
+
+    if (backlight_)
+    {
+        data |= 1 << BACKLIGHT_BIT_POS;
+    }
 
     if (!put_data(data | enable_mask))
     {
@@ -100,7 +105,6 @@ bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs)
     uint8_t base_mask = 0;
     base_mask |= (uint8_t)rw << READ_WRITE_BIT_POS;
     base_mask |= (uint8_t)rs << REGISTER_SELECT_BIT_POS;
-    base_mask |= (uint8_t)backlight_ << BACKLIGHT_BIT_POS;
 
     const uint8_t data_mask_high = data & 0xF0;
     const uint8_t data_mask_low = (data << 4) & 0xF0;
