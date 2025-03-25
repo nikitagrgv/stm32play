@@ -68,7 +68,7 @@ bool i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t
         return true;
     }
 
-    uint32_t end_time = glob::total_msec + timeout_ms;
+    const uint32_t end_time = glob::total_msec + timeout_ms;
     const auto is_timeout = [&] {
         return timeout_ms != -1 && glob::total_msec >= end_time;
     };
