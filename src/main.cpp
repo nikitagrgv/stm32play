@@ -166,8 +166,7 @@ int main()
                 snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
                 display.print(buffer);
 
-                display.goHome();
-                display.shiftCursorRight(LCD1602Driver::SCREEN_WIDTH);
+                display.moveCursorToSecondLine();
 
                 snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
                 display.print(buffer);
