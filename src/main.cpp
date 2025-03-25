@@ -110,12 +110,13 @@ int main()
     command_executor.addCommand(std::make_unique<SHT31Command>(sht31_i2c));
 
     // Display
-    LCD1602Driver display{I2C::I2C_1, TIM2};
-    const bool display_initialized = display.initialize();
-    if (!display_initialized)
-    {
-        io::printSyncFmt("LCD1602 Initialization failed\n");
-    }
+    // utils::sleepMsec(3000);
+    // LCD1602Driver display{I2C::I2C_1, TIM2};
+    // const bool display_initialized = display.initialize();
+    // if (!display_initialized)
+    // {
+    //     io::printSyncFmt("LCD1602 Initialization failed\n");
+    // }
 
     irq::enableInterrupts();
 
@@ -137,7 +138,14 @@ int main()
                 if (!user_key_state)
                 {
                     io::printSyncFmt("User key pressed\n");
-                    display.print("Hello!");
+                    LCD1602Driver display{I2C::I2C_1, TIM2};
+                    const bool display_initialized = display.initialize();
+                    if (!display_initialized)
+                    {
+                        io::printSyncFmt("LCD1602 Initialization failed\n");
+                    }
+
+                    display.print('1');
                 }
             }
         }

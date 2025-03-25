@@ -11,9 +11,7 @@ LCD1602Driver::LCD1602Driver(I2C i2c, TIM_TypeDef *timer)
 
 bool LCD1602Driver::initialize()
 {
-    constexpr uint8_t address = 0x27;
-
-    i2c::masterTransmitBlocking(i2c_, address, 0x00);
+    i2c::masterTransmitBlocking(i2c_, ADDRESS, 0x00);
 
     constexpr uint8_t BACKLIGHT_BIT = 1 << 3;
 
