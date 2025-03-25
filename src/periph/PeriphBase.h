@@ -59,10 +59,10 @@ struct Pin
         : port(port)
         , num(num)
     {
-        MICRO_ASSERT(num >= 0 && num < 16);
+        MICRO_ASSERT(num < 16);
     }
 
-    FORCE_INLINE constexpr bool isValid() const { return num >= 0 && num < 16; }
+    FORCE_INLINE constexpr bool isValid() const { return num < 16; }
 
     GPIOPort port{GPIOPort::A};
     uint8_t num{0};
