@@ -13,31 +13,31 @@ bool LCD1602Driver::initialize()
 {
     constexpr uint8_t address = 0x27;
 
-    i2c::masterTransmitBlocking(i2c, address, 0x00);
+    i2c::masterTransmitBlocking(i2c_, address, 0x00);
 
     constexpr uint8_t BACKLIGHT_BIT = 1 << 3;
 
     utils::sleepMsec(100);
-    triggerLcd(i2c, address, 0b11'0000 | BACKLIGHT_BIT);
+    trigger(0b11'0000 | BACKLIGHT_BIT);
     utils::sleepMsec(20);
-    triggerLcd(i2c, address, 0b11'0000 | BACKLIGHT_BIT);
+    trigger(0b11'0000 | BACKLIGHT_BIT);
     utils::sleepMsec(20);
-    triggerLcd(i2c, address, 0b11'0000 | BACKLIGHT_BIT);
-    utils::sleepMsec(20);
-
-    triggerLcd(i2c, address, 0b10'0000 | BACKLIGHT_BIT);
+    trigger(0b11'0000 | BACKLIGHT_BIT);
     utils::sleepMsec(20);
 
-    runLcdCommand(i2c, address, 0b101000, RWMode::Write, RSMode::Command);
-    utils::sleepMsec(20);
-    runLcdCommand(i2c, address, 0b1000, RWMode::Write, RSMode::Command);
-    utils::sleepMsec(20);
-    runLcdCommand(i2c, address, 0b1, RWMode::Write, RSMode::Command);
-    utils::sleepMsec(20);
-    runLcdCommand(i2c, address, 0b110, RWMode::Write, RSMode::Command);
+    trigger(0b10'0000 | BACKLIGHT_BIT);
     utils::sleepMsec(20);
 
-    runLcdCommand(i2c, address, 0b1111, RWMode::Write, RSMode::Command);
+    run_command(0b101000, RWMode::Write, RSMode::Command);
+    utils::sleepMsec(20);
+    run_command(0b1000, RWMode::Write, RSMode::Command);
+    utils::sleepMsec(20);
+    run_command(0b1, RWMode::Write, RSMode::Command);
+    utils::sleepMsec(20);
+    run_command(0b110, RWMode::Write, RSMode::Command);
+    utils::sleepMsec(20);
+
+    run_command(0b1111, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
 
     // uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
@@ -97,6 +97,6 @@ bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs, bool backlig
     const uint8_t high = data_mask_high | base_mask;
     const uint8_t low = data_mask_low | base_mask;
 
-    triggerLcd(i2c, address, high);
-    triggerLcd(i2c, address, low);
+    trigger(high);
+    trigger(low);
 }
