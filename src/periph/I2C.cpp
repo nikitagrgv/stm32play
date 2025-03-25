@@ -78,11 +78,21 @@ bool i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t
 
     i2c_reg->CR1 |= I2C_CR1_START;
     while (!(i2c_reg->SR1 & I2C_SR1_SB))
-    {}
+    {
+        if (is_timeout())
+        {
+            return false;
+        }
+    }
 
     i2c_reg->DR = address << 1 | 1;
     while (!(i2c_reg->SR1 & I2C_SR1_ADDR))
-    {}
+    {
+        if (is_timeout())
+        {
+            return false;
+        }
+    }
 
     if (num_bytes == 1)
     {
@@ -93,11 +103,16 @@ bool i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t
         i2c_reg->CR1 |= I2C_CR1_STOP;
 
         while (!(i2c_reg->SR1 & I2C_SR1_RXNE))
-        {}
+        {
+            if (is_timeout())
+            {
+                return false;
+            }
+        }
 
         *buf++ = i2c_reg->DR;
 
-        return;
+        return true;
     }
 
     if (num_bytes == 2)
@@ -108,14 +123,19 @@ bool i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t
         (void)i2c_reg->SR2; // Clear ADDR
 
         while (!(i2c_reg->SR1 & I2C_SR1_BTF))
-        {}
+        {
+            if (is_timeout())
+            {
+                return false;
+            }
+        }
 
         i2c_reg->CR1 |= I2C_CR1_STOP;
 
         *buf++ = i2c_reg->DR;
         *buf++ = i2c_reg->DR;
 
-        return;
+        return true;
     }
 
     i2c_reg->CR1 |= I2C_CR1_ACK;
@@ -125,19 +145,34 @@ bool i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t
     for (int i = 0; i < num_bytes - 3; ++i)
     {
         while (!(i2c_reg->SR1 & I2C_SR1_RXNE))
-        {}
+        {
+            if (is_timeout())
+            {
+                return false;
+            }
+        }
         *buf++ = i2c_reg->DR;
     }
 
     while (!(i2c_reg->SR1 & I2C_SR1_BTF))
-    {}
+    {
+        if (is_timeout())
+        {
+            return false;
+        }
+    }
 
     i2c_reg->CR1 &= ~I2C_CR1_ACK;
 
     *buf++ = i2c_reg->DR;
 
     while (!(i2c_reg->SR1 & I2C_SR1_BTF))
-    {}
+    {
+        if (is_timeout())
+        {
+            return false;
+        }
+    }
 
     i2c_reg->CR1 |= I2C_CR1_STOP;
 
