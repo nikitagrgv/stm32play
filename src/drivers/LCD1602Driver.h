@@ -52,6 +52,8 @@ private:
 
 private:
     bool backlight_ = true;
+    NumLines num_lines_ = NumLines::Two;
+    Font font_ = Font::Font5x8;
 
     I2C i2c_;
     TIM_TypeDef *timer_;
