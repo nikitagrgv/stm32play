@@ -36,10 +36,10 @@ SHT31Driver::ErrorCode SHT31Driver::run(float &temperature, float &humidity)
     }
 
     constexpr float divisor = 2 << 16 - 1;
-    const uint16_t temp = (uint16_t)receive_data[0] << 8 | receive_data[1];
-    const uint16_t hum = (uint16_t)receive_data[3] << 8 | receive_data[4];
-    humidity = 100.0f * (float)hum / divisor;
-    temperature = -45.0f + 175.0f * (float)temp / divisor;
+    const uint16_t temperature_raw = (uint16_t)receive_data[0] << 8 | receive_data[1];
+    const uint16_t humidity_raw = (uint16_t)receive_data[3] << 8 | receive_data[4];
+    humidity = 100.0f * (float)humidity_raw / divisor;
+    temperature = -45.0f + 175.0f * (float)temperature_raw / divisor;
 
     return ErrorCode::Success;
 }
