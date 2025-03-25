@@ -162,7 +162,11 @@ int main()
 
                 constexpr int BUFFER_SIZE = 64;
                 char buffer[BUFFER_SIZE];
-                snprintf(buffer, BUFFER_SIZE, "T=%f\nH=%f", temp, hum);
+
+                snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
+                display.print(buffer);
+
+                snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
                 display.print(buffer);
             }
         }
