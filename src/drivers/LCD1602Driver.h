@@ -86,6 +86,7 @@ private:
     bool put_data(uint8_t data);
     bool trigger(uint8_t data);
     bool run_command(uint8_t data, RWMode rw, RSMode rs);
+    bool run_command_extra_delay(uint8_t data, RWMode rw, RSMode rs);
 
     void short_delay();
 

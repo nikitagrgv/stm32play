@@ -226,6 +226,16 @@ bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs)
     return true;
 }
 
+bool LCD1602Driver::run_command_extra_delay(uint8_t data, RWMode rw, RSMode rs)
+{
+    if (!run_command(data, RWMode::Write, RSMode::Command))
+    {
+        return false;
+    }
+    short_delay();
+    return true;
+}
+
 void LCD1602Driver::short_delay()
 {
     utils::sleepUsec(timer_, DELAY_US);
@@ -241,12 +251,7 @@ bool LCD1602Driver::update_function_set()
     uint8_t data = 1 << 5;
     data |= (uint8_t)font_ << FONT_BIT_POS;
     data |= (uint8_t)lines_mode_ << NUM_LINES_BIT_POS;
-    if (!run_command(data, RWMode::Write, RSMode::Command))
-    {
-        return false;
-    }
-    short_delay();
-    return true;
+    return run_command_extra_delay(data, RWMode::Write, RSMode::Command);
 }
 
 bool LCD1602Driver::update_display_control()
@@ -255,12 +260,7 @@ bool LCD1602Driver::update_display_control()
     data |= (uint8_t)display_enabled_ << DISPLAY_ON_BIT_POS;
     data |= (uint8_t)cursor_enabled_ << CURSOR_ON_BIT_POS;
     data |= (uint8_t)cursor_blinking_enabled_ << CURSOR_BLINKING_ON_BIT_POS;
-    if (!run_command(data, RWMode::Write, RSMode::Command))
-    {
-        return false;
-    }
-    short_delay();
-    return true;
+    return run_command_extra_delay(data, RWMode::Write, RSMode::Command);
 }
 
 bool LCD1602Driver::update_entry_mode()
@@ -268,12 +268,7 @@ bool LCD1602Driver::update_entry_mode()
     uint8_t data = 1 << 2;
     data |= (uint8_t)cursor_move_direction_ << CURSOR_MOVE_DIR_BIT_POS;
     data |= (uint8_t)display_shift_enabled_ << DISPLAY_SHIFT_ENABLED_BIT_POS;
-    if (!run_command(data, RWMode::Write, RSMode::Command))
-    {
-        return false;
-    }
-    short_delay();
-    return true;
+    return run_command_extra_delay(data, RWMode::Write, RSMode::Command);
 }
 
 bool LCD1602Driver::cursor_or_display_shift(MoveDirection direction, bool is_display)
@@ -281,10 +276,5 @@ bool LCD1602Driver::cursor_or_display_shift(MoveDirection direction, bool is_dis
     uint8_t data = 1 << 4;
     data |= (uint8_t)direction << SHIFT_RIGHT_OR_LEFT_BIT_POS;
     data |= (uint8_t)is_display << DISPLAY_OR_CURSOR_BIT_POS;
-    if (!run_command(data, RWMode::Write, RSMode::Command))
-    {
-        return false;
-    }
-    short_delay();
-    return true;
+    return run_command_extra_delay(data, RWMode::Write, RSMode::Command);
 }
