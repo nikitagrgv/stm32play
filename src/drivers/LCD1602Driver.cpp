@@ -25,7 +25,7 @@ bool LCD1602Driver::initialize()
         return false;
     }
 
-    // Setup 4-bit mode
+    // Initialization sequence
     utils::sleepMsec(15);
     trigger(0b11'0000);
     utils::sleepMsec(5);
@@ -33,6 +33,7 @@ bool LCD1602Driver::initialize()
     utils::sleepMsec(1);
     trigger(0b11'0000);
     utils::sleepMsec(1);
+    // Setup 4-bit mode
     trigger(0b10'0000);
     utils::sleepMsec(1);
 
