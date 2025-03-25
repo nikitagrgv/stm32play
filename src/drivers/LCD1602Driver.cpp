@@ -100,6 +100,24 @@ bool LCD1602Driver::shiftDisplayRight(int distance)
     return cursor_or_display_shift(MoveDirection::Right, true, distance);
 }
 
+bool LCD1602Driver::setCursorPosition(int position)
+{
+    if (!goHome())
+    {
+        return false;
+    }
+    if (!shiftCursorRight(position))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool LCD1602Driver::moveCursorToSecondLine()
+{
+    return setCursorPosition(SCREEN_WIDTH);
+}
+
 bool LCD1602Driver::print(char ch)
 {
     return run_command(ch, RWMode::Write, RSMode::Data);

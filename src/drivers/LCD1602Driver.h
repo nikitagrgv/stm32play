@@ -40,6 +40,10 @@ public:
     bool shiftDisplayLeft(int distance = 1);
     bool shiftDisplayRight(int distance = 1);
 
+    bool setCursorPosition(int position);
+
+    bool moveCursorToSecondLine();
+
     bool print(char ch);
     bool print(const char *str);
 
