@@ -129,6 +129,7 @@ int main()
     uint32_t user_key_last_change_time = 0;
 
     uint32_t last_temperature_update_time = 0;
+    constexpr uint32_t TEMPERATURE_UPDATE_PERIOD_MS = 1000;
     while (true)
     {
         const uint32_t cur_time = glob::total_msec;
@@ -145,6 +146,11 @@ int main()
                     display.print("Hello!");
                 }
             }
+        }
+
+        if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
+        {
+            last_temperature_update_time = cur_time;
         }
 
         uint8_t byte;
