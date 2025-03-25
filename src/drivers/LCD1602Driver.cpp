@@ -40,8 +40,7 @@ bool LCD1602Driver::initialize()
     trigger(0b10'0000);
     utils::sleepMsec(1);
 
-    run_command(0b101000, RWMode::Write, RSMode::Command);
-    utils::sleepMsec(20);
+    update_display_control();
     run_command(0b1000, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
     run_command(0b1, RWMode::Write, RSMode::Command);
@@ -155,5 +154,6 @@ void LCD1602Driver::update_backlight()
 
 void LCD1602Driver::update_display_control()
 {
-
+    run_command(0b101000, RWMode::Write, RSMode::Command);
+    utils::sleepMsec(20);
 }
