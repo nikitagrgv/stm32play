@@ -26,8 +26,8 @@ private:
         Data = 1
     };
 
-    constexpr int DELAY_US = 80;
-    constexpr uint8_t ADDRESS = 0x27;
+    static constexpr int DELAY_US = 80;
+    static constexpr uint8_t ADDRESS = 0x27;
 
 private:
     bool trigger(uint8_t data);
