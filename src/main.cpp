@@ -166,7 +166,7 @@ int main()
                 snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
                 display.print(buffer);
 
-                display.moveCursorToSecondLine();
+                display.goToSecondLine();
 
                 snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
                 display.print(buffer);

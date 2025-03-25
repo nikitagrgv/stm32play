@@ -113,7 +113,7 @@ bool LCD1602Driver::setCursorPosition(int position)
     return true;
 }
 
-bool LCD1602Driver::moveCursorToSecondLine()
+bool LCD1602Driver::goToSecondLine()
 {
     return setCursorPosition(SCREEN_WIDTH);
 }

@@ -42,7 +42,7 @@ public:
 
     bool setCursorPosition(int position);
 
-    bool moveCursorToSecondLine();
+    bool goToSecondLine();
 
     bool print(char ch);
     bool print(const char *str);
