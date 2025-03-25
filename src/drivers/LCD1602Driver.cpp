@@ -23,6 +23,9 @@ constexpr uint8_t CURSOR_BLINKING_ON_BIT_POS = 0;
 constexpr uint8_t CURSOR_MOVE_DIR_BIT_POS = 1;
 constexpr uint8_t DISPLAY_SHIFT_ENABLED_BIT_POS = 0;
 
+constexpr uint8_t SHIFT_RIGHT_OR_LEFT_BIT_POS = 2;
+constexpr uint8_t DISPLAY_OR_CURSOR_BIT_POS = 3;
+
 } // namespace
 
 LCD1602Driver::LCD1602Driver(I2C i2c, TIM_TypeDef *timer)
@@ -272,3 +275,5 @@ bool LCD1602Driver::update_entry_mode()
     short_delay();
     return true;
 }
+
+bool LCD1602Driver::cursor_or_display_shift(MoveDirection direction, bool is_display) {}

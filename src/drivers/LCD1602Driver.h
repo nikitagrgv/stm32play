@@ -94,6 +94,8 @@ private:
     bool update_display_control();
     bool update_entry_mode();
 
+    bool cursor_or_display_shift(MoveDirection direction, bool is_display);
+
 private:
     bool backlight_ = true;
 
