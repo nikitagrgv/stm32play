@@ -10,6 +10,7 @@ SHT31Driver::SHT31Driver(I2C i2c)
 SHT31Driver::ErrorCode SHT31Driver::run(float &temperature, float &humidity)
 {
     constexpr uint8_t sht31_address = 0x44;
+
     const uint8_t transmit_data[2] = {0x2C, 0x10};
     i2c::masterTransmitBlocking(i2c_, sht31_address, transmit_data, 2, TIMEOUT_MS);
 
