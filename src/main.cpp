@@ -34,16 +34,6 @@ CommandExecutor command_executor;
 
 bool checkSht31(I2C i2c, float &temperature, float &humidity)
 {
-    rcc::enableClocks(rcc::I2C_1);
-
-    constexpr Pin scl_pin{GPIOPort::B, 8};
-    constexpr Pin sda_pin{GPIOPort::B, 9};
-
-    gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
-    gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
-
-    i2c::setupI2C(I2C::I2C_1);
-
     utils::sleepMsec(1);
 
     constexpr uint8_t sht31_address = 0x44;
@@ -116,18 +106,6 @@ void runLcdCommand(I2C i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs,
 
 bool runLcd(I2C i2c)
 {
-    rcc::enableClocks(rcc::I2C_1);
-
-    constexpr Pin scl_pin{GPIOPort::B, 8};
-    constexpr Pin sda_pin{GPIOPort::B, 9};
-
-    gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
-    gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
-
-    i2c::setupI2C(i2c);
-
-    utils::sleepMsec(1);
-
     constexpr uint8_t address = 0x27;
 
     i2c::masterTransmitBlocking(i2c, address, 0x00);
@@ -175,25 +153,14 @@ int main()
 
     irq::disableInterrupts();
 
-    rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::USART_1 | rcc::TIM_2);
+    rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::TIM_2);
 
     constexpr Pin led_pin{GPIOPort::C, 13};
-
-    constexpr Pin usart_tx_pin{GPIOPort::A, 9};
-    constexpr Pin usart_rx_pin{GPIOPort::A, 10};
 
     constexpr Pin user_key{GPIOPort::A, 0};
     gpio::configureInput(user_key, gpio::PullMode::Up);
 
     gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
-
-#ifdef STM32F103
-    gpio::configureAlternateOutput(usart_tx_pin, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
-    gpio::configureAlternateInput(usart_rx_pin, gpio::PullMode::Up);
-#elifdef STM32F401
-    gpio::configureAlternate(usart_tx_pin, 7, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
-    gpio::configureAlternate(usart_rx_pin, 7, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High, gpio::PullMode::Up);
-#endif
 
     // SysTick
     constexpr uint32_t systick_frequency = 1000;
@@ -201,12 +168,29 @@ int main()
     systick::restartTimer();
 
     // USART1
+    rcc::enableClocks(rcc::USART_1);
+
+    constexpr Pin usart_tx_pin{GPIOPort::A, 9};
+    constexpr Pin usart_rx_pin{GPIOPort::A, 10};
+    gpio::configureAlternate(usart_tx_pin, 7, gpio::OutputMode::PushPull, gpio::OutputSpeed::High);
+    gpio::configureAlternate(usart_rx_pin, 7, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High, gpio::PullMode::Up);
+
     constexpr uint32_t baudrate = 56'000;
     constexpr uint32_t flags = usart::ENABLE_RECEIVE | usart::ENABLE_TRANSMIT | usart::ENABLE_RECEIVE_INTERRUPT;
     usart::setupUsart(USART::USART_1, baudrate, flags);
     irq::enableInterrupt(InterruptType::USART1IRQ);
 
     io::setPrintUsart(USART1);
+
+    // I2C1
+    rcc::enableClocks(rcc::I2C_1);
+
+    constexpr Pin scl_pin{GPIOPort::B, 8};
+    constexpr Pin sda_pin{GPIOPort::B, 9};
+    gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
+    gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
+
+    i2c::setupI2C(I2C::I2C_1);
 
     irq::setHandler(InterruptType::SysTickIRQ, [](void *) {
         //
