@@ -59,13 +59,13 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
     i2c_reg->CR1 |= I2C_CR1_PE;
 }
 
-bool i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t num_bytes)
+void i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t num_bytes)
 {
     I2C_TypeDef *i2c_reg = get_i2c_register(i2c);
 
     if (num_bytes == 0)
     {
-        return true;
+        return;
     }
 
     i2c_reg->CR1 |= I2C_CR1_START;
@@ -89,7 +89,7 @@ bool i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t
 
         *buf++ = i2c_reg->DR;
 
-        return true;
+        return;
     }
 
     if (num_bytes == 2)
@@ -107,7 +107,7 @@ bool i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t
         *buf++ = i2c_reg->DR;
         *buf++ = i2c_reg->DR;
 
-        return true;
+        return;
     }
 
     i2c_reg->CR1 |= I2C_CR1_ACK;
@@ -136,16 +136,16 @@ bool i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t
     *buf++ = i2c_reg->DR;
     *buf++ = i2c_reg->DR;
 
-    return true;
+    return;
 }
 
-bool i2c::masterTransmitBlocking(I2C i2c, uint8_t address, const uint8_t *buf, uint32_t num_bytes)
+void i2c::masterTransmitBlocking(I2C i2c, uint8_t address, const uint8_t *buf, uint32_t num_bytes)
 {
     I2C_TypeDef *i2c_reg = get_i2c_register(i2c);
 
     if (num_bytes == 0)
     {
-        return true;
+        return;
     }
 
     i2c_reg->CR1 |= I2C_CR1_START;
@@ -169,6 +169,4 @@ bool i2c::masterTransmitBlocking(I2C i2c, uint8_t address, const uint8_t *buf, u
     {}
 
     i2c_reg->CR1 |= I2C_CR1_STOP;
-
-    return true;
 }
