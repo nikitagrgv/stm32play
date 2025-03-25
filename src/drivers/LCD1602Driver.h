@@ -24,6 +24,8 @@ public:
         Right = 1,
     };
 
+    static constexpr uint8_t SCREEN_WIDTH = 40;
+
 public:
     LCD1602Driver(I2C i2c, TIM_TypeDef *timer);
 
