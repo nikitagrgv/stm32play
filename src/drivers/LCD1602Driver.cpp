@@ -166,7 +166,7 @@ bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs)
 
 void LCD1602Driver::update_backlight()
 {
-    put_data(0);
+    put_data(0xFF);
 }
 
 void LCD1602Driver::update_display_control()
