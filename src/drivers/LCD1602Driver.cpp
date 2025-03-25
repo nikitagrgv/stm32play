@@ -6,8 +6,9 @@
 namespace
 {
 
-uint32_t READ_WRITE_BIT_POS = 1;
 uint32_t REGISTER_SELECT_BIT_POS = 0;
+uint32_t READ_WRITE_BIT_POS = 1;
+uint32_t ENABLE_BIT_POS = 2;
 uint32_t BACKLIGHT_BIT_POS = 3;
 
 } // namespace
