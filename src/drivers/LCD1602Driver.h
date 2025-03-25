@@ -6,6 +6,19 @@
 class LCD1602Driver
 {
 public:
+    enum class NumLines : uint8_t
+    {
+        One = 0,
+        Two = 1,
+    };
+
+    enum class Font
+    {
+        Font5x8 = 0,
+        Font5x10 = 1,
+    };
+
+public:
     LCD1602Driver(I2C i2c, TIM_TypeDef *timer);
 
     bool initialize();
