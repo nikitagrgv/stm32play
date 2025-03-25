@@ -80,6 +80,8 @@ bool LCD1602Driver::trigger(uint8_t data)
     {
         return false;
     }
+
+    return true;
 }
 
 bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs, bool backlight)
