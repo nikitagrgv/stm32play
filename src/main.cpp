@@ -133,6 +133,7 @@ int main()
     while (true)
     {
         const uint32_t cur_time = glob::total_msec;
+
         if (cur_time - user_key_last_change_time > 10)
         {
             user_key_last_change_time = cur_time;
