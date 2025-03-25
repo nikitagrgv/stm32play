@@ -70,9 +70,9 @@ private:
     LinesMode lines_mode_ = LinesMode::Two;
     Font font_ = Font::Font5x8;
 
-    bool display_on_{true};
-    bool cursor_on_{true};
-    bool cursor_blink_on_{true};
+    bool display_enabled_{true};
+    bool cursor_enabled_{true};
+    bool cursor_blink_enabled_{true};
 
     I2C i2c_;
     TIM_TypeDef *timer_;
