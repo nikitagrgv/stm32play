@@ -33,7 +33,7 @@ bool LCD1602Driver::initialize()
     trigger(0b11'0000 | BACKLIGHT_MASK);
     utils::sleepMsec(1);
     trigger(0b11'0000 | BACKLIGHT_MASK);
-    utils::sleepMsec(20);
+    utils::sleepMsec(1);
 
     trigger(0b10'0000 | BACKLIGHT_MASK);
     utils::sleepMsec(20);
