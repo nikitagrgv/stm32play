@@ -1,5 +1,8 @@
 #include "LCD1602Driver.h"
 
+#include "Sleep.h"
+#include "periph/I2C.h"
+
 
 LCD1602Driver::LCD1602Driver(I2C i2c, TIM_TypeDef *timer)
     : i2c_(i2c)
@@ -59,14 +62,24 @@ bool LCD1602Driver::print(const char *str)
 
 bool LCD1602Driver::trigger(uint8_t data)
 {
-    utils::sleepUsec(TIM2, FAST_DELAY_US);
+    utils::sleepUsec(timer_, DELAY_US);
 
     constexpr uint8_t enable_mask = 1 << 2;
     constexpr uint8_t enable_clear_mask = ~enable_mask;
 
-    i2c::masterTransmitBlocking(i2c, address, data | enable_mask);
-    utils::sleepUsec(TIM2, FAST_DELAY_US);
-    i2c::masterTransmitBlocking(i2c, address, data & enable_clear_mask);
+    bool success = i2c::masterTransmitBlocking(i2c_, ADDRESS, data | enable_mask);
+    if (!success)
+    {
+        return false;
+    }
+
+    utils::sleepUsec(timer_, DELAY_US);
+
+    success = i2c::masterTransmitBlocking(i2c_, ADDRESS, data & enable_clear_mask);
+    if (!success)
+    {
+        return false;
+    }
 }
 
 bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs, bool backlight)
