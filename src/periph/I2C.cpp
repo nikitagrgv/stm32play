@@ -59,7 +59,7 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
     i2c_reg->CR1 |= I2C_CR1_PE;
 }
 
-void i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t num_bytes)
+void i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t num_bytes, int timeout_ms)
 {
     I2C_TypeDef *i2c_reg = get_i2c_register(i2c);
 
@@ -139,7 +139,7 @@ void i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t *buf, uint32_t
     return;
 }
 
-void i2c::masterTransmitBlocking(I2C i2c, uint8_t address, const uint8_t *buf, uint32_t num_bytes)
+void i2c::masterTransmitBlocking(I2C i2c, uint8_t address, const uint8_t *buf, uint32_t num_bytes, int timeout_ms)
 {
     I2C_TypeDef *i2c_reg = get_i2c_register(i2c);
 
@@ -171,12 +171,12 @@ void i2c::masterTransmitBlocking(I2C i2c, uint8_t address, const uint8_t *buf, u
     i2c_reg->CR1 |= I2C_CR1_STOP;
 }
 
-void i2c::masterTransmitBlocking(I2C i2c, uint8_t address, uint8_t value)
+void i2c::masterTransmitBlocking(I2C i2c, uint8_t address, uint8_t value, int timeout_ms)
 {
-    masterTransmitBlocking(i2c, address, &value, 1);
+    masterTransmitBlocking(i2c, address, &value, 1, timeout_ms);
 }
 
-void i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t &value)
+void i2c::masterReceiveBlocking(I2C i2c, uint8_t address, uint8_t &value, int timeout_ms)
 {
-    masterTransmitBlocking(i2c, address, &value, 1);
+    masterTransmitBlocking(i2c, address, &value, 1, timeout_ms);
 }
