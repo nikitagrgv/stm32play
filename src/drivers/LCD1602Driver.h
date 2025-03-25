@@ -92,7 +92,7 @@ private:
     bool cursor_enabled_{true};
     bool cursor_blinking_enabled_{true};
 
-    MoveDirection cursor_direction_{MoveDirection::Increment};
+    MoveDirection cursor_move_direction_{MoveDirection::Increment};
     bool display_shift_enabled_{false};
 
     I2C i2c_;

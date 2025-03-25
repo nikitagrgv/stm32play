@@ -246,9 +246,8 @@ bool LCD1602Driver::update_display_control()
 bool LCD1602Driver::update_entry_mode()
 {
     uint8_t data = 1 << 2;
-    data |= (uint8_t)display_enabled_ << DISPLAY_ON_BIT_POS;
-    data |= (uint8_t)cursor_enabled_ << CURSOR_ON_BIT_POS;
-    data |= (uint8_t)cursor_blinking_enabled_ << CURSOR_BLINKING_ON_BIT_POS;
+    data |= (uint8_t)cursor_move_direction_ << CURSOR_MOVE_DIR_BIT_POS;
+    data |= (uint8_t)display_shift_enabled_ << DISPLAY_SHIFT_ENABLED_BIT_POS;
     if (!run_command(data, RWMode::Write, RSMode::Command))
     {
         return false;
