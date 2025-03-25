@@ -80,6 +80,7 @@ private:
     bool update_backlight();
     bool update_function_set();
     bool update_display_control();
+    bool update_entry_mode();
 
 private:
     bool backlight_ = true;
