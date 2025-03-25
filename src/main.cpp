@@ -12,6 +12,7 @@
 #include "low_level/clock.h"
 #include "periph/EXTI.h"
 #include "periph/GPIO.h"
+#include "periph/I2C.h"
 #include "periph/IRQ.h"
 #include "periph/PeriphBase.h"
 #include "periph/RCC.h"
@@ -151,7 +152,7 @@ bool checkSht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
     gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
     gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
 
-    setupI2C(i2c);
+    i2c::setupI2C(I2C::I2C_1);
 
     utils::sleepMsec(1);
 
@@ -227,7 +228,7 @@ void runLcdCommand(I2C_TypeDef *i2c, uint8_t address, uint8_t data, RWMode rw, R
     triggerLcd(i2c, address, low);
 }
 
-bool runLcd(I2C_TypeDef *i2c)
+bool runLcd(I2C i2cc, I2C_TypeDef *i2c)
 {
     rcc::enableClocks(rcc::I2C_1);
 
@@ -237,7 +238,7 @@ bool runLcd(I2C_TypeDef *i2c)
     gpio::configureAlternate(scl_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
     gpio::configureAlternate(sda_pin, 4, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::Max, gpio::PullMode::Up);
 
-    setupI2C(i2c);
+    i2c::setupI2C(i2cc);
 
     utils::sleepMsec(1);
 
@@ -385,7 +386,7 @@ int main()
                         I2C_TypeDef *i2c = I2C1;
                         const uint8_t address = 0x27;
 
-                        runLcd(i2c);
+                        runLcd(I2C::I2C_1, i2c);
                         //
                         // LCD my_lcd;
                         // lcd_init(&my_lcd, address, 4, 5, i2c);
