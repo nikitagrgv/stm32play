@@ -73,12 +73,22 @@ bool LCD1602Driver::print(const char *str)
 
 void LCD1602Driver::setBacklightEnabled(bool backlight)
 {
+    if (backlight_ == backlight)
+    {
+        return;
+    }
     backlight_ = backlight;
+    update_display_control();
 }
 
 void LCD1602Driver::setLinesMode(LinesMode lines_mode)
 {
+    if (lines_mode_ == lines_mode)
+    {
+        return;
+    }
     lines_mode_ = lines_mode;
+    update_display_control();
 }
 
 void LCD1602Driver::setFont(Font font)
