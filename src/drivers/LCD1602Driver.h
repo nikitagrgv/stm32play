@@ -104,7 +104,9 @@ private:
     bool cursor_or_display_shift(MoveDirection direction, bool is_display, int distance);
 
 private:
-    bool backlight_ = true;
+    bool initialized_{false};
+
+    bool backlight_{true};
 
     LinesMode lines_mode_ = LinesMode::Two;
     Font font_ = Font::Font5x8;
