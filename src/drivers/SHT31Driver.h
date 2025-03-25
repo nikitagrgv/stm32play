@@ -17,5 +17,8 @@ public:
     ErrorCode run(float &temperature, float &humidity);
 
 private:
+    static constexpr int TIMEOUT_MS = 100;
+
+private:
     I2C i2c_;
 };
