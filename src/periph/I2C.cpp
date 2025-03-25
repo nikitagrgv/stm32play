@@ -58,3 +58,116 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
     i2c_reg->FLTR = 0;
     i2c_reg->CR1 |= I2C_CR1_PE;
 }
+bool i2c::masterReceive(I2C i2c, uint8_t address, uint8_t *buf, uint32_t num_bytes)
+{
+    I2C_TypeDef *i2c_reg = get_i2c_register(i2c);
+
+    if (num_bytes == 0)
+    {
+        return true;
+    }
+
+    i2c_reg->CR1 |= I2C_CR1_START;
+    while (!(i2c_reg->SR1 & I2C_SR1_SB))
+    {}
+
+    i2c_reg->DR = address << 1 | 1;
+    while (!(i2c_reg->SR1 & I2C_SR1_ADDR))
+    {}
+
+    if (num_bytes == 1)
+    {
+        i2c_reg->CR1 &= ~I2C_CR1_ACK;
+
+        (void)i2c_reg->SR2; // Clear ADDR
+
+        i2c_reg->CR1 |= I2C_CR1_STOP;
+
+        while (!(i2c_reg->SR1 & I2C_SR1_RXNE))
+        {}
+
+        *buf++ = i2c_reg->DR;
+
+        return true;
+    }
+
+    if (num_bytes == 2)
+    {
+        i2c_reg->CR1 |= I2C_CR1_POS;
+        i2c_reg->CR1 &= ~I2C_CR1_ACK;
+
+        (void)i2c_reg->SR2; // Clear ADDR
+
+        while (!(i2c_reg->SR1 & I2C_SR1_BTF))
+        {}
+
+        i2c_reg->CR1 |= I2C_CR1_STOP;
+
+        *buf++ = i2c_reg->DR;
+        *buf++ = i2c_reg->DR;
+
+        return true;
+    }
+
+    i2c_reg->CR1 |= I2C_CR1_ACK;
+
+    (void)i2c_reg->SR2; // Clear ADDR
+
+    for (int i = 0; i < num_bytes - 3; ++i)
+    {
+        while (!(i2c_reg->SR1 & I2C_SR1_RXNE))
+        {}
+        *buf++ = i2c_reg->DR;
+    }
+
+    while (!(i2c_reg->SR1 & I2C_SR1_BTF))
+    {}
+
+    i2c_reg->CR1 &= ~I2C_CR1_ACK;
+
+    *buf++ = i2c_reg->DR;
+
+    while (!(i2c_reg->SR1 & I2C_SR1_BTF))
+    {}
+
+    i2c_reg->CR1 |= I2C_CR1_STOP;
+
+    *buf++ = i2c_reg->DR;
+    *buf++ = i2c_reg->DR;
+
+    return true;
+}
+
+bool i2c::masterTransmit(I2C i2c, uint8_t address, const uint8_t *buf, uint32_t num_bytes)
+{
+    I2C_TypeDef *i2c_reg = get_i2c_register(i2c);
+
+    if (num_bytes == 0)
+    {
+        return true;
+    }
+
+    i2c_reg->CR1 |= I2C_CR1_START;
+    while (!(i2c_reg->SR1 & I2C_SR1_SB))
+    {}
+
+    i2c_reg->DR = address << 1 | 0;
+    while (!(i2c_reg->SR1 & I2C_SR1_ADDR))
+    {}
+
+    (void)i2c_reg->SR2; // Clear ADDR
+
+    for (uint32_t i = 0; i < num_bytes; ++i)
+    {
+        while (!(i2c_reg->SR1 & I2C_SR1_TXE))
+        {}
+        i2c_reg->DR = *buf++;
+    }
+
+    while (!(i2c_reg->SR1 & I2C_SR1_BTF))
+    {}
+
+    i2c_reg->CR1 |= I2C_CR1_STOP;
+
+    return true;
+}
