@@ -35,6 +35,8 @@ LCD1602Driver::LCD1602Driver(I2C i2c, TIM_TypeDef *timer)
 
 bool LCD1602Driver::initialize()
 {
+    initialized_ = false;
+
     if (!put_data(0x00))
     {
         return false;
@@ -42,21 +44,46 @@ bool LCD1602Driver::initialize()
 
     // Initialization sequence
     utils::sleepMsec(15);
-    trigger(0b11'0000);
+    if (!trigger(0b11'0000))
+    {
+        return false;
+    }
     utils::sleepMsec(5);
-    trigger(0b11'0000);
+    if (!trigger(0b11'0000))
+    {
+        return false;
+    }
     utils::sleepMsec(1);
-    trigger(0b11'0000);
+    if (!trigger(0b11'0000))
+    {
+        return false;
+    }
     utils::sleepMsec(1);
     // Set 4-bit mode
-    trigger(0b10'0000);
+    if (!trigger(0b10'0000))
+    {
+        return false;
+    }
     utils::sleepMsec(1);
 
-    update_function_set();
-    update_display_control();
-    clear();
-    update_entry_mode();
+    if (!update_function_set())
+    {
+        return false;
+    }
+    if (!update_display_control())
+    {
+        return false;
+    }
+    if (!clear())
+    {
+        return false;
+    }
+    if (!update_entry_mode())
+    {
+        return false;
+    }
 
+    initialized_ = true;
     return true;
 }
 
