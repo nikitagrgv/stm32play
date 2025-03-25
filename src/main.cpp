@@ -48,6 +48,7 @@ int main()
     // Led
     constexpr Pin led_pin{GPIOPort::C, 13};
     gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
+    gpio::setPinOutput(led_pin, false);
 
     // User key
     constexpr Pin user_key{GPIOPort::A, 0};
@@ -98,7 +99,7 @@ int main()
         }
     });
 
-    // Others
+    // Commands
     command_executor.addCommand(std::make_unique<PrintCommand>());
 
     constexpr Pin dht_pin{GPIOPort::B, 5};
@@ -108,7 +109,6 @@ int main()
     constexpr I2C sht31_i2c = I2C::I2C_1;
     command_executor.addCommand(std::make_unique<SHT31Command>(sht31_i2c));
 
-    gpio::setPinOutput(led_pin, false);
 
     irq::enableInterrupts();
 
