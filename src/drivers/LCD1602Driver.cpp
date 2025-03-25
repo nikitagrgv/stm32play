@@ -21,7 +21,7 @@ constexpr uint8_t CURSOR_ON_BIT_POS = 1;
 constexpr uint8_t CURSOR_BLINKING_ON_BIT_POS = 0;
 
 constexpr uint8_t CURSOR_MOVE_DIR_BIT_POS = 1;
-constexpr uint8_t DISPLAY_SHIFT_ENABLED_BIT_POS = 1;
+constexpr uint8_t DISPLAY_SHIFT_ENABLED_BIT_POS = 0;
 
 } // namespace
 
