@@ -80,6 +80,26 @@ bool LCD1602Driver::clearDisplay()
     return true;
 }
 
+bool LCD1602Driver::shiftCursorLeft()
+{
+    return cursor_or_display_shift(MoveDirection::Left, false);
+}
+
+bool LCD1602Driver::shiftCursorRight()
+{
+    return cursor_or_display_shift(MoveDirection::Right, false);
+}
+
+bool LCD1602Driver::shiftDisplayLeft()
+{
+    return cursor_or_display_shift(MoveDirection::Left, true);
+}
+
+bool LCD1602Driver::shiftDisplayRight()
+{
+    return cursor_or_display_shift(MoveDirection::Right, true);
+}
+
 bool LCD1602Driver::print(char ch)
 {
     return run_command(ch, RWMode::Write, RSMode::Data);
