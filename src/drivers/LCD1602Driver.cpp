@@ -49,9 +49,6 @@ bool LCD1602Driver::initialize()
     update_function_set();
     update_display_control();
     clearDisplay();
-
-    run_command(0b1, RWMode::Write, RSMode::Command);
-    utils::sleepMsec(20);
     run_command(0b110, RWMode::Write, RSMode::Command);
     utils::sleepMsec(20);
 
