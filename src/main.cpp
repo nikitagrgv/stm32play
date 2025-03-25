@@ -213,39 +213,22 @@ int main()
                 {
                     io::printSyncFmt("User key pressed\n");
 
-                    if (0)
-                    {
-                        float temperature = 0.0f;
-                        float humidity = 0.0f;
-                        const bool valid = checkSht31(I2C::I2C_1, temperature, humidity);
-                        if (valid)
-                        {
-                            io::printSyncFmt("T = %f, H = %f\n", temperature, humidity);
-                        }
-                        else
-                        {
-                            io::printSyncFmt("SHT31 error\n");
-                        }
-                    }
-                    else
-                    {
-                        const uint8_t address = 0x27;
-                        runLcd(I2C::I2C_1);
-                        //
-                        // LCD my_lcd;
-                        // lcd_init(&my_lcd, address, 4, 5, i2c);
-                        //
-                        // utils::sleepMsec(1);
-                        // runLcdCommand(i2c, address, 'T', RWMode::Write, RSMode::Data);
-                        // utils::sleepMsec(1);
-                        // runLcdCommand(i2c, address, 'h', RWMode::Write, RSMode::Data);
-                        // utils::sleepMsec(1);
-                        // runLcdCommand(i2c, address, 'a', RWMode::Write, RSMode::Data);
-                        // utils::sleepMsec(1);
-                        //
-                        // char message[] = "Thanks extremq";
-                        // lcd_string(&my_lcd, message);
-                    }
+                    const uint8_t address = 0x27;
+                    runLcd(I2C::I2C_1);
+                    //
+                    // LCD my_lcd;
+                    // lcd_init(&my_lcd, address, 4, 5, i2c);
+                    //
+                    // utils::sleepMsec(1);
+                    // runLcdCommand(i2c, address, 'T', RWMode::Write, RSMode::Data);
+                    // utils::sleepMsec(1);
+                    // runLcdCommand(i2c, address, 'h', RWMode::Write, RSMode::Data);
+                    // utils::sleepMsec(1);
+                    // runLcdCommand(i2c, address, 'a', RWMode::Write, RSMode::Data);
+                    // utils::sleepMsec(1);
+                    //
+                    // char message[] = "Thanks extremq";
+                    // lcd_string(&my_lcd, message);
                 }
             }
         }
