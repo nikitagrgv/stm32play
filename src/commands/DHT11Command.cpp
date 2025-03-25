@@ -37,7 +37,7 @@ bool DHT11Command::execute(const char *args)
         return true;
     }
 
-    io::printSyncFmt("T = %f, H = %f\n", temperature, humidity);
+    io::printSyncFmt("DHT11: T = %f, H = %f\n", temperature, humidity);
 
     return true;
 }
