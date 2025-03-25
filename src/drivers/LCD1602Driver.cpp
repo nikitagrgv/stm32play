@@ -3,6 +3,12 @@
 #include "Sleep.h"
 #include "periph/I2C.h"
 
+namespace
+{
+
+
+
+}
 
 LCD1602Driver::LCD1602Driver(I2C i2c, TIM_TypeDef *timer)
     : i2c_(i2c)
