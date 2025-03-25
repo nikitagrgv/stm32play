@@ -99,5 +99,9 @@ bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs, bool backlig
     {
         return false;
     }
-    return trigger(low);
+    if (!trigger(low))
+    {
+        return false;
+    }
+    return true;
 }
