@@ -22,6 +22,8 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
 {
     I2C_TypeDef *i2c_reg = get_i2c_register(i2c);
 
+    glob::
+
     i2c_reg->CR1 = 0;
     i2c_reg->CR1 = I2C_CR1_ACK;
     i2c_reg->CR2 = (42 << I2C_CR2_FREQ_Pos);
@@ -33,3 +35,5 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
     i2c_reg->FLTR = 0;
     i2c_reg->CR1 |= I2C_CR1_PE;
 }
+
+
