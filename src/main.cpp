@@ -193,6 +193,7 @@ int main()
 
     i2c::setupI2C(I2C::I2C_1);
 
+    // Handlers
     irq::setHandler(InterruptType::SysTickIRQ, [](void *) {
         //
         ++glob::total_msec;
