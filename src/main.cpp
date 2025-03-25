@@ -400,19 +400,21 @@ int main()
                         I2C_TypeDef *i2c = I2C1;
                         const uint8_t address = 0x27;
 
-                        LCD my_lcd;
-                        lcd_init(&my_lcd, address, 4, 5, i2c);
-
-                        utils::sleepMsec(1);
-                        runLcdCommand(i2c, address, 'T', RWMode::Write, RSMode::Data);
-                        utils::sleepMsec(1);
-                        runLcdCommand(i2c, address, 'h', RWMode::Write, RSMode::Data);
-                        utils::sleepMsec(1);
-                        runLcdCommand(i2c, address, 'a', RWMode::Write, RSMode::Data);
-                        utils::sleepMsec(1);
-
-                        char message[] = "Thanks extremq";
-                        lcd_string(&my_lcd, message);
+                        runLcd(i2c);
+                        //
+                        // LCD my_lcd;
+                        // lcd_init(&my_lcd, address, 4, 5, i2c);
+                        //
+                        // utils::sleepMsec(1);
+                        // runLcdCommand(i2c, address, 'T', RWMode::Write, RSMode::Data);
+                        // utils::sleepMsec(1);
+                        // runLcdCommand(i2c, address, 'h', RWMode::Write, RSMode::Data);
+                        // utils::sleepMsec(1);
+                        // runLcdCommand(i2c, address, 'a', RWMode::Write, RSMode::Data);
+                        // utils::sleepMsec(1);
+                        //
+                        // char message[] = "Thanks extremq";
+                        // lcd_string(&my_lcd, message);
                     }
                 }
             }
