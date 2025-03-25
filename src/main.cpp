@@ -163,6 +163,8 @@ int main()
                 constexpr int BUFFER_SIZE = 64;
                 char buffer[BUFFER_SIZE];
 
+                display.goHome();
+
                 snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
                 display.print(buffer);
 
