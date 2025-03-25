@@ -67,16 +67,14 @@ bool LCD1602Driver::trigger(uint8_t data)
     constexpr uint8_t enable_mask = 1 << 2;
     constexpr uint8_t enable_clear_mask = ~enable_mask;
 
-    bool success = i2c::masterTransmitBlocking(i2c_, ADDRESS, data | enable_mask);
-    if (!success)
+    if (!i2c::masterTransmitBlocking(i2c_, ADDRESS, data | enable_mask))
     {
         return false;
     }
 
     utils::sleepUsec(timer_, DELAY_US);
 
-    success = i2c::masterTransmitBlocking(i2c_, ADDRESS, data & enable_clear_mask);
-    if (!success)
+    if (i2c::masterTransmitBlocking(i2c_, ADDRESS, data & enable_clear_mask))
     {
         return false;
     }
