@@ -44,7 +44,7 @@ bool LCD1602Driver::initialize()
 
 bool LCD1602Driver::print(char ch)
 {
-    run_command(address, 'f', RWMode::Write, RSMode::Data);
+    return run_command(ch, RWMode::Write, RSMode::Data);
 }
 
 bool LCD1602Driver::print(const char *str)
@@ -57,7 +57,7 @@ bool LCD1602Driver::print(const char *str)
     return true;
 }
 
-bool LCD1602Driver::trigger(I2C i2c, uint8_t address, uint8_t data)
+bool LCD1602Driver::trigger(uint8_t data)
 {
     utils::sleepUsec(TIM2, FAST_DELAY_US);
 
@@ -69,7 +69,7 @@ bool LCD1602Driver::trigger(I2C i2c, uint8_t address, uint8_t data)
     i2c::masterTransmitBlocking(i2c, address, data & enable_clear_mask);
 }
 
-bool LCD1602Driver::run_command(I2C i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs, bool backlight)
+bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs, bool backlight)
 {
     uint8_t base_mask = 0;
     base_mask |= (uint8_t)rw << 1;

@@ -30,8 +30,8 @@ private:
     constexpr uint8_t ADDRESS = 0x27;
 
 private:
-    bool trigger(I2C i2c, uint8_t address, uint8_t data);
-    bool run_command(I2C i2c, uint8_t address, uint8_t data, RWMode rw, RSMode rs, bool backlight = true);
+    bool trigger(uint8_t data);
+    bool run_command(uint8_t data, RWMode rw, RSMode rs, bool backlight = true);
 
 private:
     I2C i2c_;
