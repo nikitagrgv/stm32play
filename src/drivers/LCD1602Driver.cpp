@@ -27,11 +27,11 @@ bool LCD1602Driver::initialize()
 
     constexpr uint8_t BACKLIGHT_MASK = backlight_ << BACKLIGHT_BIT_POS;
 
-    utils::sleepMsec(100);
+    utils::sleepMsec(15);
     trigger(0b11'0000 | BACKLIGHT_MASK);
-    utils::sleepMsec(20);
+    utils::sleepMsec(5);
     trigger(0b11'0000 | BACKLIGHT_MASK);
-    utils::sleepMsec(20);
+    utils::sleepMsec(1);
     trigger(0b11'0000 | BACKLIGHT_MASK);
     utils::sleepMsec(20);
 
