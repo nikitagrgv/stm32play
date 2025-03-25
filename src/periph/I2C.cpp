@@ -185,28 +185,53 @@ bool i2c::masterTransmitBlocking(I2C i2c, uint8_t address, const uint8_t *buf, u
 
     if (num_bytes == 0)
     {
-        return;
+        return true;
     }
+
+    const uint32_t end_time = glob::total_msec + timeout_ms;
+    const auto is_timeout = [&] {
+        return timeout_ms != -1 && glob::total_msec >= end_time;
+    };
 
     i2c_reg->CR1 |= I2C_CR1_START;
     while (!(i2c_reg->SR1 & I2C_SR1_SB))
-    {}
+    {
+        if (is_timeout())
+        {
+            return false;
+        }
+    }
 
     i2c_reg->DR = address << 1 | 0;
     while (!(i2c_reg->SR1 & I2C_SR1_ADDR))
-    {}
+    {
+        if (is_timeout())
+        {
+            return false;
+        }
+    }
 
     (void)i2c_reg->SR2; // Clear ADDR
 
     for (uint32_t i = 0; i < num_bytes; ++i)
     {
         while (!(i2c_reg->SR1 & I2C_SR1_TXE))
-        {}
+        {
+            if (is_timeout())
+            {
+                return false;
+            }
+        }
         i2c_reg->DR = *buf++;
     }
 
     while (!(i2c_reg->SR1 & I2C_SR1_BTF))
-    {}
+    {
+        if (is_timeout())
+        {
+            return false;
+        }
+    }
 
     i2c_reg->CR1 |= I2C_CR1_STOP;
 }
