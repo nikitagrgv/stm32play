@@ -99,6 +99,10 @@ bool LCD1602Driver::returnHome()
 
 bool LCD1602Driver::put_data(uint8_t data)
 {
+    if (backlight_)
+    {
+        data |= 1 << BACKLIGHT_BIT_POS;
+    }
     utils::sleepUsec(timer_, DELAY_US);
     return i2c::masterTransmitBlocking(i2c_, ADDRESS, data, TIMEOUT_MS);
 }
@@ -107,11 +111,6 @@ bool LCD1602Driver::trigger(uint8_t data)
 {
     constexpr uint8_t enable_mask = 1 << ENABLE_BIT_POS;
     constexpr uint8_t enable_clear_mask = ~enable_mask;
-
-    if (backlight_)
-    {
-        data |= 1 << BACKLIGHT_BIT_POS;
-    }
 
     if (!put_data(data | enable_mask))
     {
@@ -151,11 +150,7 @@ bool LCD1602Driver::run_command(uint8_t data, RWMode rw, RSMode rs)
 
 void LCD1602Driver::update_backlight()
 {
-
+    put_data()
 }
 
-void LCD1602Driver::update_display_control()
-{
-
-}
-
+void LCD1602Driver::update_display_control() {}
