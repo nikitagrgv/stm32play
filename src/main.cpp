@@ -109,6 +109,8 @@ int main()
     constexpr I2C sht31_i2c = I2C::I2C_1;
     command_executor.addCommand(std::make_unique<SHT31Command>(sht31_i2c));
 
+    // Display
+    LCD1602Driver display{I2C::I2C_1, TIM2};
 
     irq::enableInterrupts();
 
