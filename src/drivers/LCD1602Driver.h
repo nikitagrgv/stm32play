@@ -20,8 +20,8 @@ public:
 
     enum class MoveDirection
     {
-        Decrement = 0,
-        Increment = 1,
+        Left = 0,
+        Right = 1,
     };
 
 public:
@@ -31,6 +31,12 @@ public:
 
     bool returnHome();
     bool clearDisplay();
+
+    bool shiftCursorLeft();
+    bool shiftCursorRight();
+
+    bool shiftDisplayLeft();
+    bool shiftDisplayRight();
 
     bool print(char ch);
     bool print(const char *str);
@@ -98,7 +104,7 @@ private:
     bool cursor_enabled_{true};
     bool cursor_blinking_enabled_{true};
 
-    MoveDirection cursor_move_direction_{MoveDirection::Increment};
+    MoveDirection cursor_move_direction_{MoveDirection::Right};
     bool display_shift_enabled_{false};
 
     I2C i2c_;
