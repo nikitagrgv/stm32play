@@ -32,7 +32,7 @@ CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
-bool checkSht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
+bool checkSht31(I2C i2c, float &temperature, float &humidity)
 {
     rcc::enableClocks(rcc::I2C_1);
 
@@ -51,7 +51,7 @@ bool checkSht31(I2C_TypeDef *i2c, float &temperature, float &humidity)
     i2c::masterTransmitBlocking(i2c, sht31_address, transmit_data, 2);
 
     uint8_t receive_data[6] = {0, 0, 0, 0, 0, 0};
-    masterReceive(i2c, sht31_address, receive_data, 6);
+    i2c::masterReceiveBlocking(i2c, sht31_address, receive_data, 6);
 
     constexpr uint8_t crc8_poly = 0x31;
     constexpr uint8_t crc8_init = 0xFF;
