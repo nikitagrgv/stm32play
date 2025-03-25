@@ -18,7 +18,7 @@ public:
         Font5x10 = 1,
     };
 
-    enum class ShiftDirection
+    enum class MoveDirection
     {
         Decrement = 0,
         Increment = 1,
