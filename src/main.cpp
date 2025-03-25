@@ -126,8 +126,9 @@ int main()
     io::printSyncFmt("--- Device is ready ---\n");
 
     bool user_key_state = gpio::getPinInput(user_key);
-    uint32_t user_key_last_change_time = glob::total_msec;
+    uint32_t user_key_last_change_time = 0;
 
+    uint32_t last_temperature_update_time = 0;
     while (true)
     {
         const uint32_t cur_time = glob::total_msec;
