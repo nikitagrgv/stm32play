@@ -29,7 +29,7 @@ public:
 
     bool initialize();
 
-    bool returnHome();
+    bool goHome();
     bool clear();
 
     bool shiftCursorLeft(int distance = 1);

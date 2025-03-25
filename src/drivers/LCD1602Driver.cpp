@@ -60,7 +60,7 @@ bool LCD1602Driver::initialize()
     return true;
 }
 
-bool LCD1602Driver::returnHome()
+bool LCD1602Driver::goHome()
 {
     if (!run_command(0b10, RWMode::Write, RSMode::Command))
     {

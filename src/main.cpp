@@ -166,6 +166,9 @@ int main()
                 snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
                 display.print(buffer);
 
+                display.goHome();
+                display.shiftCursorRight(40);
+
                 snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
                 display.print(buffer);
             }
