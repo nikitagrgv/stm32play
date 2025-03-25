@@ -100,7 +100,7 @@ bool LCD1602Driver::setFont(Font font)
         return true;
     }
     font_ = font;
-    update_function_set();
+    return update_function_set();
 }
 
 bool LCD1602Driver::setDisplayEnabled(bool enabled)
