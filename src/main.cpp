@@ -111,6 +111,11 @@ int main()
 
     // Display
     LCD1602Driver display{I2C::I2C_1, TIM2};
+    bool display_initialized = display.initialize();
+    if (!display_initialized)
+    {
+        io::printSyncFmt("LCD1602 Initialization failed\n");
+    }
 
     irq::enableInterrupts();
 
