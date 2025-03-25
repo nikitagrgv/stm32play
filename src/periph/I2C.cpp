@@ -36,7 +36,7 @@ void i2c::setupI2C(I2C i2c, uint32_t speed)
     i2c_reg->OAR1 = 0;
     i2c_reg->OAR2 = 0;
     i2c_reg->SR1 = 0;
-    i2c_reg->CCR = 210;
+    i2c_reg->CCR = ccr;
     i2c_reg->TRISE = 43;
     i2c_reg->FLTR = 0;
     i2c_reg->CR1 |= I2C_CR1_PE;
