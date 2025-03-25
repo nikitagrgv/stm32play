@@ -6,10 +6,13 @@
 namespace
 {
 
-constexpr uint32_t REGISTER_SELECT_BIT_POS = 0;
-constexpr uint32_t READ_WRITE_BIT_POS = 1;
-constexpr uint32_t ENABLE_BIT_POS = 2;
-constexpr uint32_t BACKLIGHT_BIT_POS = 3;
+constexpr uint8_t REGISTER_SELECT_BIT_POS = 0;
+constexpr uint8_t READ_WRITE_BIT_POS = 1;
+constexpr uint8_t ENABLE_BIT_POS = 2;
+constexpr uint8_t BACKLIGHT_BIT_POS = 3;
+
+constexpr uint8_t NUM_LINES_BIT_POS = 3;
+constexpr uint8_t FONT_BIT_POS = 2;
 
 } // namespace
 
