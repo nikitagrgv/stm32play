@@ -10,4 +10,5 @@ public:
 
 private:
     I2C i2c_;
+    TIM_TypeDef *timer_;
 };
