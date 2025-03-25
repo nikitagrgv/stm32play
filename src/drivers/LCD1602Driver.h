@@ -10,6 +10,9 @@ public:
 
     bool initialize();
 
+    bool print(char ch);
+    bool print(const char *str);
+
 private:
     enum class RWMode : uint8_t
     {

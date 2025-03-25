@@ -44,6 +44,18 @@ bool LCD1602Driver::initialize()
     return true;
 }
 
+bool LCD1602Driver::print(char ch) {}
+
+bool LCD1602Driver::print(const char *str)
+{
+    while (*str)
+    {
+        print(*str);
+        ++str;
+    }
+    return true;
+}
+
 bool LCD1602Driver::trigger(I2C i2c, uint8_t address, uint8_t data)
 {
     utils::sleepUsec(TIM2, FAST_DELAY_US);
