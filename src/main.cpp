@@ -105,9 +105,12 @@ int main()
     // Commands
     command_executor.addCommand(std::make_unique<PrintCommand>());
 
+
     constexpr Pin dht_pin{GPIOPort::B, 5};
     TIM_TypeDef *dht_timer = TIM2;
-    command_executor.addCommand(std::make_unique<DHT11Command>(dht_pin, dht_timer));
+    DHT11Driver dht11{dht_pin, dht_timer};
+
+    command_executor.addCommand(std::make_unique<DHT11Command>(&dht11));
 
     command_executor.addCommand(std::make_unique<SHT31Command>(main_i2c));
 
@@ -133,7 +136,6 @@ int main()
     uint32_t last_temperature_update_time = 0;
     constexpr uint32_t TEMPERATURE_UPDATE_PERIOD_MS = 1000;
 
-    DHT11Driver dht11{dht_pin, dht_timer};
 
     while (true)
     {

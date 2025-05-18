@@ -1,23 +1,19 @@
 #include "DHT11Command.h"
 
+#include "DeviceCMSIS.h"
 #include "Print.h"
 #include "drivers/DHT11Driver.h"
 #include "periph/PeriphBase.h"
 
-#include "DeviceCMSIS.h"
-
-DHT11Command::DHT11Command(const Pin &pin, TIM_TypeDef *timer)
-    : pin_(pin)
-    , timer_(timer)
+DHT11Command::DHT11Command(DHT11Driver *driver)
+    : dht11(driver)
 {}
 
 bool DHT11Command::execute(const char *args)
 {
-    DHT11Driver dht11{pin_, timer_};
-
     float temperature = 0.0f;
     float humidity = 0.0f;
-    const DHT11Driver::ErrorCode code = dht11.run(temperature, humidity);
+    const DHT11Driver::ErrorCode code = dht11->run(temperature, humidity);
 
     if (code == DHT11Driver::ErrorCode::Timeout)
     {

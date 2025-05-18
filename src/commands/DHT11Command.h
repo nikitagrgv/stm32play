@@ -1,19 +1,18 @@
 #pragma once
 
 #include "CommandExecutor.h"
-#include "periph/PeriphBase.h"
-
 #include "DeviceCMSIS.h"
+#include "drivers/DHT11Driver.h"
+#include "periph/PeriphBase.h"
 
 class DHT11Command final : public ICommand
 {
 public:
-    DHT11Command(const Pin &pin, TIM_TypeDef *timer);
+    DHT11Command(DHT11Driver *driver);
 
     const char *name() override { return "dht11"; }
     bool execute(const char *args) override;
 
 private:
-    Pin pin_;
-    TIM_TypeDef *timer_{};
+    DHT11Driver *dht11{};
 };
