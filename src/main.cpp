@@ -139,41 +139,78 @@ int main()
     {
         const uint32_t cur_time = glob::total_msec;
 
+        if (cur_time - user_key_last_change_time > 10)
+        {
+            user_key_last_change_time = cur_time;
+            const bool new_user_key_state = gpio::getPinInput(user_key);
+            if (new_user_key_state != user_key_state)
+            {
+                user_key_state = new_user_key_state;
+                if (!user_key_state)
+                {
+                    io::printSyncFmt("User key pressed\n");
+                    display.print("Hello!");
+                }
+            }
+        }
+
         if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
         {
             last_temperature_update_time = cur_time;
 
             float temp, hum;
-
-            io::printSyncFmt("BEFORE RUN\n");
-
             const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
 
-            if (error_code != DHT11Driver::ErrorCode::Success)
+            if (error_code == DHT11Driver::ErrorCode::Success)
             {
-                io::printSyncFmt("DHT11 ERROR %d\n", (int)error_code);
-            }
-            else
-            {
+                display.clear();
+
                 constexpr int BUFFER_SIZE = 16;
                 char buffer[BUFFER_SIZE];
 
-                snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
-
-                io::printSyncFmt("BEFORE CLEAR\n");
-
-                display.clear();
-
-                io::printSyncFmt("BEFORE GO HOME\n");
-
                 display.goHome();
 
-                io::printSyncFmt("BEFORE PRINT\n");
-
+                snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
                 display.print(buffer);
 
-                io::printSyncFmt("UPDATED\n");
+                display.goToSecondLine();
+
+                snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
+                display.print(buffer);
+            }
+            else if (error_code == DHT11Driver::ErrorCode::Timeout)
+            {
+                display.clear();
+                display.goHome();
+                display.print("DHT11 timeout\n");
+            }
+            else if (error_code == DHT11Driver::ErrorCode::InvalidChecksum)
+            {
+                display.clear();
+                display.goHome();
+                display.print("DHT11 invalid checksum\n");
             }
         }
+
+        uint8_t byte;
+        while (usart1_stream.readByte(byte))
+        {
+            stat::addReadBytesStream(1);
+            command_buffer.writeByte(byte);
+        }
+
+        const char *command = command_buffer.getCurrentCommand();
+        if (!command)
+        {
+            continue;
+        }
+
+        const bool executed = command_executor.execute(command);
+        if (!executed)
+        {
+            io::printSyncFmt("can't execute: `%s`\n", command);
+        }
+
+        command_buffer.flushCurrentCommand();
     }
 }

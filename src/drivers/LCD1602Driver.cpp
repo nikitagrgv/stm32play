@@ -1,6 +1,5 @@
 #include "LCD1602Driver.h"
 
-#include "Print.h"
 #include "Sleep.h"
 #include "periph/I2C.h"
 
@@ -104,9 +103,7 @@ bool LCD1602Driver::clear()
     {
         return false;
     }
-    io::printSyncFmt("Before sleep\n");
     utils::sleepMsec(timer_, 5);
-    io::printSyncFmt("after sleep\n");
     return true;
 }
 
