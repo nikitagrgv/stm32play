@@ -132,6 +132,9 @@ int main()
 
     uint32_t last_temperature_update_time = 0;
     constexpr uint32_t TEMPERATURE_UPDATE_PERIOD_MS = 1000;
+
+    DHT11Driver dht11{dht_pin, dht_timer};
+
     while (true)
     {
         const uint32_t cur_time = glob::total_msec;
@@ -140,24 +143,37 @@ int main()
         {
             last_temperature_update_time = cur_time;
 
-            constexpr int BUFFER_SIZE = 16;
-            char buffer[BUFFER_SIZE];
+            float temp, hum;
 
-            snprintf(buffer, BUFFER_SIZE, "T=%d", cur_time);
+            io::printSyncFmt("BEFORE RUN\n");
 
-            io::printSyncFmt("BEFORE CLEAR\n");
+            const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
 
-            display.clear();
+            if (error_code != DHT11Driver::ErrorCode::Success)
+            {
+                io::printSyncFmt("DHT11 ERROR %d\n", (int)error_code);
+            }
+            else
+            {
+                constexpr int BUFFER_SIZE = 16;
+                char buffer[BUFFER_SIZE];
 
-            io::printSyncFmt("BEFORE GO HOME\n");
+                snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
 
-            display.goHome();
+                io::printSyncFmt("BEFORE CLEAR\n");
 
-            io::printSyncFmt("BEFORE PRINT\n");
+                display.clear();
 
-            display.print(buffer);
+                io::printSyncFmt("BEFORE GO HOME\n");
 
-            io::printSyncFmt("UPDATED\n");
+                display.goHome();
+
+                io::printSyncFmt("BEFORE PRINT\n");
+
+                display.print(buffer);
+
+                io::printSyncFmt("UPDATED\n");
+            }
         }
     }
 }
