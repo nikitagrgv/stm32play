@@ -90,6 +90,10 @@ void get_masks(uint32_t periph, uint32_t &ahb1_mask, uint32_t &apb1_mask, uint32
     {
         apb1_mask |= RCC_APB1ENR_TIM3EN;
     }
+    if (periph & TIM_1)
+    {
+        apb1_mask |= RCC_APB2ENR_TIM1EN;
+    }
 }
 #else
     #error

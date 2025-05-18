@@ -45,7 +45,7 @@ int main()
 
     irq::disableInterrupts();
 
-    rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::TIM_2 | rcc::TIM_3);
+    rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::TIM_2 | rcc::TIM_3 | rcc::TIM_1);
 
     // Led
     constexpr Pin led_pin{GPIOPort::C, 13};
@@ -114,7 +114,7 @@ int main()
     irq::enableInterrupts();
 
     // Display
-    LCD1602Driver display{main_i2c, TIM2};
+    LCD1602Driver display{main_i2c, TIM3};
     const bool display_initialized = display.initialize();
     if (display_initialized)
     {
@@ -139,60 +139,25 @@ int main()
         if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
         {
             last_temperature_update_time = cur_time;
-            DHT11Driver dht11{dht_pin, dht_timer};
-            float temp, hum;
 
-            io::printSyncFmt("About to run DHT11\n");
+            constexpr int BUFFER_SIZE = 16;
+            char buffer[BUFFER_SIZE];
 
-            const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
+            snprintf(buffer, BUFFER_SIZE, "T=%d", cur_time);
 
-            io::printSyncFmt("DHT11 run complete\n");
+            io::printSyncFmt("BEFORE CLEAR\n");
 
-            if (error_code == DHT11Driver::ErrorCode::Success)
-            {
-                io::printSyncFmt("Before LCD print\n");
+            display.clear();
 
-                display.clear();
+            io::printSyncFmt("BEFORE GO HOME\n");
 
-                constexpr int BUFFER_SIZE = 16;
-                char buffer[BUFFER_SIZE];
+            display.goHome();
 
-                display.goHome();
+            io::printSyncFmt("BEFORE PRINT\n");
 
-                snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
-                display.print(buffer);
+            display.print(buffer);
 
-                display.goToSecondLine();
-
-                snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
-                display.print(buffer);
-                io::printSyncFmt("Success\n");
-            }
-            else if (error_code == DHT11Driver::ErrorCode::Timeout)
-            {
-                io::printSyncFmt("Before LCD print timeout\n");
-
-                display.clear();
-
-                io::printSyncFmt("after clear\n");
-
-                display.goHome();
-
-                io::printSyncFmt("after go home\n");
-
-                display.print("DHT11 timeout\n");
-
-                io::printSyncFmt("Timeout\n");
-            }
-            else if (error_code == DHT11Driver::ErrorCode::InvalidChecksum)
-            {
-                io::printSyncFmt("Before LCD print checksum\n");
-
-                display.clear();
-                display.goHome();
-                display.print("DHT11 invalid checksum\n");
-                io::printSyncFmt("Invalid checksum\n");
-            }
+            io::printSyncFmt("UPDATED\n");
         }
     }
 }
