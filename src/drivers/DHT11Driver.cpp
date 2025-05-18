@@ -30,7 +30,7 @@ DHT11Driver::ErrorCode DHT11Driver::run(float &temperature, float &humidity)
 
     gpio::disablePin(pin_);
     gpio::setPinOutput(pin_, false);
-    gpio::configureOutput(pin_, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
+    gpio::configureOutput(pin_, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High, gpio::PullMode::Up);
 
     utils::sleepMsec(timer_, 20);
 
