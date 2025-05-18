@@ -20,6 +20,7 @@ enum : uint32_t
     I2C_3 = 1 << 7,
 
     TIM_2 = 1 << 8,
+    TIM_3 = 1 << 9,
 };
 
 void enableClocks(uint32_t periphs);
