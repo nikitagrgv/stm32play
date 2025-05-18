@@ -154,9 +154,11 @@ int main()
         if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
         {
             last_temperature_update_time = cur_time;
-            SHT31Driver sht31{main_i2c};
+            DHT11Driver dht11{dht_pin, dht_timer};
             float temp, hum;
-            if (sht31.run(temp, hum) == SHT31Driver::ErrorCode::Success)
+            const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
+
+            if (error_code == DHT11Driver::ErrorCode::Success)
             {
                 display.clear();
 
@@ -172,6 +174,18 @@ int main()
 
                 snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
                 display.print(buffer);
+            }
+            else if (error_code == DHT11Driver::ErrorCode::Timeout)
+            {
+                display.clear();
+                display.goHome();
+                display.print("DHT11 timeout\n");
+            }
+            else if (error_code == DHT11Driver::ErrorCode::InvalidChecksum)
+            {
+                display.clear();
+                display.goHome();
+                display.print("DHT11 invalid checksum\n");
             }
         }
 
