@@ -184,13 +184,13 @@ int main()
             {
                 display.clear();
                 display.goHome();
-                display.print("DHT11 timeout\n");
+                display.print("DHT11 timeout");
             }
             else if (error_code == DHT11Driver::ErrorCode::InvalidChecksum)
             {
                 display.clear();
                 display.goHome();
-                display.print("DHT11 invalid checksum\n");
+                display.print("DHT11 invalid checksum");
             }
         }
 
