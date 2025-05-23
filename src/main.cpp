@@ -248,6 +248,7 @@ int main()
             {
                 if (mq2_initialized())
                 {
+                    mq2.updateRatio();
                     const uint32_t value_lpg = mq2.readLPG();
                     const uint32_t value_methane = mq2.readMethane();
                     const uint32_t value_smoke = mq2.readSmoke();

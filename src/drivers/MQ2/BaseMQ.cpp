@@ -81,13 +81,17 @@ float BaseMQ::calculateResistance() const
 
 float BaseMQ::readScaled(float a, float b) const
 {
-    float ratio = readRatio();
-    return std::exp((std::log(ratio) - b) / a);
+    return std::exp((std::log(cached_ratio) - b) / a);
 }
 
 float BaseMQ::readRatio() const
 {
     return readRs() / getRo();
+}
+
+void BaseMQ::updateRatio()
+{
+    cached_ratio = readRatio();
 }
 
 bool BaseMQ::heatingCompleted() const

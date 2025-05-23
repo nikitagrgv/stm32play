@@ -36,6 +36,7 @@ public:
     bool heatingCompleted() const;
     bool coolanceCompleted() const;
     float readRatio() const;
+    void updateRatio();
     inline bool isCalibrated() const { return _stateCalibrate; };
     inline float getRo() const { return _ro; };
 
@@ -47,6 +48,7 @@ protected:
     virtual float getRL() const = 0;
 
 private:
+    float cached_ratio = 1;
     // bool _heater = false;
     // bool _cooler = false;
     bool _stateCalibrate = false;
