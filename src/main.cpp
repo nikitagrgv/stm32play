@@ -61,10 +61,10 @@ int main()
     constexpr Pin adc_pin{GPIOPort::A, 5};
     gpio::configureAnalog(adc_pin);
 
-    ADC1->CR2 = 0;                  // Reset CR2
-    ADC1->SMPR2 |= (7U << (3 * 5)); // 480 cycles
-    ADC1->SQR3 = 5;                 // Channel 0 first in regular sequence
-    ADC1->CR2 |= ADC_CR2_ADON;      // Enable ADC1
+    ADC1->CR2 = 0;
+    ADC1->SMPR2 |= (7U << (3 * 5));
+    ADC1->SQR3 = 5;
+    ADC1->CR2 |= ADC_CR2_ADON;
 
     // Led
     constexpr Pin led_pin{GPIOPort::C, 13};
