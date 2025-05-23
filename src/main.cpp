@@ -188,7 +188,26 @@ int main()
             float temp, hum;
             const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
 
-            if (error_code == DHT11Driver::ErrorCode::Success)
+            const uint16_t adc_value = adcRead();
+
+            if (true)
+            {
+                display.clear();
+
+                constexpr int BUFFER_SIZE = 16;
+                char buffer[BUFFER_SIZE];
+
+                display.goHome();
+
+                snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
+                display.print(buffer);
+
+                display.goToSecondLine();
+
+                snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
+                display.print(buffer);
+            }
+            else if (error_code == DHT11Driver::ErrorCode::Success)
             {
                 display.clear();
 
