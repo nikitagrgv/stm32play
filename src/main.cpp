@@ -35,6 +35,20 @@ CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
+uint16_t adcRead()
+{
+    // Start conversion
+    ADC1->CR2 |= ADC_CR2_SWSTART;
+
+    // Wait for conversion to complete
+    while (!(ADC1->SR & ADC_SR_EOC));
+
+    // Read the converted value
+    uint16_t adc_value = ADC1->DR;
+
+    return adc_value;
+}
+
 int main()
 {
     glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
@@ -45,15 +59,17 @@ int main()
 
     irq::disableInterrupts();
 
-    rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::TIM_2 | rcc::TIM_3 | rcc::TIM_1 | rcc::ADC_1);
+    rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::TIM_2 | rcc::TIM_3
+        | rcc::TIM_1 | rcc::ADC_1);
 
+    // ADC
     constexpr Pin adc_pin{GPIOPort::A, 5};
     gpio::configureAnalog(adc_pin);
 
-    ADC1->CR2 = 0;                         // Reset CR2
-    ADC1->SQR3 = 0;                        // Channel 0 first in regular sequence
-    ADC1->SMPR2 |= ADC_SMPR2_SMP0_2;       // Sampling time 56 cycles for channel 0
-    ADC1->CR2 |= ADC_CR2_ADON;             // Enable ADC1
+    ADC1->CR2 = 0;                  // Reset CR2
+    ADC1->SMPR2 |= (7U << (3 * 5)); // 480 cycles
+    ADC1->SQR3 = 5;                 // Channel 0 first in regular sequence
+    ADC1->CR2 |= ADC_CR2_ADON;      // Enable ADC1
 
     // Led
     constexpr Pin led_pin{GPIOPort::C, 13};
