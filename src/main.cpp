@@ -50,7 +50,7 @@ float readADC1Voltage()
 
     uint16_t rawData = readADC1();
     float voltage = rawData;
-    voltage = voltage * 3.3f / MAX_VALUE;
+    voltage = voltage * REF_VOLTAGE / MAX_VALUE;
     return voltage;
 }
 
