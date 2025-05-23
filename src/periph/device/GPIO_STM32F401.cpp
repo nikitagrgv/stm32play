@@ -111,6 +111,12 @@ void gpio::configureAlternate(Pin pin, int alt_func, OutputMode output_mode, Out
     configure(pin, mode, output_mode, speed, pull_mode, alt_func);
 }
 
+void gpio::configureAnalog(Pin pin)
+{
+    constexpr uint32_t mode = 0b10;
+    configure(pin, mode, OutputMode::OpenDrain, OutputSpeed::Low, PullMode::None, 0);
+}
+
 void gpio::disablePin(Pin pin)
 {
     configureInput(pin, PullMode::None);

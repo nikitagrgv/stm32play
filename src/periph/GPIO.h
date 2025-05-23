@@ -37,6 +37,8 @@ void configureAlternateInput(Pin pin, PullMode pull_mode = PullMode::None);
 void configureAlternate(Pin pin, int alt_func, OutputMode output_mode, OutputSpeed speed, PullMode pull_mode = PullMode::None);
 #endif
 
+void configureAnalog(Pin pin);
+
 void disablePin(Pin pin);
 
 bool getPinInput(Pin pin);

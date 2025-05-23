@@ -47,6 +47,8 @@ int main()
 
     rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::TIM_2 | rcc::TIM_3 | rcc::TIM_1);
 
+    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
+
     // Led
     constexpr Pin led_pin{GPIOPort::C, 13};
     gpio::configureOutput(led_pin, gpio::OutputMode::OpenDrain, gpio::OutputSpeed::High);
