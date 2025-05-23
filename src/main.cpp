@@ -209,7 +209,7 @@ int main()
                 user_key_state = new_user_key_state;
                 if (!user_key_state)
                 {
-                    if (!mq2_inited_force)
+                    if (!mq2_initialized())
                     {
                         mq2_init_force();
                         io::printSyncFmt("Force MQ2 initialization\n");
@@ -217,6 +217,10 @@ int main()
                         display.goHome();
                         display.print("MQ2 force init");
                         utils::sleepMsec(1500);
+                    }
+                    else if ()
+                    {
+
                     }
                 }
             }
