@@ -35,7 +35,7 @@ CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
-uint16_t Read_ADC1(void)
+uint16_t readADC1()
 {
     ADC1->CR2 |= ADC_CR2_SWSTART;
     while (!(ADC1->SR & ADC_SR_EOC))
@@ -182,7 +182,7 @@ int main()
             float temp, hum;
             const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
 
-            const uint16_t adc_value = Read_ADC1();
+            const uint16_t adc_value = readADC1();
 
             if (true)
             {
