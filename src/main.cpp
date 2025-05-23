@@ -216,7 +216,7 @@ int main()
                         display.clear();
                         display.goHome();
                         display.print("MQ2 force init");
-                        utils::sleepMsec(1000);
+                        utils::sleepMsec(1500);
                     }
                 }
             }
@@ -229,7 +229,7 @@ int main()
             display.clear();
             display.goHome();
             display.print("MQ2 calibrated");
-            utils::sleepMsec(1000);
+            utils::sleepMsec(1500);
         }
 
         if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
