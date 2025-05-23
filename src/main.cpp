@@ -177,7 +177,7 @@ int main()
     uint32_t user_key_last_change_time = 0;
 
     uint32_t last_temperature_update_time = 0;
-    constexpr uint32_t TEMPERATURE_UPDATE_PERIOD_MS = 1000;
+    constexpr uint32_t TEMPERATURE_UPDATE_PERIOD_MS = 500;
 
     uint32_t mq2_start_time = glob::total_msec;
     uint32_t mq2_end_init_time = mq2_start_time + 60 * 1000;
@@ -272,10 +272,6 @@ int main()
                     display.clear();
                     display.goHome();
                     snprintf(buffer, BUFFER_SIZE, "MQ2 wait: %ds", remaining);
-                    display.print(buffer);
-                    display.goToSecondLine();
-
-                    snprintf(buffer, BUFFER_SIZE, "%d msec...", remaining);
                     display.print(buffer);
                 }
             }
