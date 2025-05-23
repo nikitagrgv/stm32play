@@ -199,7 +199,7 @@ int main()
 
                 display.goHome();
 
-                snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
+                snprintf(buffer, BUFFER_SIZE, "T=%d", (uint32_t)adc_value);
                 display.print(buffer);
 
                 display.goToSecondLine();
