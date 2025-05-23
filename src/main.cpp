@@ -206,6 +206,8 @@ int main()
                 {
                     mq2_inited_force();
                     io::printSyncFmt("Force MQ2 initialization\n");
+                    display.clear();
+                    display.goHome();
                     display.print("MQ2 force init");
                 }
             }
