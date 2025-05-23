@@ -10,7 +10,7 @@
 // время охлаждение датчика
 #define MQ_COOLANCE_TIME 9000
 // масимальное значение АЦП
-#define ADC_VALUE_MAX ((float)(1<<12)
+#define ADC_VALUE_MAX ((float)(1<<12))
 
 #if defined(ARDUINO_ARCH_ESP32)
     #define analogWrite ledcWrite
