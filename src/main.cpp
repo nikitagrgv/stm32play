@@ -244,13 +244,13 @@ int main()
             {
                 if (mq2_initialized())
                 {
-                    display.clear();
-                    display.goHome();
-
                     const uint32_t value_lpg = mq2.readLPG();
                     const uint32_t value_methane = mq2.readMethane();
                     const uint32_t value_smoke = mq2.readSmoke();
                     const uint32_t value_hydrogen = mq2.readHydrogen();
+
+                    display.clear();
+                    display.goHome();
 
                     snprintf(buffer, BUFFER_SIZE, "smoke: %d", value_smoke);
                     display.print(buffer);
