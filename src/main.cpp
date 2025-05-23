@@ -182,7 +182,7 @@ int main()
     uint32_t mq2_start_time = glob::total_msec;
     uint32_t mq2_end_init_time = mq2_start_time + 60 * 1000;
 
-    const auto mq2_initialized = [=] {
+    const auto mq2_initialized = [&] {
         return glob::total_msec >= mq2_end_init_time;
     };
 
