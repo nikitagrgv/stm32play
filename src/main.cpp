@@ -157,6 +157,8 @@ int main()
 
     irq::enableInterrupts();
 
+    MQ2Custom mq2;
+
     // Display
     LCD1602Driver display{main_i2c, TIM3};
     const bool display_initialized = display.initialize();
