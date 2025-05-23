@@ -252,7 +252,7 @@ int main()
                     const uint32_t value_smoke = mq2.readSmoke();
                     const uint32_t value_hydrogen = mq2.readHydrogen();
 
-                    snprintf(buffer, BUFFER_SIZE, "");
+                    snprintf(buffer, BUFFER_SIZE, "smoke: %d", value_smoke);
                     display.print(buffer);
 
                     display.goToSecondLine();
