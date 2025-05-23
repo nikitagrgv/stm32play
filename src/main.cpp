@@ -47,6 +47,13 @@ int main()
 
     rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::TIM_2 | rcc::TIM_3 | rcc::TIM_1 | rcc::ADC_1);
 
+    constexpr Pin adc_pin{GPIOPort::A, 5};
+    gpio::configureAnalog(adc_pin);
+
+    ADC1->CR2 = 0;                         // Reset CR2
+    ADC1->SQR3 = 0;                        // Channel 0 first in regular sequence
+    ADC1->SMPR2 |= ADC_SMPR2_SMP0_2;       // Sampling time 56 cycles for channel 0
+    ADC1->CR2 |= ADC_CR2_ADON;             // Enable ADC1
 
     // Led
     constexpr Pin led_pin{GPIOPort::C, 13};
