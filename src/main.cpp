@@ -180,9 +180,11 @@ int main()
     constexpr uint32_t TEMPERATURE_UPDATE_PERIOD_MS = 1000;
 
     uint32_t mq2_start_time = glob::total_msec;
-    uint32_t mq2_end_time = mq2_start_time + 60 * 1000;
+    uint32_t mq2_end_init_time = mq2_start_time + 60 * 1000;
 
-    bool mq2_initialized = false;
+    const auto mq2_initialized = [=] {
+        return glob::total_msec >= mq2_end_init_time;
+    };
 
     while (true)
     {
@@ -213,9 +215,11 @@ int main()
 
             if (true)
             {
-                if (remaining_mq2_initialization_ms )
+                if (remaining_mq2_initialization_ms)
+                {
 
-                display.clear();
+                    display.clear();
+                }
 
                 constexpr int BUFFER_SIZE = 16;
                 char buffer[BUFFER_SIZE];
