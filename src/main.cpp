@@ -193,7 +193,7 @@ int main()
             float temp, hum;
             const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
 
-            const uint16_t adc_value = readADC1();
+            const float adc_value = readADC1Voltage();
 
             if (true)
             {
@@ -204,7 +204,7 @@ int main()
 
                 display.goHome();
 
-                snprintf(buffer, BUFFER_SIZE, "T=%d", (uint32_t)adc_value);
+                snprintf(buffer, BUFFER_SIZE, "T=%f", adc_value);
                 display.print(buffer);
 
                 display.goToSecondLine();
