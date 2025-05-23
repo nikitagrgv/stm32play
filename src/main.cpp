@@ -245,7 +245,7 @@ int main()
 
                     display.clear();
                     display.goHome();
-                    snprintf(buffer, BUFFER_SIZE, "MQ2 heating: %d", remaining);
+                    snprintf(buffer, BUFFER_SIZE, "MQ2 wait: %ds", remaining);
                     display.print(buffer);
                     display.goToSecondLine();
 
