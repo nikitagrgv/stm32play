@@ -261,12 +261,12 @@ int main()
                     display.clear();
                     display.goHome();
 
-                    snprintf(buffer, BUFFER_SIZE, "smoke: %d", value_smoke);
+                    snprintf(buffer, BUFFER_SIZE, "SMK %u LPG %u", value_smoke, value_lpg);
                     display.print(buffer);
 
                     display.goToSecondLine();
 
-                    // snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
+                    snprintf(buffer, BUFFER_SIZE, "MTH %u HDG %u", value_methane, value_hydrogen);
                     display.print(buffer);
                 }
                 else
