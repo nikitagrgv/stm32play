@@ -189,7 +189,8 @@ int main()
         {
             last_temperature_update_time = cur_time;
 
-            float temp, hum;
+            float temp = 0;
+            float hum = 0;
             const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
 
             const float adc_value = readADC1Voltage();
