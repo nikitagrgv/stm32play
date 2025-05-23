@@ -32,6 +32,7 @@ class BaseMQ
 public:
     BaseMQ(uint8_t pin);
     BaseMQ(uint8_t pin, uint8_t pinHeater);
+    virtual ~BaseMQ();
     void calibrate();
     void calibrate(float ro);
     void heaterPwrHigh();

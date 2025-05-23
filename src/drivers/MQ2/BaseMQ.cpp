@@ -14,11 +14,14 @@ BaseMQ::BaseMQ(uint8_t pin) {
   _pin = pin;
 }
 
-BaseMQ::BaseMQ(uint8_t pin, uint8_t pinHeater) {
-  _pin = pin;
-  _pinHeater = pinHeater;
-  pinMode(_pinHeater, OUTPUT);
+BaseMQ::BaseMQ(uint8_t pin, uint8_t pinHeater)
+{
+    _pin = pin;
+    _pinHeater = pinHeater;
+    pinMode(_pinHeater, OUTPUT);
 }
+
+BaseMQ::~BaseMQ() {}
 
 // фиксированая калибровка датчика
 // при знании сопративления датчика на чистом воздухе
