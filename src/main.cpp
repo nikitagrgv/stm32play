@@ -204,8 +204,9 @@ int main()
                 user_key_state = new_user_key_state;
                 if (!user_key_state)
                 {
-                    io::printSyncFmt("User key pressed\n");
-                    display.print("Hello!");
+                    mq2_inited_force();
+                    io::printSyncFmt("Force MQ2 initialization\n");
+                    display.print("MQ2 force init");
                 }
             }
         }
