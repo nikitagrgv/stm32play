@@ -43,6 +43,16 @@ uint16_t readADC1()
     return ADC1->DR;
 }
 
+float readADC1Voltage()
+{
+    constexpr float REF_VOLTAGE = 3.3f;
+    constexpr float MAX_VALUE = 1 << 12;
+
+    uint16_t rawData = readADC1();
+    float voltage = rawData;
+    voltage = voltage * 3.3f / MAX_VALUE;
+}
+
 int main()
 {
     glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
