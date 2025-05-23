@@ -241,12 +241,14 @@ int main()
                 }
                 else
                 {
+                    const int remaining = (mq2_end_init_time - cur_time) / 1000;
+
                     display.clear();
                     display.goHome();
-                    display.print("MQ2 initialization...");
+                    snprintf(buffer, BUFFER_SIZE, "MQ2 heating: %d", remaining);
+                    display.print(buffer);
                     display.goToSecondLine();
 
-                    const int remaining = mq2_end_init_time - cur_time;
                     snprintf(buffer, BUFFER_SIZE, "%d msec...", remaining);
                     display.print(buffer);
                 }
