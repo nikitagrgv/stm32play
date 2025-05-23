@@ -248,6 +248,7 @@ int main()
 
                     const int remaining = mq2_end_init_time - cur_time;
                     snprintf(buffer, BUFFER_SIZE, "%d msec...", remaining);
+                    display.print(buffer);
                 }
             }
             else if (error_code == DHT11Driver::ErrorCode::Success)
