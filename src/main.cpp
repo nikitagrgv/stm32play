@@ -220,6 +220,7 @@ int main()
                     }
                     else if (mq2_calibrated)
                     {
+                        mq2_calibrated = false;
                         io::printSyncFmt("MQ2 recalibration\n");
                         display.clear();
                         display.goHome();
