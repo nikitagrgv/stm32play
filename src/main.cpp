@@ -183,17 +183,20 @@ int main()
     uint32_t mq2_end_init_time = mq2_start_time + 60 * 1000;
     bool mq2_inited_force = false;
 
-    const auto mq2_initialized = [&] {
-        return mq2_inited_force || glob::total_msec >= mq2_end_init_time;
-    };
-
     const auto mq2_init_force = [&] {
         mq2_inited_force = true;
     };
 
+    constexpr int BUFFER_SIZE = 16;
+    char buffer[BUFFER_SIZE];
+
     while (true)
     {
         const uint32_t cur_time = glob::total_msec;
+
+        const auto mq2_initialized = [&] {
+            return mq2_inited_force || cur_time >= mq2_end_init_time;
+        };
 
         if (cur_time - user_key_last_change_time > 10)
         {
@@ -223,14 +226,20 @@ int main()
 
             if (true)
             {
-                if (remaining_mq2_initialization_ms)
+                if (mq2_initialized())
                 {
-
                     display.clear();
                 }
+                else
+                {
+                    display.clear();
+                    display.goHome();
+                    display.print("MQ2 initialization...");
+                    display.goToSecondLine();
 
-                constexpr int BUFFER_SIZE = 16;
-                char buffer[BUFFER_SIZE];
+                    const int remaining = mq2_end_init_time - cur_time;
+                    snprintf(buffer, BUFFER_SIZE, "%d sec...", remaining);
+                }
 
                 display.goHome();
 
@@ -245,9 +254,6 @@ int main()
             else if (error_code == DHT11Driver::ErrorCode::Success)
             {
                 display.clear();
-
-                constexpr int BUFFER_SIZE = 16;
-                char buffer[BUFFER_SIZE];
 
                 display.goHome();
 
