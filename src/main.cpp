@@ -58,23 +58,13 @@ int main()
 
 
     // 2. Configure PA5 as analog input
-    GPIOA->MODER |= (3U << (5 * 2));  // Set PA5 to analog mode
-    GPIOA->PUPDR &= ~(3U << (5 * 2)); // No pull-up, pull-down
+    constexpr Pin adc_pin{GPIOPort::A, 5};
+    gpio::configureAnalog(adc_pin);
 
-    // 3. Configure ADC1
     ADC1->CR2 = 0;                  // Reset CR2
-    ADC1->SQR3 = 5;                 // Set channel 5 (PA5) as 1st conversion in regular sequence
-    ADC1->SMPR2 |= (7U << (3 * 5)); // Set sampling time for channel 5 to 480 cycles
+    ADC1->SMPR2 |= (7U << (3 * 5)); // 480 cycles
+    ADC1->SQR3 = 5;                 // Channel 0 first in regular sequence
     ADC1->CR2 |= ADC_CR2_ADON;      // Enable ADC1
-
-    // // ADC
-    // constexpr Pin adc_pin{GPIOPort::A, 5};
-    // gpio::configureAnalog(adc_pin);
-    //
-    // ADC1->CR2 = 0;                  // Reset CR2
-    // ADC1->SMPR2 |= (7U << (3 * 5)); // 480 cycles
-    // ADC1->SQR3 = 5;                 // Channel 0 first in regular sequence
-    // ADC1->CR2 |= ADC_CR2_ADON;      // Enable ADC1
 
     // Led
     constexpr Pin led_pin{GPIOPort::C, 13};
