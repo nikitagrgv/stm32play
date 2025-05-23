@@ -243,8 +243,6 @@ int main()
                     display.clear();
                     display.goHome();
 
-                    mq2.calibrate();
-
                     // snprintf(buffer, BUFFER_SIZE, "T=%f", adc_value);
                     // display.print(buffer);
 
