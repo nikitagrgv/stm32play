@@ -229,6 +229,15 @@ int main()
                 if (mq2_initialized())
                 {
                     display.clear();
+                    display.goHome();
+
+                    // snprintf(buffer, BUFFER_SIZE, "T=%f", adc_value);
+                    // display.print(buffer);
+
+                    display.goToSecondLine();
+
+                    // snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
+                    // display.print(buffer);
                 }
                 else
                 {
@@ -240,16 +249,6 @@ int main()
                     const int remaining = mq2_end_init_time - cur_time;
                     snprintf(buffer, BUFFER_SIZE, "%d msec...", remaining);
                 }
-
-                display.goHome();
-
-                snprintf(buffer, BUFFER_SIZE, "T=%f", adc_value);
-                display.print(buffer);
-
-                display.goToSecondLine();
-
-                snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
-                display.print(buffer);
             }
             else if (error_code == DHT11Driver::ErrorCode::Success)
             {
