@@ -155,8 +155,6 @@ int main()
 
     command_executor.addCommand(std::make_unique<DHT11Command>(&dht11));
 
-    command_executor.addCommand(std::make_unique<SHT31Command>(main_i2c));
-
     irq::enableInterrupts();
 
     // Display
