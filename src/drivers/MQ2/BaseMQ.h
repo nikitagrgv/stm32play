@@ -9,29 +9,22 @@
 #define MQ_HEATING_TIME 6000
 // время охлаждение датчика
 #define MQ_COOLANCE_TIME 9000
-// разрядность АЦП
-#define ADC_BIT 10
 // масимальное значение АЦП
-#define ADC_VALUE_MAX pow(2, ADC_BIT)
+#define ADC_VALUE_MAX ((float)(1<<12)
 
 #if defined(ARDUINO_ARCH_ESP32)
     #define analogWrite ledcWrite
 #endif
 
-#if defined(__AVR__)
-    #define OPERATING_VOLTAGE 5.0
-
-#else
-    #define OPERATING_VOLTAGE 3.3
-#endif
+#define OPERATING_VOLTAGE 5.0
 
 #include <cstdint>
 
 class BaseMQ
 {
 public:
-    BaseMQ(uint8_t pin);
-    BaseMQ(uint8_t pin, uint8_t pinHeater);
+    BaseMQ();
+    // BaseMQ(uint8_t pin, uint8_t pinHeater);
     virtual ~BaseMQ();
     void calibrate();
     void calibrate(float ro);
@@ -52,13 +45,13 @@ protected:
     virtual float getRL() const = 0;
 
 private:
-    bool _heater = false;
-    bool _cooler = false;
+    // bool _heater = false;
+    // bool _cooler = false;
     bool _stateCalibrate = false;
     unsigned long _prMillis = 0;
     float _ro = 1.0f;
-    uint8_t _pin;
-    uint8_t _pinHeater;
+    // uint8_t _pin;
+    // uint8_t _pinHeater;
     float readRs() const;
     float calculateResistance(int sensorADC) const;
 };
