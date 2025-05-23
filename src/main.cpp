@@ -187,6 +187,8 @@ int main()
         mq2_inited_force = true;
     };
 
+    bool mq2_calibrated = false;
+
     constexpr int BUFFER_SIZE = 16;
     char buffer[BUFFER_SIZE];
 
@@ -220,6 +222,12 @@ int main()
             }
         }
 
+        if (mq2_initialized() && !mq2_calibrated)
+        {
+            mq2_calibrated = true;
+            mq2.calibrate();
+        }
+
         if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
         {
             last_temperature_update_time = cur_time;
@@ -234,6 +242,8 @@ int main()
                 {
                     display.clear();
                     display.goHome();
+
+                    mq2.calibrate();
 
                     // snprintf(buffer, BUFFER_SIZE, "T=%f", adc_value);
                     // display.print(buffer);
