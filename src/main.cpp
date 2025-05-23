@@ -226,6 +226,10 @@ int main()
         {
             mq2_calibrated = true;
             mq2.calibrate();
+            display.clear();
+            display.goHome();
+            display.print("MQ2 calibrated");
+            utils::sleepMsec(1000);
         }
 
         if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
