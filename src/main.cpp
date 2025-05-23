@@ -57,10 +57,6 @@ int main()
         | rcc::TIM_1 | rcc::ADC_1);
 
 
-    // 1. Enable clocks for GPIOA and ADC1
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; // Enable GPIOA clock
-    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;  // Enable ADC1 clock
-
     // 2. Configure PA5 as analog input
     GPIOA->MODER |= (3U << (5 * 2));  // Set PA5 to analog mode
     GPIOA->PUPDR &= ~(3U << (5 * 2)); // No pull-up, pull-down
