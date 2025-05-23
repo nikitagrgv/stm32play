@@ -248,12 +248,12 @@ int main()
                     display.goHome();
 
                     // snprintf(buffer, BUFFER_SIZE, "T=%f", adc_value);
-                    // display.print(buffer);
+                    display.print(buffer);
 
                     display.goToSecondLine();
 
                     // snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
-                    // display.print(buffer);
+                    display.print(buffer);
                 }
                 else
                 {
