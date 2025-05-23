@@ -218,9 +218,13 @@ int main()
                         display.print("MQ2 force init");
                         utils::sleepMsec(1500);
                     }
-                    else if ()
+                    else if (mq2_calibrated)
                     {
-
+                        io::printSyncFmt("MQ2 recalibration\n");
+                        display.clear();
+                        display.goHome();
+                        display.print("MQ2 recalibration");
+                        utils::sleepMsec(1500);
                     }
                 }
             }
