@@ -179,7 +179,10 @@ int main()
     uint32_t last_temperature_update_time = 0;
     constexpr uint32_t TEMPERATURE_UPDATE_PERIOD_MS = 1000;
 
-    uint32_t remaining_mq2_initialization_ms = 60 * 1000;
+    uint32_t mq2_start_time = glob::total_msec;
+    uint32_t mq2_end_time = mq2_start_time + 60 * 1000;
+
+    bool mq2_initialized = false;
 
     while (true)
     {
@@ -208,10 +211,10 @@ int main()
             float hum = 0;
             const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
 
-            const float adc_value = readADC1Voltage();
-
             if (true)
             {
+                if (remaining_mq2_initialization_ms )
+
                 display.clear();
 
                 constexpr int BUFFER_SIZE = 16;
