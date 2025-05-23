@@ -238,7 +238,7 @@ int main()
                     display.goToSecondLine();
 
                     const int remaining = mq2_end_init_time - cur_time;
-                    snprintf(buffer, BUFFER_SIZE, "%d sec...", remaining);
+                    snprintf(buffer, BUFFER_SIZE, "%d msec...", remaining);
                 }
 
                 display.goHome();
