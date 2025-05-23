@@ -216,16 +216,11 @@ int main()
                         display.clear();
                         display.goHome();
                         display.print("MQ2 force init");
-                        utils::sleepMsec(1500);
+                        utils::sleepMsec(1000);
                     }
                     else if (mq2_calibrated)
                     {
                         mq2_calibrated = false;
-                        io::printSyncFmt("MQ2 recalibration\n");
-                        display.clear();
-                        display.goHome();
-                        display.print("MQ2 recalibration");
-                        utils::sleepMsec(1500);
                     }
                 }
             }
@@ -238,7 +233,7 @@ int main()
             display.clear();
             display.goHome();
             display.print("MQ2 calibrated");
-            utils::sleepMsec(1500);
+            utils::sleepMsec(1000);
         }
 
         if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
