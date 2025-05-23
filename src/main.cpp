@@ -37,10 +37,10 @@ CommandExecutor command_executor;
 
 uint16_t Read_ADC1(void)
 {
-    ADC1->CR2 |= ADC_CR2_SWSTART; // Start conversion
+    ADC1->CR2 |= ADC_CR2_SWSTART;
     while (!(ADC1->SR & ADC_SR_EOC))
-        ;            // Wait for conversion to complete
-    return ADC1->DR; // Read converted value
+        ;
+    return ADC1->DR;
 }
 
 int main()
