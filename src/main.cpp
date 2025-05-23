@@ -247,7 +247,12 @@ int main()
                     display.clear();
                     display.goHome();
 
-                    snprintf(buffer, BUFFER_SIZE, "01234567890123456789");
+                    const uint32_t value_lpg = mq2.readLPG();
+                    const uint32_t value_methane = mq2.readMethane();
+                    const uint32_t value_smoke = mq2.readSmoke();
+                    const uint32_t value_hydrogen = mq2.readHydrogen();
+
+                    snprintf(buffer, BUFFER_SIZE, "");
                     display.print(buffer);
 
                     display.goToSecondLine();
