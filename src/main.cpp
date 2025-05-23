@@ -53,6 +53,12 @@ float readADC1Voltage()
     return voltage;
 }
 
+float readVoltageMQ2()
+{
+    const float divided = readADC1Voltage();
+    return divided * 2.0;
+}
+
 int main()
 {
     glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
