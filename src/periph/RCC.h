@@ -22,6 +22,8 @@ enum : uint32_t
     TIM_2 = 1 << 8,
     TIM_3 = 1 << 9,
     TIM_1 = 1 << 10,
+
+    ADC_1 = 1 << 11,
 };
 
 void enableClocks(uint32_t periphs);
