@@ -189,7 +189,7 @@ int main()
 
     bool mq2_calibrated = false;
 
-    constexpr int BUFFER_SIZE = 16;
+    constexpr int BUFFER_SIZE = 16+1;
     char buffer[BUFFER_SIZE];
 
     while (true)
@@ -247,7 +247,7 @@ int main()
                     display.clear();
                     display.goHome();
 
-                    // snprintf(buffer, BUFFER_SIZE, "T=%f", adc_value);
+                    snprintf(buffer, BUFFER_SIZE, "01234567890123456789");
                     display.print(buffer);
 
                     display.goToSecondLine();
