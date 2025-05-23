@@ -41,7 +41,8 @@ uint16_t adcRead()
     ADC1->CR2 |= ADC_CR2_SWSTART;
 
     // Wait for conversion to complete
-    while (!(ADC1->SR & ADC_SR_EOC));
+    while (!(ADC1->SR & ADC_SR_EOC))
+    {}
 
     // Read the converted value
     uint16_t adc_value = ADC1->DR;
