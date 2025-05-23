@@ -4,9 +4,7 @@
 
 #include <cmath>
 
-BaseMQ::BaseMQ()
-{
-}
+BaseMQ::BaseMQ() {}
 
 // BaseMQ::BaseMQ(uint8_t pin, uint8_t pinHeater)
 // {
@@ -65,7 +63,7 @@ float BaseMQ::readRs() const
     float rs = 0;
     for (int i = 0; i < MQ_SAMPLE_TIMES; i++)
     {
-        rs += calculateResistance(analogRead(_pin));
+        rs += calculateResistance();
         utils::sleepMsec(MQ_SAMPLE_INTERVAL);
     }
     rs = rs / MQ_SAMPLE_TIMES;
@@ -74,9 +72,9 @@ float BaseMQ::readRs() const
 
 
 // сопротивление датчика
-float BaseMQ::calculateResistance(int sensorADC) const
+float BaseMQ::calculateResistance() const
 {
-    float sensorVoltage = sensorADC * (OPERATING_VOLTAGE / ADC_VALUE_MAX);
+    float sensorVoltage = getVoltage();
     float sensorResistance = (OPERATING_VOLTAGE - sensorVoltage) / sensorVoltage * getRL();
     return sensorResistance;
 }

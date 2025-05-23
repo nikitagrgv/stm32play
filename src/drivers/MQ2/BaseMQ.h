@@ -10,7 +10,7 @@
 // время охлаждение датчика
 #define MQ_COOLANCE_TIME 9000
 // масимальное значение АЦП
-#define ADC_VALUE_MAX ((float)(1<<12))
+#define ADC_VALUE_MAX ((float)(1 << 12))
 
 #if defined(ARDUINO_ARCH_ESP32)
     #define analogWrite ledcWrite
@@ -40,6 +40,8 @@ public:
     inline float getRo() const { return _ro; };
 
 protected:
+    virtual float getVoltage() const = 0;
+
     float readScaled(float a, float b) const;
     virtual float getRoInCleanAir() const = 0;
     virtual float getRL() const = 0;
@@ -53,7 +55,7 @@ private:
     // uint8_t _pin;
     // uint8_t _pinHeater;
     float readRs() const;
-    float calculateResistance(int sensorADC) const;
+    float calculateResistance() const;
 };
 
 #endif

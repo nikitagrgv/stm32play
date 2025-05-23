@@ -60,6 +60,13 @@ float readVoltageMQ2()
     return divided * 2.0;
 }
 
+
+class MQ2Custom : public MQ2
+{
+public:
+    float getVoltage() const override { return readVoltageMQ2(); }
+};
+
 int main()
 {
     glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();

@@ -4,21 +4,22 @@
 #include "BaseMQ.h"
 
 // резистор установленный на плату (кОм)
-#define MQ2_RL_BOARD            5.0
+#define MQ2_RL_BOARD 5.0
 // коефициент чистого воздуха из графика
-#define MQ2_RO_IN_CLEAR_AIR     9.83
+#define MQ2_RO_IN_CLEAR_AIR 9.83
 
-class MQ2 : public BaseMQ {
+class MQ2 : public BaseMQ
+{
 public:
-    MQ2(uint8_t pin);
-    MQ2(uint8_t pin, uint8_t pinHeater);
+    MQ2();
     unsigned long readLPG();
     unsigned long readMethane();
     unsigned long readSmoke();
     unsigned long readHydrogen();
+
 private:
     virtual float getRL() const { return MQ2_RL_BOARD; }
     virtual float getRoInCleanAir() const { return MQ2_RO_IN_CLEAR_AIR; }
 };
 
-#endif  // MQ2_H_
+#endif // MQ2_H_
