@@ -212,6 +212,7 @@ int main()
                     display.clear();
                     display.goHome();
                     display.print("MQ2 force init");
+                    utils::sleepMsec(1000);
                 }
             }
         }
