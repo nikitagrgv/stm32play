@@ -10,6 +10,7 @@
 #include "debug/Statistic.h"
 #include "drivers/DHT11Driver.h"
 #include "drivers/LCD1602Driver.h"
+#include "drivers/MQ2/MQ2.h"
 #include "drivers/SHT31Driver.h"
 #include "low_level/clock.h"
 #include "periph/EXTI.h"
