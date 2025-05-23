@@ -179,6 +179,7 @@ int main()
     uint32_t last_temperature_update_time = 0;
     constexpr uint32_t TEMPERATURE_UPDATE_PERIOD_MS = 1000;
 
+    uint32_t remaining_mq2_initialization_ms = 60 * 1000;
 
     while (true)
     {
