@@ -45,6 +45,7 @@ void get_masks(uint32_t periph, uint32_t &apb1_mask, uint32_t &apb2_mask)
     {
         apb1_mask |= RCC_APB1ENR_TIM2EN;
     }
+    #error todo
 }
 #elifdef STM32F401
 void get_masks(uint32_t periph, uint32_t &ahb1_mask, uint32_t &apb1_mask, uint32_t &apb2_mask)
