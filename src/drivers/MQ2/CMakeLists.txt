@@ -1,0 +1,8 @@
+
+target_sources(${EXECUTABLE_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/BaseMQ.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/BaseMQ.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/MQ2.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/MQ2.h
+)
+
