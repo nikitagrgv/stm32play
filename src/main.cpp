@@ -35,19 +35,12 @@ CommandBuffer command_buffer;
 
 CommandExecutor command_executor;
 
-uint16_t adcRead()
+uint16_t Read_ADC1(void)
 {
-    // Start conversion
-    ADC1->CR2 |= ADC_CR2_SWSTART;
-
-    // Wait for conversion to complete
+    ADC1->CR2 |= ADC_CR2_SWSTART; // Start conversion
     while (!(ADC1->SR & ADC_SR_EOC))
-    {}
-
-    // Read the converted value
-    uint16_t adc_value = ADC1->DR;
-
-    return adc_value;
+        ;            // Wait for conversion to complete
+    return ADC1->DR; // Read converted value
 }
 
 int main()
@@ -63,14 +56,29 @@ int main()
     rcc::enableClocks(rcc::GPIO_A | rcc::GPIO_B | rcc::GPIO_C | rcc::SYSCFG_OR_AFIO | rcc::TIM_2 | rcc::TIM_3
         | rcc::TIM_1 | rcc::ADC_1);
 
-    // ADC
-    constexpr Pin adc_pin{GPIOPort::A, 5};
-    gpio::configureAnalog(adc_pin);
 
+    // 1. Enable clocks for GPIOA and ADC1
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; // Enable GPIOA clock
+    RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;  // Enable ADC1 clock
+
+    // 2. Configure PA5 as analog input
+    GPIOA->MODER |= (3U << (5 * 2));  // Set PA5 to analog mode
+    GPIOA->PUPDR &= ~(3U << (5 * 2)); // No pull-up, pull-down
+
+    // 3. Configure ADC1
     ADC1->CR2 = 0;                  // Reset CR2
-    ADC1->SMPR2 |= (7U << (3 * 5)); // 480 cycles
-    ADC1->SQR3 = 5;                 // Channel 0 first in regular sequence
+    ADC1->SQR3 = 5;                 // Set channel 5 (PA5) as 1st conversion in regular sequence
+    ADC1->SMPR2 |= (7U << (3 * 5)); // Set sampling time for channel 5 to 480 cycles
     ADC1->CR2 |= ADC_CR2_ADON;      // Enable ADC1
+
+    // // ADC
+    // constexpr Pin adc_pin{GPIOPort::A, 5};
+    // gpio::configureAnalog(adc_pin);
+    //
+    // ADC1->CR2 = 0;                  // Reset CR2
+    // ADC1->SMPR2 |= (7U << (3 * 5)); // 480 cycles
+    // ADC1->SQR3 = 5;                 // Channel 0 first in regular sequence
+    // ADC1->CR2 |= ADC_CR2_ADON;      // Enable ADC1
 
     // Led
     constexpr Pin led_pin{GPIOPort::C, 13};
@@ -188,7 +196,7 @@ int main()
             float temp, hum;
             const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
 
-            const uint16_t adc_value = adcRead();
+            const uint16_t adc_value = Read_ADC1();
 
             if (true)
             {
