@@ -240,20 +240,23 @@ int main()
             return mq2_inited_force || cur_time >= mq2_end_init_time;
         };
 
-        if (screen_mode == ScreenMode::MQ2 && user_kay_holding && (cur_time - last_user_key_press > 1300))
+        if (user_kay_holding && (cur_time - last_user_key_press > 1300))
         {
-            if (!mq2_initialized())
+            if (screen_mode == ScreenMode::MQ2)
             {
-                mq2_inited_force = true;
-                io::printSyncFmt("Force MQ2 initialization\n");
-                display.clear();
-                display.goHome();
-                display.print("MQ2 force init");
-                utils::sleepMsec(1000);
-            }
-            else if (mq2_calibrated)
-            {
-                mq2_calibrated = false;
+                if (!mq2_initialized())
+                {
+                    mq2_inited_force = true;
+                    io::printSyncFmt("Force MQ2 initialization\n");
+                    display.clear();
+                    display.goHome();
+                    display.print("MQ2 force init");
+                    utils::sleepMsec(1000);
+                }
+                else if (mq2_calibrated)
+                {
+                    mq2_calibrated = false;
+                }
             }
 
             skip_release = true;
