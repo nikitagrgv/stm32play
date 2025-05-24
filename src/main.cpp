@@ -176,8 +176,8 @@ int main()
     bool user_key_state = gpio::getPinInput(user_key);
     uint32_t user_key_last_change_time = 0;
 
-    uint32_t last_temperature_update_time = 0;
-    constexpr uint32_t TEMPERATURE_UPDATE_PERIOD_MS = 500;
+    uint32_t last_screen_update_time = 0;
+    constexpr uint32_t SCREEN_UPDATE_PERIOD_MS = 500;
 
     uint32_t mq2_start_time = glob::total_msec;
     uint32_t mq2_end_init_time = mq2_start_time + 60 * 1000;
@@ -236,9 +236,9 @@ int main()
             utils::sleepMsec(1000);
         }
 
-        if (cur_time - last_temperature_update_time > TEMPERATURE_UPDATE_PERIOD_MS)
+        if (cur_time - last_screen_update_time > SCREEN_UPDATE_PERIOD_MS)
         {
-            last_temperature_update_time = cur_time;
+            last_screen_update_time = cur_time;
 
             float temp = 0;
             float hum = 0;
