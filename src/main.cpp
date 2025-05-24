@@ -237,7 +237,7 @@ int main()
             return mq2_inited_force || cur_time >= mq2_end_init_time;
         };
 
-        if (user_kay_holding && (cur_time - last_user_key_press > 1300))
+        if (screen_mode == ScreenMode::MQ2 && user_kay_holding && (cur_time - last_user_key_press > 1300))
         {
             if (!mq2_initialized())
             {
