@@ -282,7 +282,7 @@ int main()
             }
         }
 
-        if (mq2_initialized() && !mq2_calibrated)
+        if (screen_mode == ScreenMode::MQ2 && mq2_initialized() && !mq2_calibrated)
         {
             mq2_calibrated = true;
             mq2.calibrate();
