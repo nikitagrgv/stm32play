@@ -211,6 +211,20 @@ int main()
 
         if (user_kay_holding && (cur_time - last_user_key_press > 1000))
         {
+            if (!mq2_initialized())
+            {
+                mq2_inited_force = true;
+                io::printSyncFmt("Force MQ2 initialization\n");
+                display.clear();
+                display.goHome();
+                display.print("MQ2 force init");
+                utils::sleepMsec(1000);
+            }
+            else if (mq2_calibrated)
+            {
+                mq2_calibrated = false;
+            }
+
             skip_release = true;
             user_kay_holding = false;
         }
