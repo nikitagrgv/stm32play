@@ -192,6 +192,7 @@ int main()
     const bool display_initialized = display.initialize();
     if (display_initialized)
     {
+        display.setCursorEnabled(false);
         display.print("Initialized");
         utils::sleepMsec(500);
     }
