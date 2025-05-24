@@ -336,7 +336,7 @@ int main()
                     snprintf(buffer, BUFFER_SIZE, "MQ2 wait: %ds", remaining);
                     display.print(buffer);
                     display.goToSecondLine();
-                    display.print("Press USR to force");
+                    display.print("Press USR to stop");
                 }
             }
             else
