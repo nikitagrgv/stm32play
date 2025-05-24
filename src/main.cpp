@@ -190,13 +190,15 @@ int main()
 
     enum class ScreenMode
     {
-        DHT11,
-        MQ2,
+        DHT11 = 0,
+        MQ2 = 1,
     };
     ScreenMode screen_mode = ScreenMode::MQ2;
 
     while (true)
     {
+        bool force_screen_update = false;
+
         const uint32_t cur_time = glob::total_msec;
 
         const auto mq2_initialized = [&] {
@@ -212,19 +214,21 @@ int main()
                 user_key_state = new_user_key_state;
                 if (user_key_state)
                 {
-                    if (!mq2_initialized())
-                    {
-                        mq2_inited_force = true;
-                        io::printSyncFmt("Force MQ2 initialization\n");
-                        display.clear();
-                        display.goHome();
-                        display.print("MQ2 force init");
-                        utils::sleepMsec(1000);
-                    }
-                    else if (mq2_calibrated)
-                    {
-                        mq2_calibrated = false;
-                    }
+                    screen_mode = (ScreenMode)(!(bool)screen_mode);
+
+                    // if (!mq2_initialized())
+                    // {
+                    //     mq2_inited_force = true;
+                    //     io::printSyncFmt("Force MQ2 initialization\n");
+                    //     display.clear();
+                    //     display.goHome();
+                    //     display.print("MQ2 force init");
+                    //     utils::sleepMsec(1000);
+                    // }
+                    // else if (mq2_calibrated)
+                    // {
+                    //     mq2_calibrated = false;
+                    // }
                 }
             }
         }
