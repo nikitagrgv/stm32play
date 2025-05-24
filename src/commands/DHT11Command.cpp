@@ -13,7 +13,15 @@ bool DHT11Command::execute(const char *args)
 {
     float temperature = 0.0f;
     float humidity = 0.0f;
-    const DHT11Driver::ErrorCode code = dht11->run(temperature, humidity);
+
+    DHT11Driver::ErrorCode code = DHT11Driver::ErrorCode::Timeout;
+
+    int attempts = 10;
+    while (attempts > 0 && code != DHT11Driver::ErrorCode::Success)
+    {
+        code = dht11->run(temperature, humidity);
+        attempts--;
+    }
 
     if (code == DHT11Driver::ErrorCode::Timeout)
     {
