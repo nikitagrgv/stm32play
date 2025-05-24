@@ -183,10 +183,6 @@ int main()
     uint32_t mq2_end_init_time = mq2_start_time + 60 * 1000;
     bool mq2_inited_force = false;
 
-    const auto mq2_init_force = [&] {
-        mq2_inited_force = true;
-    };
-
     bool mq2_calibrated = false;
 
     constexpr int BUFFER_SIZE = 16+1;
@@ -211,7 +207,7 @@ int main()
                 {
                     if (!mq2_initialized())
                     {
-                        mq2_init_force();
+                        mq2_inited_force = true;
                         io::printSyncFmt("Force MQ2 initialization\n");
                         display.clear();
                         display.goHome();
