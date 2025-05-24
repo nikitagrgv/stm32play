@@ -84,7 +84,7 @@ struct MQ2Command : public ICommand
         const uint32_t value_smoke = mq2_->readSmoke();
         const uint32_t value_hydrogen = mq2_->readHydrogen();
 
-        io::printSyncFmt("MQ2: Smoke = %3u; LPG = %3u; Methane = %3u; Hydrogen = %3u\n", value_smoke, value_lpg,
+        io::printSyncFmt("MQ2: Smoke = %u; LPG = %u; Methane = %u; Hydrogen = %u\n", value_smoke, value_lpg,
             value_methane, value_hydrogen);
 
         return true;
