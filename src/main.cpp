@@ -188,6 +188,12 @@ int main()
     constexpr int BUFFER_SIZE = 16+1;
     char buffer[BUFFER_SIZE];
 
+    enum class ScreenMode
+    {
+        DHT11,
+        MQ2,
+    };
+
     while (true)
     {
         const uint32_t cur_time = glob::total_msec;
