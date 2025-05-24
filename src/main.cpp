@@ -193,7 +193,7 @@ int main()
         DHT11,
         MQ2,
     };
-    ScreenMode screen_mode = ScreenMode::DHT11;
+    ScreenMode screen_mode = ScreenMode::MQ2;
 
     while (true)
     {
