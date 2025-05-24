@@ -185,6 +185,8 @@ int main()
 
     MQ2Custom mq2;
 
+    command_executor.addCommand(std::make_unique<MQ2Command>(&mq2));
+
     // Display
     LCD1602Driver display{main_i2c, TIM3};
     const bool display_initialized = display.initialize();
