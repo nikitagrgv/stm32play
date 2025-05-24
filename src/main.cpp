@@ -199,7 +199,7 @@ int main()
         if (cur_time - user_key_last_change_time > 10)
         {
             user_key_last_change_time = cur_time;
-            const bool new_user_key_state = gpio::getPinInput(user_key);
+            const bool new_user_key_state = !gpio::getPinInput(user_key);
             if (new_user_key_state != user_key_state)
             {
                 user_key_state = new_user_key_state;
