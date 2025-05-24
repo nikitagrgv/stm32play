@@ -197,6 +197,7 @@ int main()
 
     uint32_t last_user_key_press = glob::total_msec;
     bool skip_release = false;
+    bool user_kay_holding = false;
 
     while (true)
     {
@@ -208,7 +209,7 @@ int main()
             return mq2_inited_force || cur_time >= mq2_end_init_time;
         };
 
-        if (user_key_state && (cur_time - last_user_key_press > 1000))
+        if (user_kay_holding && (cur_time - last_user_key_press > 1000))
         {
             skip_release = true;
         }
@@ -223,11 +224,16 @@ int main()
                 if (user_key_state)
                 {
                     last_user_key_press = cur_time;
+                    user_kay_holding = true;
                 }
-                else if (!skip_release)
+                else
                 {
-                    screen_mode = (ScreenMode)(!(bool)screen_mode);
-                    force_screen_update = true;
+                    user_kay_holding = false;
+                    if (!skip_release)
+                    {
+                        screen_mode = (ScreenMode)(!(bool)screen_mode);
+                        force_screen_update = true;
+                    }
                 }
             }
         }
