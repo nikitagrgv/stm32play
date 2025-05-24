@@ -185,7 +185,7 @@ int main()
 
     bool mq2_calibrated = false;
 
-    constexpr int BUFFER_SIZE = 16+1;
+    constexpr int BUFFER_SIZE = 16 + 1;
     char buffer[BUFFER_SIZE];
 
     enum class ScreenMode
@@ -215,6 +215,7 @@ int main()
                 if (user_key_state)
                 {
                     screen_mode = (ScreenMode)(!(bool)screen_mode);
+                    force_screen_update = true;
 
                     // if (!mq2_initialized())
                     // {
@@ -243,15 +244,11 @@ int main()
             utils::sleepMsec(1000);
         }
 
-        if (cur_time - last_screen_update_time > SCREEN_UPDATE_PERIOD_MS)
+        if (force_screen_update || cur_time - last_screen_update_time > SCREEN_UPDATE_PERIOD_MS)
         {
             last_screen_update_time = cur_time;
 
-            float temp = 0;
-            float hum = 0;
-            const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
-
-            if (true)
+            if (screen_mode == ScreenMode::MQ2)
             {
                 if (mq2_initialized())
                 {
@@ -282,31 +279,38 @@ int main()
                     display.print(buffer);
                 }
             }
-            else if (error_code == DHT11Driver::ErrorCode::Success)
+            else
             {
-                display.clear();
+                float temp = 0;
+                float hum = 0;
+                const DHT11Driver::ErrorCode error_code = dht11.run(temp, hum);
 
-                display.goHome();
+                if (error_code == DHT11Driver::ErrorCode::Success)
+                {
+                    display.clear();
 
-                snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
-                display.print(buffer);
+                    display.goHome();
 
-                display.goToSecondLine();
+                    snprintf(buffer, BUFFER_SIZE, "T=%f", temp);
+                    display.print(buffer);
 
-                snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
-                display.print(buffer);
-            }
-            else if (error_code == DHT11Driver::ErrorCode::Timeout)
-            {
-                display.clear();
-                display.goHome();
-                display.print("DHT11 timeout");
-            }
-            else if (error_code == DHT11Driver::ErrorCode::InvalidChecksum)
-            {
-                display.clear();
-                display.goHome();
-                display.print("DHT11 invalid checksum");
+                    display.goToSecondLine();
+
+                    snprintf(buffer, BUFFER_SIZE, "H=%f", hum);
+                    display.print(buffer);
+                }
+                else if (error_code == DHT11Driver::ErrorCode::Timeout)
+                {
+                    display.clear();
+                    display.goHome();
+                    display.print("DHT11 timeout");
+                }
+                else if (error_code == DHT11Driver::ErrorCode::InvalidChecksum)
+                {
+                    display.clear();
+                    display.goHome();
+                    display.print("DHT11 invalid checksum");
+                }
             }
         }
 
