@@ -212,7 +212,7 @@ int main()
             if (new_user_key_state != user_key_state)
             {
                 user_key_state = new_user_key_state;
-                if (user_key_state)
+                if (!user_key_state)
                 {
                     screen_mode = (ScreenMode)(!(bool)screen_mode);
                     force_screen_update = true;
