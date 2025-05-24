@@ -195,6 +195,9 @@ int main()
     };
     ScreenMode screen_mode = ScreenMode::MQ2;
 
+    uint32_t last_user_key_press = glob::total_msec;
+    bool skip_release = false;
+
     while (true)
     {
         bool force_screen_update = false;
@@ -205,6 +208,11 @@ int main()
             return mq2_inited_force || cur_time >= mq2_end_init_time;
         };
 
+        if (user_key_state && (cur_time - last_user_key_press > 1000))
+        {
+            skip_release = true;
+        }
+
         if (cur_time - user_key_last_change_time > 10)
         {
             user_key_last_change_time = cur_time;
@@ -212,24 +220,14 @@ int main()
             if (new_user_key_state != user_key_state)
             {
                 user_key_state = new_user_key_state;
-                if (!user_key_state)
+                if (user_key_state)
+                {
+                    last_user_key_press = cur_time;
+                }
+                else if (!skip_release)
                 {
                     screen_mode = (ScreenMode)(!(bool)screen_mode);
                     force_screen_update = true;
-
-                    // if (!mq2_initialized())
-                    // {
-                    //     mq2_inited_force = true;
-                    //     io::printSyncFmt("Force MQ2 initialization\n");
-                    //     display.clear();
-                    //     display.goHome();
-                    //     display.print("MQ2 force init");
-                    //     utils::sleepMsec(1000);
-                    // }
-                    // else if (mq2_calibrated)
-                    // {
-                    //     mq2_calibrated = false;
-                    // }
                 }
             }
         }
