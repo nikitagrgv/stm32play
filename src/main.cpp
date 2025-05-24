@@ -212,6 +212,7 @@ int main()
         if (user_kay_holding && (cur_time - last_user_key_press > 1000))
         {
             skip_release = true;
+            user_kay_holding = false;
         }
 
         if (cur_time - user_key_last_change_time > 10)
