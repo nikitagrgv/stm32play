@@ -249,6 +249,7 @@ int main()
                         screen_mode = (ScreenMode)(!(bool)screen_mode);
                         force_screen_update = true;
                     }
+                    skip_release = false;
                 }
             }
         }
