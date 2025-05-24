@@ -193,6 +193,7 @@ int main()
     if (display_initialized)
     {
         display.print("Initialized");
+        utils::sleepMsec(500);
     }
     else
     {
