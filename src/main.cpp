@@ -193,6 +193,7 @@ int main()
     if (display_initialized)
     {
         display.setCursorEnabled(false);
+        display.setCursorBlinkingEnabled(false);
         display.print("Initialized");
         utils::sleepMsec(500);
     }
