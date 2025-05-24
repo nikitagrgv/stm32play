@@ -282,14 +282,18 @@ int main()
             }
         }
 
-        if (screen_mode == ScreenMode::MQ2 && mq2_initialized() && !mq2_calibrated)
+        if (mq2_initialized() && !mq2_calibrated)
         {
             mq2_calibrated = true;
             mq2.calibrate();
-            display.clear();
-            display.goHome();
-            display.print("MQ2 calibrated");
-            utils::sleepMsec(1000);
+
+            if (screen_mode == ScreenMode::MQ2)
+            {
+                display.clear();
+                display.goHome();
+                display.print("MQ2 calibrated");
+                utils::sleepMsec(1000);
+            }
         }
 
         if (force_screen_update || cur_time - last_screen_update_time > SCREEN_UPDATE_PERIOD_MS)
