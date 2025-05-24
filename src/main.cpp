@@ -81,7 +81,7 @@ int main()
         | rcc::TIM_1 | rcc::ADC_1);
 
 
-    // 2. Configure PA5 as analog input
+    // MQ2 Analog input
     constexpr Pin adc_pin{GPIOPort::A, 5};
     gpio::configureAnalog(adc_pin);
 
