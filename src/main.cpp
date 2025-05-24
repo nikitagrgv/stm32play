@@ -67,6 +67,32 @@ public:
     float getVoltage() const override { return readVoltageMQ2(); }
 };
 
+
+struct MQ2Command : public ICommand
+{
+    MQ2Command(MQ2Custom *mq2)
+        : mq2_(mq2)
+    {}
+
+    const char *name() override { return "mq2"; }
+
+    bool execute(const char *args) override
+    {
+        mq2_->updateRatio();
+        const uint32_t value_lpg = mq2_->readLPG();
+        const uint32_t value_methane = mq2_->readMethane();
+        const uint32_t value_smoke = mq2_->readSmoke();
+        const uint32_t value_hydrogen = mq2_->readHydrogen();
+
+        io::printSyncFmt("MQ2: Smoke = %3u; LPG = %3u; Methane = %3u; Hydrogen = %3u\n", value_smoke, value_lpg,
+            value_methane, value_hydrogen);
+
+        return true;
+    }
+
+    MQ2Custom *mq2_{};
+};
+
 int main()
 {
     glob::SYSTEM_CORE_CLOCK = calcSystemCoreClock();
